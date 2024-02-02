@@ -11,6 +11,8 @@ using UnityEngine;
 
 namespace Assets.Scenes{
 	public class ConnectionManager : MonoBehaviour{
+		public static Action ClientSignin;
+		
 		private const string InternalServerIp = "0.0.0.0";
 		private ushort _severDefaultPort = 7777;
 		private const ushort SeverMaxPlayer = 10;
@@ -43,6 +45,9 @@ namespace Assets.Scenes{
 			if(isStartServer){
 				StartServer();
 				await StartServerServices();
+			}
+			else{
+				ClientSignin?.Invoke();
 			}
 		}
 
