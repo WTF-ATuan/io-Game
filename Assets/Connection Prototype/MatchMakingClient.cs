@@ -20,12 +20,9 @@ namespace Assets.Scenes{
 		}
 
 		private async void SignIn(){
-			await ClientSignIn();
+			var initializationOptions = new InitializationOptions();
+			await UnityServices.InitializeAsync(initializationOptions);
 			await AuthenticationService.Instance.SignInAnonymouslyAsync();
-		}
-
-		private async Task ClientSignIn(){
-			await UnityServices.InitializeAsync();
 			Debug.Log($"Player Sign in with {PlayerID()}");
 		}
 
@@ -62,6 +59,7 @@ namespace Assets.Scenes{
 					case MultiplayAssignment.StatusOptions.Failed:
 						throw new Exception($"Ticket Fail: {multiplayAssignment.Message}");
 					case MultiplayAssignment.StatusOptions.InProgress:
+						Debug.Log($"Ticket Inprogress");
 						break;
 					case MultiplayAssignment.StatusOptions.Found:
 						gotAssignment = true;
@@ -77,6 +75,7 @@ namespace Assets.Scenes{
 			NetworkManager.Singleton.GetComponent<UnityTransport>()
 					.SetConnectionData(assignment.Ip, (ushort)assignment.Port);
 			NetworkManager.Singleton.StartClient();
+			Debug.Log($"Ip:{assignment.Ip} , Port:{assignment.Port}");
 		}
 
 		private string PlayerID(){
