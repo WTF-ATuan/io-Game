@@ -11,6 +11,8 @@ using UnityEngine;
 
 namespace Assets.Scenes{
 	public class MatchMakingClient : MonoBehaviour{
+		[SerializeField] private ClientStatusUI statusUI;
+		
 		private void OnEnable(){
 			ConnectionManager.ClientSignin += SignIn;
 		}
@@ -28,6 +30,7 @@ namespace Assets.Scenes{
 
 		public void StartMatch(){
 			CreatATicket();
+			statusUI.OnStartMatch();
 		}
 
 		private async void CreatATicket(){
@@ -59,7 +62,7 @@ namespace Assets.Scenes{
 					case MultiplayAssignment.StatusOptions.Failed:
 						throw new Exception($"Ticket Fail: {multiplayAssignment.Message}");
 					case MultiplayAssignment.StatusOptions.InProgress:
-						Debug.Log($"Ticket Inprogress");
+						statusUI.OnWaitingConnection();
 						break;
 					case MultiplayAssignment.StatusOptions.Found:
 						gotAssignment = true;
@@ -76,6 +79,7 @@ namespace Assets.Scenes{
 					.SetConnectionData(assignment.Ip, (ushort)assignment.Port);
 			NetworkManager.Singleton.StartClient();
 			Debug.Log($"Ip:{assignment.Ip} , Port:{assignment.Port}");
+			statusUI.OnConnect();
 		}
 
 		private string PlayerID(){
