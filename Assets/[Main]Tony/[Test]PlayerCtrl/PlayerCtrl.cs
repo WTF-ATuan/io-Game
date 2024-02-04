@@ -22,6 +22,11 @@ public class PlayerCtrl : MonoBehaviour {
     private void FixedUpdate()
     {
         LastActionData = new PlayerActionData(this);
-        transform.position = LastActionData.Pos;
+        UpdateAction(LastActionData);
+    }
+
+    void UpdateAction(PlayerActionData ActionData) {
+        transform.position = ActionData.Pos;
+        transform.eulerAngles = new Vector3(0, 0, ActionData.Towards);
     }
 }

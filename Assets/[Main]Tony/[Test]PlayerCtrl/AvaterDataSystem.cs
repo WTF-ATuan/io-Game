@@ -7,10 +7,12 @@ using Zenject;
 public class AvaterData {
     
     public float MoveSpeed;
+    public float RotSpeed;
     public float MoveFriction;
 
-    public AvaterData(float moveSpeed, float moveFriction) {
+    public AvaterData(float moveSpeed,float rotSpeed, float moveFriction) {
         MoveSpeed = moveSpeed;
+        RotSpeed = rotSpeed;
         MoveFriction = moveFriction;
     }
 }
@@ -25,7 +27,7 @@ public class AvaterDataCtrl : IAvaterDataCtrl {
 
     public virtual Dictionary<int, AvaterData> DataLoad() {
         var data = new Dictionary<int, AvaterData>();
-        data.Add(0,new AvaterData(7f, 0.07f));
+        data.Add(0,new AvaterData(7f, 0.1f,0.07f));
         return data;
     }
 
