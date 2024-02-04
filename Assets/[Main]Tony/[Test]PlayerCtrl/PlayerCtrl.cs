@@ -26,12 +26,10 @@ public class PlayerCtrl : MonoBehaviour {
         ServerTest();
     }
 
-    async Task ServerTest()
-    {
-        while (true)
-        {
-           
-            await Task.Delay(1000);
+    async Task ServerTest() {
+        while (true) {
+            ActionData.ClientDataRefresh();//todo ServerDataRefresh
+            await Task.Delay(50);
         }
     }
 

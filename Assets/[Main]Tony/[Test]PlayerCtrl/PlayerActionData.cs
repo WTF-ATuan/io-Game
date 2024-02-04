@@ -18,12 +18,23 @@ public class PlayerActionData
         TimeStamp = Time.time; //todo change to serverSyncTime
         Pos = Player.transform.position;
     }
+
+    public void ServerDataRefresh(PlayerActionData data) {
+        Pos = data.Pos;
+        TargetVec = data.TargetVec;
+        NowVec = data.NowVec;
+        Towards = data.Towards;
+        RotVec = data.RotVec;
+    }
+    public void ClientDataRefresh()
+    {
+        Pos = (Vector2) Player.transform.position;
+        TargetVec = Player.InputCtrl.MoveJoy();
+    }
     
     public void LocalUpdate() {
         float missTime = Time.time-TimeStamp;
         TimeStamp = Time.time; //todo change to serverSyncTime
-        TargetVec = Player.InputCtrl.MoveJoy();
-        Pos = (Vector2) Player.transform.position;
 
         Vector2 vec = TargetVec - NowVec;
         Vector2 direction = vec.normalized;
@@ -37,7 +48,7 @@ public class PlayerActionData
       
         float targetTowards = TargetVec != Vector2.zero ? TargetVec.Angle() : Towards;
         Towards = Mathf.SmoothDampAngle(Towards, targetTowards, ref RotVec, Player.AvaterData.RotSpeed);
-        Pos = (Vector2)Player.transform.position + NowVec * Player.AvaterData.MoveSpeed * missTime;
+        Pos = Pos + NowVec * Player.AvaterData.MoveSpeed * missTime;
     }
 
 }
