@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Mono.CSharp;
 using UnityEngine;
 using Zenject;
@@ -10,23 +11,38 @@ public class PlayerCtrl : MonoBehaviour {
     public IInput InputCtrl { get; private set; }
     public AvaterData AvaterData { get; private set; }
     
-    public PlayerActionData LastActionData{ get; private set; }
+    public PlayerActionData ActionData{ get; private set; }
 
     [Inject]
     void Constructor(IAvaterDataCtrl AvaterDataCtrl, IInput inputCtrl)
     {
         InputCtrl = inputCtrl;
         AvaterData = AvaterDataCtrl.GetData(0);
-    }
-    
-    private void FixedUpdate()
-    {
-        LastActionData = new PlayerActionData(this);
-        UpdateAction(LastActionData);
+        ActionData = new PlayerActionData(this);
     }
 
-    void UpdateAction(PlayerActionData ActionData) {
+    private void Start()
+    {
+        ServerTest();
+    }
+
+    async Task ServerTest()
+    {
+        while (true)
+        {
+           
+            await Task.Delay(1000);
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        ActionData.LocalUpdate();
+        UpdateAction();
+    }
+
+    void UpdateAction() {
         transform.position = ActionData.Pos;
-        transform.eulerAngles = new Vector3(0, 0, ActionData.Towards);
+        transform.eulerAngles = new Vector3(0,0,ActionData.Towards);
     }
 }
