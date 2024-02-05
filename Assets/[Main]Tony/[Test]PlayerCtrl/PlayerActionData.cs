@@ -8,6 +8,7 @@ public class PlayerActionData
     public Vector2 Pos;
     public Vector2 TargetVec;
     public Vector2 NowVec;
+    public Vector2 AimPos;
     public float Towards;
     public float RotVec;
 
@@ -30,6 +31,7 @@ public class PlayerActionData
     {
         Pos = (Vector2) Player.transform.position;
         TargetVec = Player.InputCtrl.MoveJoy();
+        AimPos = Player.InputCtrl.AimJoy();
     }
     
     public void LocalUpdate() {
@@ -45,10 +47,11 @@ public class PlayerActionData
             newVec = NowVec+direction * Mathf.Min(moveFriction, distance);
         }
         NowVec = newVec;
-      
-        float targetTowards = TargetVec != Vector2.zero ? TargetVec.Angle() : Towards;
-        Towards = Mathf.SmoothDampAngle(Towards, targetTowards, ref RotVec, Player.AvaterData.RotSpeed);
         Pos = Pos + NowVec * Player.AvaterData.MoveSpeed * missTime;
+        
+        //Towards
+        float targetTowards = AimPos == Vector2.zero ? TargetVec != Vector2.zero ? TargetVec.Angle() : Towards : AimPos.Angle();
+        Towards = Mathf.SmoothDampAngle(Towards, targetTowards, ref RotVec, Player.AvaterData.RotSpeed);
     }
 
 }

@@ -5,15 +5,32 @@ using Zenject;
 
 public interface IInput {
     public Vector2 MoveJoy();
+    public Vector2 AimJoy();
 }
 
-public class PCInput : IInput {
+public class PCInput : IInput
+{
+    [Inject] 
+    private IBattleCtrl BattleCtrl;
+    
     public Vector2 MoveJoy() {
         Vector2 data = new Vector2();
         if (Input.GetKey(KeyCode.A)) data += new Vector2(-1,  0);
         if (Input.GetKey(KeyCode.D)) data += new Vector2( 1,  0);
         if (Input.GetKey(KeyCode.W)) data += new Vector2( 0,  1);
         if (Input.GetKey(KeyCode.S)) data += new Vector2( 0, -1);
+        return data.normalized;
+    }
+
+    public Vector2 AimJoy()
+    {
+        Vector2 data = Vector2.zero;
+        if (Input.GetMouseButton(0)) {
+            Vector3 playerPos = BattleCtrl.GetLocalPlayer().transform.position;
+            playerPos = Camera.main.WorldToScreenPoint(playerPos);
+            Vector3 mousePos = Input.mousePosition;
+            data = mousePos - playerPos;
+        }
         return data.normalized;
     }
 }
@@ -24,10 +41,23 @@ public class AndroidInput : IInput {
         //todo
         return data;
     }
+
+    public Vector2 AimJoy()
+    {
+        Vector2 data = new Vector2();
+        //todo
+        return data;
+    }
 }
 
 public class IPhoneInput : IInput {
     public Vector2 MoveJoy() {
+        Vector2 data = new Vector2();
+        //todo
+        return data;
+    }
+    public Vector2 AimJoy()
+    {
         Vector2 data = new Vector2();
         //todo
         return data;

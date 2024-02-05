@@ -54,6 +54,6 @@ public class AvaterDataSystem : MonoInstaller
     public override void InstallBindings() {
         //todo 
         //Container.Bind<IAvaterDataCtrl>().To<ServerAvaterDataCtrl>().FromNew().AsSingle();
-        Container.Bind<IAvaterDataCtrl>().To<DemoAvaterDataCtrl>().FromNew().AsSingle();
+        Container.Bind<IAvaterDataCtrl>().To<DemoAvaterDataCtrl>().FromNew().AsSingle().NonLazy();
     }
 }
