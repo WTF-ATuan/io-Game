@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerActionData
+public class AvaterStateData
 {
     public float TimeStamp;
+    
     public Vector2 Pos;
     public Vector2 TargetVec;
     public Vector2 NowVec;
@@ -12,15 +13,19 @@ public class PlayerActionData
     public float Towards;
     public float RotVec;
 
+    public float Power;//0~1
+
     protected PlayerCtrl Player;
-    public PlayerActionData(PlayerCtrl player)
+    public AvaterStateData(PlayerCtrl player)
     {
         Player = player;
         TimeStamp = Time.time; //todo change to serverSyncTime
         Pos = Player.transform.position;
+
+        Power = 1;
     }
 
-    public void ServerDataRefresh(PlayerActionData data) {
+    public void ServerDataRefresh(AvaterStateData data) {
         Pos = data.Pos;
         TargetVec = data.TargetVec;
         NowVec = data.NowVec;
@@ -31,7 +36,19 @@ public class PlayerActionData
     {
         Pos = (Vector2) Player.transform.position;
         TargetVec = Player.InputCtrl.MoveJoy();
-        AimPos = Player.InputCtrl.AimJoy();
+        var newAimPos = Player.InputCtrl.AimJoy();
+
+        if (AimPos != Vector2.zero && newAimPos == Vector2.zero) {
+            int maxBullet = Player.Loadout.NowAttribute.MaxBullet;
+            if (maxBullet > 0) {
+                float powerNeed = 1f / maxBullet;
+                if (Power >= powerNeed) {
+                    //todo Shoot
+                    Power = Mathf.Clamp01(Power-powerNeed);
+                }
+            }
+        }
+        AimPos = newAimPos;
     }
     
     public void LocalUpdate() {
@@ -42,16 +59,19 @@ public class PlayerActionData
         Vector2 direction = vec.normalized;
         Vector2 newVec = TargetVec;
         float distance = vec.magnitude;
-        float moveFriction = Player.AvaterData.MoveFriction;
+        float moveFriction = AvaterAttribute.MoveFriction;
         if (distance > moveFriction) {
             newVec = NowVec+direction * Mathf.Min(moveFriction, distance);
         }
         NowVec = newVec;
-        Pos = Pos + NowVec * Player.AvaterData.MoveSpeed * missTime;
+        Pos = Pos + NowVec * Player.BaseAttribute.MoveSpeed * missTime;
         
         //Towards
         float targetTowards = AimPos == Vector2.zero ? TargetVec != Vector2.zero ? TargetVec.Angle() : Towards : AimPos.Angle();
-        Towards = Mathf.SmoothDampAngle(Towards, targetTowards, ref RotVec, Player.AvaterData.RotSpeed);
+        Towards = Mathf.SmoothDampAngle(Towards, targetTowards, ref RotVec, AvaterAttribute.RotSpeed);
+        
+        //Power
+        Power = Mathf.Clamp01(Power+missTime / Player.Loadout.NowAttribute.PowerChargeToFullSec);
     }
 
 }
