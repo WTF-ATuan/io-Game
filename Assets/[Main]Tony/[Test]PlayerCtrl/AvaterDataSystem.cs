@@ -44,18 +44,20 @@ public class Weapon : InsertThing
 {
     public Dictionary<AttributeType, float> AttributeBonus;
 
-    public Weapon(int maxBullet, float powerChargeToFullSec, float damage) {
+    public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD) {
         AttributeBonus = new Dictionary<AttributeType, float>();
         AttributeBonus.Add(AttributeType.MaxBullet, maxBullet);
         AttributeBonus.Add(AttributeType.PowerChargeToFullSec, powerChargeToFullSec);
         AttributeBonus.Add(AttributeType.Damage, damage);
+        AttributeBonus.Add(AttributeType.ShootCD, shootCD);
     }
     
     public override object Clone() {
         var clone = new Weapon(
             (int)AttributeBonus[AttributeType.MaxBullet], 
             AttributeBonus[AttributeType.PowerChargeToFullSec],
-            AttributeBonus[AttributeType.Damage]);
+            AttributeBonus[AttributeType.Damage],
+            AttributeBonus[AttributeType.ShootCD]);
         return clone;
     }
 }
@@ -191,6 +193,7 @@ public enum AttributeType {
     MaxBullet,
     PowerChargeToFullSec,
     Damage,
+    ShootCD,
 }
 
 public class AvaterAttribute {
@@ -202,6 +205,7 @@ public class AvaterAttribute {
     public int MaxBullet = 0;
     public float PowerChargeToFullSec = 0;
     public float Damage = 0;
+    public float ShootCD = 0;
     
     //NotChange
     public const float HealthChargeToFullSec = 3f;
@@ -220,6 +224,7 @@ public class AvaterAttribute {
         MaxBullet = copy.MaxBullet;
         PowerChargeToFullSec = copy.PowerChargeToFullSec;
         Damage = copy.Damage;
+        ShootCD = copy.ShootCD;
     }
     
     public void Copy(AvaterAttribute copy) {
@@ -228,6 +233,7 @@ public class AvaterAttribute {
         MaxBullet = copy.MaxBullet;
         PowerChargeToFullSec = copy.PowerChargeToFullSec;
         Damage = copy.Damage;
+        ShootCD = copy.ShootCD;
     }
 
     public void AddAttribute(AttributeType type, float value) {
@@ -247,6 +253,9 @@ public class AvaterAttribute {
                 break;
             case AttributeType.Damage:
                 Damage += value;
+                break;
+            case AttributeType.ShootCD:
+                ShootCD += value;
                 break;
         }
     }

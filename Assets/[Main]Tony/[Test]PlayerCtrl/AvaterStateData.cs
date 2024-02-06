@@ -14,6 +14,7 @@ public class AvaterStateData
     public float RotVec;
 
     public float Power;//0~1
+    public float ShootCD;
 
     protected PlayerCtrl Player;
     public AvaterStateData(PlayerCtrl player)
@@ -34,17 +35,22 @@ public class AvaterStateData
     }
     public void ClientDataRefresh()
     {
+        float nowTime = Time.time;
         Pos = (Vector2) Player.transform.position;
         TargetVec = Player.InputCtrl.MoveJoy();
         var newAimPos = Player.InputCtrl.AimJoy();
 
         if (AimPos != Vector2.zero && newAimPos == Vector2.zero) {
+            if (ShootCD>nowTime) return;
             int maxBullet = Player.Loadout.NowAttribute.MaxBullet;
             if (maxBullet > 0) {
                 float powerNeed = 1f / maxBullet;
                 if (Power >= powerNeed) {
                     //todo Shoot
                     Power = Mathf.Clamp01(Power-powerNeed);
+                    ShootCD = nowTime+Player.Loadout.NowAttribute.ShootCD;
+                    Towards = AimPos.Angle();
+                    RotVec = 0;
                 }
             }
         }

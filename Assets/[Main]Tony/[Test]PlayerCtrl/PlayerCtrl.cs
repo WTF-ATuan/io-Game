@@ -37,7 +37,7 @@ public class PlayerCtrl : MonoBehaviour
         HealthBar.Obj.transform.parent = transform;
         RecycleThings.Add(HealthBar);
 
-        Weapon weapon = new Weapon(3,6,1000);
+        Weapon weapon = new Weapon(3,6,1000, 0.5f);
         Loadout.SetWeapon(weapon,out List<Item> unload);
     }
 
