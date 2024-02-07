@@ -3,9 +3,6 @@ using UnityEngine;
 
 namespace Networking_Feature.Player{
 	public class AreaConnectionHandler : MonoBehaviour{
-		
-		
-		
 		/// <summary>
 		/// host => 1 , client => 2 , server => 3
 		/// </summary>
