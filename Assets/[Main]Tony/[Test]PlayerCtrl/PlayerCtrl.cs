@@ -5,7 +5,7 @@ using UnityEngine;
 using Zenject;
 
 
-public class PlayerCtrl : MonoBehaviour{
+public class PlayerCtrl : NetworkBehaviour{
 	public Transform body;
 
 	private IInput InputCtrl{ get; set; }
@@ -38,20 +38,26 @@ public class PlayerCtrl : MonoBehaviour{
 		Loadout.SetWeapon(weapon, out var unload);
 	}
 
-	private void OnDestroy(){
+	public override void OnDestroy(){
+		base.OnDestroy();
 		foreach(var thing in _recycleThings){
 			thing.Dispose();
 		}
 	}
 
 	private void FixedUpdate(){
+		if(!IsOwner) return;
+		CalculateActionData();
+	}
+
+	private void CalculateActionData(){
+		StateData.ClientDataRefresh();
+		StateData.LocalUpdate();
 		UpdateActionRequestServerRPC();
 	}
 
-	[ServerRpc]
+	[ServerRpc(RequireOwnership = false)]
 	private void UpdateActionRequestServerRPC(){
-		StateData.ClientDataRefresh();
-		StateData.LocalUpdate();
 		transform.position = StateData.Pos;
 		body.eulerAngles = new Vector3(0, 0, StateData.Towards);
 	}

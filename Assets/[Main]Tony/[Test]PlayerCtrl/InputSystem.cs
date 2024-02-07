@@ -26,7 +26,9 @@ public class PCInput : IInput
     {
         Vector2 data = Vector2.zero;
         if (Input.GetMouseButton(0)) {
-            Vector3 playerPos = BattleCtrl.GetLocalPlayer().transform.position;
+            var localPlayer = BattleCtrl.GetLocalPlayer();
+            if(!localPlayer) return Vector2.zero;
+            Vector3 playerPos = localPlayer.transform.position;
             playerPos = Camera.main.WorldToScreenPoint(playerPos);
             Vector3 mousePos = Input.mousePosition;
             data = mousePos - playerPos;
