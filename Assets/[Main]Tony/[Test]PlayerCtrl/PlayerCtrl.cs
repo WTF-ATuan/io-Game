@@ -1,74 +1,60 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using UniRx;
+using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
 
-public class PlayerCtrl : MonoBehaviour
-{
-    public Transform Body;
-    
-    public IInput InputCtrl { get; private set; }
-    public AvaterAttribute BaseAttribute { get; private set; }
-    public AvaterStateData StateData { get; private set; }
-    public PlayerLoadout Loadout{ get; private set; }
-    public PoolObj<HealthBarCtrl> HealthBar{ get; private set; }
+public class PlayerCtrl : MonoBehaviour{
+	public Transform body;
 
-    private List<IDisposable> RecycleThings;
+	private IInput InputCtrl{ get; set; }
+	private AvaterAttribute BaseAttribute{ get; set; }
+	private AvaterStateData StateData{ get; set; }
+	private PlayerLoadout Loadout{ get; set; }
+	private PoolObj<HealthBarCtrl> HealthBar{ get; set; }
 
-    [Inject]
-    void Constructor(
-        IAvaterAttributeCtrl avaterAttributeCtrl, 
-        IInput inputCtrl,
-        IBattleCtrl battleCtrl,
-        ObjPoolCtrl<HealthBarCtrl> healthBarPool)
-    {
-        battleCtrl.SetLocalPlayer(this);
-        RecycleThings = new List<IDisposable>();
-        InputCtrl = inputCtrl;
-        BaseAttribute = avaterAttributeCtrl.GetData();
-        StateData = new AvaterStateData(this);
-        Loadout = new PlayerLoadout(BaseAttribute);
-        
-        HealthBar = healthBarPool.Get();
-        HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateData);
-        HealthBar.Obj.transform.parent = transform;
-        RecycleThings.Add(HealthBar);
+	private List<IDisposable> _recycleThings;
 
-        Weapon weapon = new Weapon(3,6,1000, 0.5f);
-        Loadout.SetWeapon(weapon,out List<Item> unload);
-    }
+	[Inject]
+	private void Initialization(
+		IAvaterAttributeCtrl avaterAttributeCtrl,
+		IInput inputCtrl,
+		IBattleCtrl battleCtrl,
+		ObjPoolCtrl<HealthBarCtrl> healthBarPool){
+		battleCtrl.SetLocalPlayer(this);
+		_recycleThings = new List<IDisposable>();
+		InputCtrl = inputCtrl;
+		BaseAttribute = avaterAttributeCtrl.GetData();
+		Loadout = new PlayerLoadout(BaseAttribute);
 
-    private void OnDestroy() {
-        foreach (var thing in RecycleThings) {
-            thing.Dispose();
-        }
-    }
+		StateData = new AvaterStateData(InputCtrl, Loadout, transform, BaseAttribute);
+		HealthBar = healthBarPool.Get();
+		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateData);
+		HealthBar.Obj.transform.parent = transform;
+		_recycleThings.Add(HealthBar);
 
-    private void Start() { }
+		var weapon = new Weapon(3, 6, 1000, 0.5f);
+		Loadout.SetWeapon(weapon, out var unload);
+	}
 
-    /*
-    async Task ServerTest() {
-        while (true) {
-            ActionData.ServerDataRefresh();
-            await Task.Delay(50);
-        }
-    }
-    */
+	private void OnDestroy(){
+		foreach(var thing in _recycleThings){
+			thing.Dispose();
+		}
+	}
 
-    private void FixedUpdate() {
-        UpdateAction();
-    }
+	private void FixedUpdate(){
+		UpdateActionRequestServerRPC();
+	}
 
-    void UpdateAction() {
-        StateData.ClientDataRefresh();
-        StateData.LocalUpdate();
-        transform.position = StateData.Pos;
-        Body.eulerAngles = new Vector3(0,0,StateData.Towards);
-    }
-    
-    //TODO 能量子彈充能&UI生成
+	[ServerRpc]
+	private void UpdateActionRequestServerRPC(){
+		StateData.ClientDataRefresh();
+		StateData.LocalUpdate();
+		transform.position = StateData.Pos;
+		body.eulerAngles = new Vector3(0, 0, StateData.Towards);
+	}
 
+	//TODO 能量子彈充能&UI生成
 }
