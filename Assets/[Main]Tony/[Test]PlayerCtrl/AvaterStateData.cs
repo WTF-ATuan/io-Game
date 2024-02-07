@@ -14,6 +14,14 @@ public class AvaterStateData{
 
 	public float Power; //0~1
 	public float ShootCd;
+    public bool IsAim => AimPos != Vector2.zero;
+
+    protected PlayerCtrl Player;
+    public AvaterStateData(PlayerCtrl player)
+    {
+        Player = player;
+        TimeStamp = Time.time; //todo change to serverSyncTime
+        Pos = Player.transform.position;
 
 	private readonly IInput _input;
 	private readonly PlayerLoadout _loadout;
@@ -39,6 +47,24 @@ public class AvaterStateData{
 		Towards = data.Towards;
 		RotVec = data.RotVec;
 	}
+        Vector2 vec = TargetVec - NowVec;
+        Vector2 direction = vec.normalized;
+        Vector2 newVec = TargetVec;
+        float distance = vec.magnitude;
+        float moveFriction = AvaterAttribute.MoveFriction;
+        if (distance > moveFriction) {
+            newVec = NowVec+direction * Mathf.Min(moveFriction, distance);
+        }
+        NowVec = newVec;
+        Pos = Pos + NowVec * Player.BaseAttribute.MoveSpeed * missTime;
+        
+        //Towards
+        float targetTowards = !IsAim ? TargetVec != Vector2.zero ? TargetVec.Angle() : Towards : AimPos.Angle();
+        Towards = Mathf.SmoothDampAngle(Towards, targetTowards, ref RotVec, AvaterAttribute.RotSpeed);
+        
+        //Power
+        Power = Mathf.Clamp01(Power+missTime / Player.Loadout.NowAttribute.PowerChargeToFullSec);
+    }
 
 	public void ClientDataRefresh(){
 		float nowTime = Time.time;
