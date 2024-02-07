@@ -44,15 +44,12 @@ public class Weapon : InsertThing
 {
     public Dictionary<AttributeType, float> AttributeBonus;
 
-    public RangePreviewData RangePreview;
-
-    public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, RangePreviewData rangePreview) {
+    public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD) {
         AttributeBonus = new Dictionary<AttributeType, float>();
         AttributeBonus.Add(AttributeType.MaxBullet, maxBullet);
         AttributeBonus.Add(AttributeType.PowerChargeToFullSec, powerChargeToFullSec);
         AttributeBonus.Add(AttributeType.Damage, damage);
         AttributeBonus.Add(AttributeType.ShootCD, shootCD);
-        RangePreview = rangePreview;
     }
     
     public override object Clone() {
@@ -60,8 +57,7 @@ public class Weapon : InsertThing
             (int)AttributeBonus[AttributeType.MaxBullet], 
             AttributeBonus[AttributeType.PowerChargeToFullSec],
             AttributeBonus[AttributeType.Damage],
-            AttributeBonus[AttributeType.ShootCD], 
-            RangePreview);
+            AttributeBonus[AttributeType.ShootCD]);
         return clone;
     }
 }
