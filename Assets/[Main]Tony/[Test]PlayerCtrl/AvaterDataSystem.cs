@@ -43,13 +43,15 @@ public class UltSkill : InsertThing
 public class Weapon : InsertThing
 {
     public Dictionary<AttributeType, float> AttributeBonus;
-
-    public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD) {
+    public RangePreviewData RangePreview;
+    
+    public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, RangePreviewData rangePreview) {
         AttributeBonus = new Dictionary<AttributeType, float>();
         AttributeBonus.Add(AttributeType.MaxBullet, maxBullet);
         AttributeBonus.Add(AttributeType.PowerChargeToFullSec, powerChargeToFullSec);
         AttributeBonus.Add(AttributeType.Damage, damage);
         AttributeBonus.Add(AttributeType.ShootCD, shootCD);
+        RangePreview = rangePreview;
     }
     
     public override object Clone() {
@@ -57,7 +59,8 @@ public class Weapon : InsertThing
             (int)AttributeBonus[AttributeType.MaxBullet], 
             AttributeBonus[AttributeType.PowerChargeToFullSec],
             AttributeBonus[AttributeType.Damage],
-            AttributeBonus[AttributeType.ShootCD]);
+            AttributeBonus[AttributeType.ShootCD],
+            RangePreview);
         return clone;
     }
 }

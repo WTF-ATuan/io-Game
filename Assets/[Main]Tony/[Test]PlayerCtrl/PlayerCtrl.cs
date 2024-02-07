@@ -15,6 +15,7 @@ public class PlayerCtrl : MonoBehaviour{
 	private PoolObj<HealthBarCtrl> HealthBar{ get; set; }
 
 	private List<IDisposable> _recycleThings;
+	private RangePreviewCtrl RangePreview;
 
 	[Inject]
 	private void Initialization(
@@ -33,8 +34,9 @@ public class PlayerCtrl : MonoBehaviour{
 		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateData);
 		HealthBar.Obj.transform.parent = transform;
 		_recycleThings.Add(HealthBar);
-
-		var weapon = new Weapon(3, 6, 1000, 0.5f);
+		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
+		
+		var weapon = new Weapon(3, 6, 1000, 0.5f,new RangePreviewData{Radius = 1,SectorAngle = 0.1f});
 		Loadout.SetWeapon(weapon, out var unload);
 	}
 
@@ -54,6 +56,12 @@ public class PlayerCtrl : MonoBehaviour{
 		StateData.LocalUpdate();
 		transform.position = StateData.Pos;
 		body.eulerAngles = new Vector3(0, 0, StateData.Towards);
+		
+		
+		if (StateData.IsAim) {
+			RangePreview.Setup(Loadout.GetWeaponInfo(out Item[] i).RangePreview,StateData.AimPos.Angle());
+		} else
+			RangePreview.Setup();
 	}
 
 	//TODO 能量子彈充能&UI生成
