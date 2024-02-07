@@ -24,7 +24,7 @@ public class RangePreviewCtrl : MonoBehaviour
         M.SetFloat(Towards, towards);
         M.SetFloat(Radius, data.Radius);
         M.SetFloat(SectorAngle, data.SectorAngle);
-        if(!gameObject.activeSelf)gameObject.SetActive(true);
+        if(!gameObject.activeSelf) gameObject.SetActive(true);
     }
 }
 
