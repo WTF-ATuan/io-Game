@@ -33,6 +33,7 @@ public class AvaterStateData
         Towards = data.Towards;
         RotVec = data.RotVec;
     }
+    
     public void ClientDataRefresh()
     {
         float nowTime = Time.time;
