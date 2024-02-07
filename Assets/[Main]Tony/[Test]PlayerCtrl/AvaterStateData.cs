@@ -16,6 +16,8 @@ public class AvaterStateData
     public float Power;//0~1
     public float ShootCD;
 
+    public bool IsAim => AimPos != Vector2.zero;
+
     protected PlayerCtrl Player;
     public AvaterStateData(PlayerCtrl player)
     {
@@ -74,7 +76,7 @@ public class AvaterStateData
         Pos = Pos + NowVec * Player.BaseAttribute.MoveSpeed * missTime;
         
         //Towards
-        float targetTowards = AimPos == Vector2.zero ? TargetVec != Vector2.zero ? TargetVec.Angle() : Towards : AimPos.Angle();
+        float targetTowards = !IsAim ? TargetVec != Vector2.zero ? TargetVec.Angle() : Towards : AimPos.Angle();
         Towards = Mathf.SmoothDampAngle(Towards, targetTowards, ref RotVec, AvaterAttribute.RotSpeed);
         
         //Power
