@@ -35,8 +35,8 @@ public class PlayerCtrl : NetworkBehaviour{
 		HealthBar.Obj.transform.parent = transform;
 		_recycleThings.Add(HealthBar);
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
-		
-		var weapon = new Weapon(3, 6, 1000, 0.5f,new RangePreviewData{Radius = 1,SectorAngle = 0.1f});
+
+		var weapon = new Weapon(3, 6, 1000, 0.5f, new RangePreviewData{ Radius = 1, SectorAngle = 0.1f });
 		Loadout.SetWeapon(weapon, out var unload);
 	}
 
@@ -55,19 +55,20 @@ public class PlayerCtrl : NetworkBehaviour{
 	private void CalculateActionData(){
 		StateData.ClientDataRefresh();
 		StateData.LocalUpdate();
-		UpdateActionRequestServerRPC();
+		transform.position = StateData.Pos;
+		body.eulerAngles = new Vector3(0, 0, StateData.Towards);
+		// UpdateActionRequestServerRPC(StateData.Pos, StateData.Towards);
 	}
 
 	[ServerRpc(RequireOwnership = false)]
-	private void UpdateActionRequestServerRPC(){
-		transform.position = StateData.Pos;
-		body.eulerAngles = new Vector3(0, 0, StateData.Towards);
-		
-		
-		if (StateData.IsAim) {
-			RangePreview.Setup(Loadout.GetWeaponInfo(out Item[] i).RangePreview,StateData.AimPos.Angle());
-		} else
-			RangePreview.Setup();
+	private void UpdateActionRequestServerRPC(Vector3 momentPos, float toWardValue){
+		transform.position = momentPos;
+		body.eulerAngles = new Vector3(0, 0, toWardValue);
+
+		// if (StateData.IsAim) {
+		// 	RangePreview.Setup(Loadout.GetWeaponInfo(out Item[] i).RangePreview,StateData.AimPos.Angle());
+		// } else
+		// RangePreview.Setup();
 	}
 
 	//TODO 能量子彈充能&UI生成
