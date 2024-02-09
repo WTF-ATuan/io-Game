@@ -467,8 +467,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Start Host
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c94cd367b6e44f24d8134fca5528bbb4, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: c94cd367b6e44f24d8134fca5528bbb4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1036,8 +1036,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Start Client
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c94cd367b6e44f24d8134fca5528bbb4, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: c94cd367b6e44f24d8134fca5528bbb4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1489,6 +1489,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HealthBarPrefab: {fileID: 5559527280960405735, guid: a5908252a2065934fb02a8ad3768bea6, type: 3}
+  ButtetPrefab: {fileID: 6241490092801916763, guid: 65cdc8585c4055c4185e26a1338e8979, type: 3}
 --- !u!1 &8969108613730107242
 GameObject:
   m_ObjectHideFlags: 0

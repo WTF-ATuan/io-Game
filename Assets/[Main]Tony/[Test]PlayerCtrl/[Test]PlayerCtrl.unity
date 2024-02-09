@@ -478,6 +478,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HealthBarPrefab: {fileID: 5559527280960405735, guid: a5908252a2065934fb02a8ad3768bea6, type: 3}
+  ButtetPrefab: {fileID: 0}
 --- !u!1001 &1070923633
 PrefabInstance:
   m_ObjectHideFlags: 0

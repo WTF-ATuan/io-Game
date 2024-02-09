@@ -11,6 +11,12 @@ public static class Mathff
         return degrees;
     }
     
+    public static Vector2 ToVec2(this float ang)
+    {
+        float radians = ang * Mathf.Deg2Rad; // 将角度转换为弧度
+        return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
+    }
+    
     public static float AngleBetween(this float angle1, float angle2)
     {
         float difference = angle2 - angle1;

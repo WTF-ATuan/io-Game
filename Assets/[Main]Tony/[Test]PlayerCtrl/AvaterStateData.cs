@@ -6,6 +6,7 @@ public class AvaterStateData{
 	public Vector2 TargetVec;
 	public Vector2 NowVec;
 	public Vector2 AimPos;
+	public Vector2 LastAimPos;
 	public float Towards;
 	public float RotVec;
 
@@ -40,27 +41,16 @@ public class AvaterStateData{
 	}
 
 	public void ClientDataRefresh(){
-		float nowTime = Time.time;
 		Pos = (Vector2)_playerTransform.position;
 		TargetVec = _input.MoveJoy();
-		var newAimPos = _input.AimJoy();
+		LastAimPos = AimPos;
+		AimPos = _input.AimJoy();
 
-		if(AimPos != Vector2.zero && newAimPos == Vector2.zero){
-			if(ShootCd > nowTime) return;
-			int maxBullet = _loadout.NowAttribute.MaxBullet;
-			if(maxBullet > 0){
-				float powerNeed = 1f / maxBullet;
-				if(Power >= powerNeed){
-					//todo Shoot
-					Power = Mathf.Clamp01(Power - powerNeed);
-					ShootCd = nowTime + _loadout.NowAttribute.ShootCD;
-					Towards = AimPos.Angle();
-					RotVec = 0;
-				}
-			}
-		}
-
-		AimPos = newAimPos;
+		var weapon = _loadout.GetWeaponInfo();
+		if (weapon != null && weapon.CanShoot(this)) {
+			Towards = AimPos.Angle();
+			RotVec = 0;
+		} 
 	}
 
 	public void LocalUpdate(){

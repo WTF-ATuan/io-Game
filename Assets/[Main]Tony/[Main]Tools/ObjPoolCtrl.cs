@@ -5,9 +5,8 @@ using UnityEngine;
 
 public delegate GameObject GetGameObject();
 
-public class ObjPoolCtrl<T>:IDisposable where T : Component
-{
-
+public class ObjPoolCtrl<T>:IDisposable where T : Component {
+    
     private GetGameObject CreateFunc;
     private Action DisposFunc;
     private List<GameObject> ActivePool;

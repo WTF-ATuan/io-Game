@@ -40,10 +40,40 @@ public class UltSkill : InsertThing
     }
 }
 
-public class Weapon : InsertThing
+
+public interface IWeaponFactory
+{
+    T Create<T>(params object[] parameters) where T : Weapon;
+}
+
+public class WeaponFactory : IWeaponFactory
+{
+    private readonly DiContainer _container;
+
+    public WeaponFactory(DiContainer container)
+    {
+        _container = container;
+    }
+
+    public T Create<T>(params object[] parameters) where T : Weapon
+    {
+        var instance = (T)Activator.CreateInstance(typeof(T), parameters);
+        _container.Inject(instance);
+        return instance;
+    }
+}
+public abstract class Weapon : InsertThing
 {
     public Dictionary<AttributeType, float> AttributeBonus;
     public RangePreviewData RangePreview;
+    protected ObjPoolCtrl<BulletCtrl> BulletPool;
+
+    [Inject]
+    private void Initialization(ObjPoolCtrl<BulletCtrl> bulletPool) {
+        BulletPool = bulletPool;
+    }
+
+    public abstract bool CanShoot(AvaterStateData data);
     
     public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, RangePreviewData rangePreview) {
         AttributeBonus = new Dictionary<AttributeType, float>();
@@ -52,16 +82,6 @@ public class Weapon : InsertThing
         AttributeBonus.Add(AttributeType.Damage, damage);
         AttributeBonus.Add(AttributeType.ShootCD, shootCD);
         RangePreview = rangePreview;
-    }
-    
-    public override object Clone() {
-        var clone = new Weapon(
-            (int)AttributeBonus[AttributeType.MaxBullet], 
-            AttributeBonus[AttributeType.PowerChargeToFullSec],
-            AttributeBonus[AttributeType.Damage],
-            AttributeBonus[AttributeType.ShootCD],
-            RangePreview);
-        return clone;
     }
 }
 
@@ -90,6 +110,18 @@ public class PlayerLoadout
     public PlayerLoadout(AvaterAttribute baseAttribute) {
         BaseAttribute = baseAttribute;
         NowAttribute = new AvaterAttribute(BaseAttribute);
+    }
+    
+    public Weapon GetWeaponInfo() {
+        return GetWeaponInfo(out Item[] inserts);
+    }
+    
+    public Armor GetArmorInfo() {
+        return GetArmorInfo(out Item[] inserts);
+    }
+    
+    public UltSkill GetUltSkillInfo() {
+        return GetUltSkillInfo(out Item[] inserts);
     }
     
     public Weapon GetWeaponInfo(out Item[] inserts) {
@@ -148,7 +180,7 @@ public class PlayerLoadout
     private T GetInfo<T>(T thing,Item[] array, out Item[] inserts)where T : InsertThing
     {
         inserts = array.ToArray();
-        return (T)thing.Clone();
+        return thing;//(T)thing.Clone();
     }
     
     private bool SetThing<T>(InsertThing oldThing,T[] array,InsertThing newThing,out List<Item> unload) where T : Item {
@@ -302,5 +334,6 @@ public class AvaterDataSystem : MonoInstaller
         //todo 
         //Container.Bind<IAvaterDataCtrl>().To<ServerAvaterDataCtrl>().FromNew().AsSingle();
         Container.Bind<IAvaterAttributeCtrl>().To<DemoAvaterAttributeCtrl>().FromNew().AsSingle().NonLazy();
+        Container.Bind<IWeaponFactory>().To<WeaponFactory>().AsSingle().WithArguments(Container);
     }
 }

@@ -22,7 +22,9 @@ public class PlayerCtrl : NetworkBehaviour{
 		IAvaterAttributeCtrl avaterAttributeCtrl,
 		IInput inputCtrl,
 		IBattleCtrl battleCtrl,
-		ObjPoolCtrl<HealthBarCtrl> healthBarPool){
+		ObjPoolCtrl<HealthBarCtrl> healthBarPool,
+		IWeaponFactory weaponFactory 
+		) {
 		battleCtrl.SetLocalPlayer(this);
 		_recycleThings = new List<IDisposable>();
 		InputCtrl = inputCtrl;
@@ -36,7 +38,7 @@ public class PlayerCtrl : NetworkBehaviour{
 		_recycleThings.Add(HealthBar);
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 
-		var weapon = new Weapon(3, 6, 1000, 0.5f, new RangePreviewData{ Radius = 1, SectorAngle = 0.1f });
+		var weapon = weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f,new RangePreviewData{Radius = 1,SectorAngle = 0.1f});
 		Loadout.SetWeapon(weapon, out var unload);
 	}
 
@@ -70,6 +72,5 @@ public class PlayerCtrl : NetworkBehaviour{
 		// } else
 		// RangePreview.Setup();
 	}
-
-	//TODO 能量子彈充能&UI生成
+	
 }
