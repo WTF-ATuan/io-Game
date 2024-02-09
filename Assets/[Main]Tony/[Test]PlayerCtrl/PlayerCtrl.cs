@@ -38,7 +38,7 @@ public class PlayerCtrl : NetworkBehaviour{
 		_recycleThings.Add(HealthBar);
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 
-		var weapon = weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f,new RangePreviewData{Radius = 1,SectorAngle = 0.1f});
+		var weapon = weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f,new RangePreviewData{Dis = 6,SectorAngle = 0.1f});
 		Loadout.SetWeapon(weapon, out var unload);
 	}
 
@@ -60,17 +60,17 @@ public class PlayerCtrl : NetworkBehaviour{
 		transform.position = StateData.Pos;
 		body.eulerAngles = new Vector3(0, 0, StateData.Towards);
 		// UpdateActionRequestServerRPC(StateData.Pos, StateData.Towards);
+		
+		if (StateData.IsAim) {
+			RangePreview.Setup(Loadout.GetWeaponInfo(out Item[] i).RangePreview,StateData.AimPos.Angle());
+		} else 
+			RangePreview.Setup();
 	}
 
 	[ServerRpc(RequireOwnership = false)]
 	private void UpdateActionRequestServerRPC(Vector3 momentPos, float toWardValue){
 		transform.position = momentPos;
 		body.eulerAngles = new Vector3(0, 0, toWardValue);
-
-		// if (StateData.IsAim) {
-		// 	RangePreview.Setup(Loadout.GetWeaponInfo(out Item[] i).RangePreview,StateData.AimPos.Angle());
-		// } else
-		// RangePreview.Setup();
 	}
 	
 }

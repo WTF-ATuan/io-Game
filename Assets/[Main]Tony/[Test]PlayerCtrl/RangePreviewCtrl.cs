@@ -9,7 +9,6 @@ public class RangePreviewCtrl : MonoBehaviour
     private Material M;
     
     private static readonly int Towards = Shader.PropertyToID("_Towards");
-    private static readonly int Radius = Shader.PropertyToID("_Radius");
     private static readonly int SectorAngle = Shader.PropertyToID("_SectorAngle");
 
     private void Start() {
@@ -22,14 +21,14 @@ public class RangePreviewCtrl : MonoBehaviour
 
     public void Setup(RangePreviewData data, float towards) {
         M.SetFloat(Towards, towards);
-        M.SetFloat(Radius, data.Radius);
         M.SetFloat(SectorAngle, data.SectorAngle);
+        transform.localScale = Vector3.one*data.Dis*0.2f;
         if(!gameObject.activeSelf) gameObject.SetActive(true);
     }
 }
 
 public struct RangePreviewData {
-    public float Radius;
+    public float Dis;
     public float SectorAngle;
     
 }

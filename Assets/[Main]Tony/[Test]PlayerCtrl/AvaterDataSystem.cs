@@ -6,24 +6,13 @@ using DG.Tweening.Plugins.Options;
 using UnityEngine;
 using Zenject;
 
-public abstract class Item: ICloneable {
-    public abstract object Clone();
+public abstract class Item{
 }
 
 public class Passive : Item {
-    public override object Clone() {
-        var clone = new Passive();
-        //todo copy some thing
-        return clone;
-    }
 }
 
 public class Rune : Item {
-    public override object Clone() {
-        var clone = new Passive();
-        //todo copy some thing
-        return clone;
-    }
 }
 
 public abstract class InsertThing:Item {
@@ -33,11 +22,6 @@ public abstract class InsertThing:Item {
 
 public class UltSkill : InsertThing
 {
-    public override object Clone() {
-        var clone = new UltSkill();
-        //todo copy some thing
-        return clone;
-    }
 }
 
 
@@ -73,7 +57,22 @@ public abstract class Weapon : InsertThing
         BulletPool = bulletPool;
     }
 
-    public abstract bool CanShoot(AvaterStateData data);
+    public abstract void OnShoot(AvaterStateData data);
+
+    public virtual bool CanShoot(AvaterStateData data) {
+        float powerNeed = (1f / (int) AttributeBonus[AttributeType.MaxBullet]);
+        float nowTime = Time.time;
+        if (data.AimPos == Vector2.zero && 
+            data.LastAimPos != Vector2.zero && 
+            data.ShootCd < nowTime && 
+            data.Power >= powerNeed) {
+            data.Power = Mathf.Clamp01(data.Power - powerNeed);
+            data.ShootCd = nowTime + AttributeBonus[AttributeType.ShootCD];
+            OnShoot(data);
+            return true;
+        }
+        return false;
+    }
     
     public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, RangePreviewData rangePreview) {
         AttributeBonus = new Dictionary<AttributeType, float>();
@@ -88,11 +87,6 @@ public abstract class Weapon : InsertThing
 public class Armor : InsertThing
 {
     public Dictionary<AttributeType, int> AttributeBonus;
-    public override object Clone() {
-        var clone = new Armor();
-        clone.AttributeBonus = new Dictionary<AttributeType, int>(this.AttributeBonus);
-        return clone;
-    }
 }
 public class PlayerLoadout
 {
