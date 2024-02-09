@@ -17,14 +17,17 @@ public class PlayerCtrl : NetworkBehaviour{
 	private List<IDisposable> _recycleThings;
 	private RangePreviewCtrl RangePreview;
 
+	private NetworkVariable<Vector3> _syncPosition = new();
+	private NetworkVariable<float> _syncTowardEuler = new();
+
 	[Inject]
 	private void Initialization(
 		IAvaterAttributeCtrl avaterAttributeCtrl,
 		IInput inputCtrl,
 		IBattleCtrl battleCtrl,
 		ObjPoolCtrl<HealthBarCtrl> healthBarPool,
-		IWeaponFactory weaponFactory 
-		) {
+		IWeaponFactory weaponFactory
+	){
 		battleCtrl.SetLocalPlayer(this);
 		_recycleThings = new List<IDisposable>();
 		InputCtrl = inputCtrl;
@@ -38,7 +41,8 @@ public class PlayerCtrl : NetworkBehaviour{
 		_recycleThings.Add(HealthBar);
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 
-		var weapon = weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f,new RangePreviewData{Dis = 6,SectorAngle = 0.1f});
+		var weapon =
+				weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f, new RangePreviewData{ Radius = 1, SectorAngle = 0.1f });
 		Loadout.SetWeapon(weapon, out var unload);
 	}
 
@@ -50,27 +54,61 @@ public class PlayerCtrl : NetworkBehaviour{
 	}
 
 	private void FixedUpdate(){
-		if(!IsOwner) return;
-		CalculateActionData();
+		if(IsOwner && IsClient){
+			CalculateActionData();
+		}
+
+		UpdateClientData();
 	}
 
 	private void CalculateActionData(){
-		StateData.ClientDataRefresh();
-		StateData.LocalUpdate();
-		transform.position = StateData.Pos;
-		body.eulerAngles = new Vector3(0, 0, StateData.Towards);
-		// UpdateActionRequestServerRPC(StateData.Pos, StateData.Towards);
-		
-		if (StateData.IsAim) {
-			RangePreview.Setup(Loadout.GetWeaponInfo(out Item[] i).RangePreview,StateData.AimPos.Angle());
-		} else 
-			RangePreview.Setup();
+		MovementRequestServerRpc(CalculatePlayerMove(), CalculatePlayerRotate());
 	}
 
 	[ServerRpc(RequireOwnership = false)]
-	private void UpdateActionRequestServerRPC(Vector3 momentPos, float toWardValue){
-		transform.position = momentPos;
-		body.eulerAngles = new Vector3(0, 0, toWardValue);
+	private void MovementRequestServerRpc(Vector3 position, float towardEuler){
+		_syncPosition.Value = position;
+		_syncTowardEuler.Value = towardEuler;
 	}
-	
+
+	private void UpdateClientData(){
+		transform.position = _syncPosition.Value;
+		body.eulerAngles = new Vector3(0, 0, _syncTowardEuler.Value);
+	}
+
+	private Vector2 _nowVec;
+
+	private double _timeStamp;
+
+	private Vector3 CalculatePlayerMove(){
+		var missTime = NetworkManager.ServerTime.Time - _timeStamp;
+		_timeStamp = NetworkManager.ServerTime.Time;
+		var targetVec = InputCtrl.MoveJoy();
+		var vec = targetVec - _nowVec;
+		var direction = vec.normalized;
+		var newVec = targetVec;
+		var distance = vec.magnitude;
+		const float moveFriction = AvaterAttribute.MoveFriction;
+		if(distance > moveFriction){
+			newVec = _nowVec + direction * Mathf.Min(moveFriction, distance);
+		}
+
+		_nowVec = newVec;
+		Vector2 pos = transform.position;
+		pos += _nowVec * BaseAttribute.MoveSpeed * (float)missTime;
+		return pos;
+	}
+
+	private float _towards;
+
+	private float CalculatePlayerRotate(){
+		var targetVec = InputCtrl.MoveJoy();
+		var aimPos = InputCtrl.AimJoy();
+		float refVec = 0;
+		var targetTowards = aimPos != Vector2.zero
+				? targetVec != Vector2.zero ? targetVec.Angle() : _towards
+				: aimPos.Angle();
+		_towards = Mathf.SmoothDampAngle(_towards, targetTowards, ref refVec, AvaterAttribute.RotSpeed);
+		return _towards;
+	}
 }
