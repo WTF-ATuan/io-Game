@@ -42,7 +42,7 @@ public class PlayerCtrl : NetworkBehaviour{
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 
 		var weapon =
-				weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f, new RangePreviewData{ Radius = 1, SectorAngle = 0.1f });
+				weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f, new RangePreviewData{ Dis = 6, SectorAngle = 0.1f });
 		Loadout.SetWeapon(weapon, out var unload);
 	}
 
