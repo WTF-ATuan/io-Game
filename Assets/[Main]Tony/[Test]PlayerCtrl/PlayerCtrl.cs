@@ -28,7 +28,7 @@ public class PlayerCtrl : NetworkBehaviour{
 		ObjPoolCtrl<HealthBarCtrl> healthBarPool,
 		IWeaponFactory weaponFactory
 	){
-		battleCtrl.SetLocalPlayer(this);
+		battleCtrl.SetLocalPlayer(this); //Todo add condition => if(currentPlayer == ownerPlayer)
 		_recycleThings = new List<IDisposable>();
 		InputCtrl = inputCtrl;
 		BaseAttribute = avaterAttributeCtrl.GetData();
@@ -72,7 +72,8 @@ public class PlayerCtrl : NetworkBehaviour{
 	}
 
 	private void UpdateClientData(){
-		transform.position = _syncPosition.Value;
+		transform.position = Vector3.Lerp(transform.position, _syncPosition.Value,
+			NetworkManager.ServerTime.FixedDeltaTime * 2);
 		body.eulerAngles = new Vector3(0, 0, _syncTowardEuler.Value);
 	}
 
@@ -81,8 +82,6 @@ public class PlayerCtrl : NetworkBehaviour{
 	private double _timeStamp;
 
 	private Vector3 CalculatePlayerMove(){
-		var missTime = NetworkManager.ServerTime.Time - _timeStamp;
-		_timeStamp = NetworkManager.ServerTime.Time;
 		var targetVec = InputCtrl.MoveJoy();
 		var vec = targetVec - _nowVec;
 		var direction = vec.normalized;
@@ -95,7 +94,7 @@ public class PlayerCtrl : NetworkBehaviour{
 
 		_nowVec = newVec;
 		Vector2 pos = transform.position;
-		pos += _nowVec * BaseAttribute.MoveSpeed * (float)missTime;
+		pos += _nowVec * BaseAttribute.MoveSpeed;
 		return pos;
 	}
 
@@ -105,7 +104,7 @@ public class PlayerCtrl : NetworkBehaviour{
 		var targetVec = InputCtrl.MoveJoy();
 		var aimPos = InputCtrl.AimJoy();
 		float refVec = 0;
-		var targetTowards = aimPos != Vector2.zero
+		var targetTowards = !(aimPos != Vector2.zero)
 				? targetVec != Vector2.zero ? targetVec.Angle() : _towards
 				: aimPos.Angle();
 		_towards = Mathf.SmoothDampAngle(_towards, targetTowards, ref refVec, AvaterAttribute.RotSpeed);
