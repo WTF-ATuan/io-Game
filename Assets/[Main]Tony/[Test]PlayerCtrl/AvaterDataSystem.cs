@@ -50,11 +50,18 @@ public abstract class Weapon : InsertThing
 {
     public Dictionary<AttributeType, float> AttributeBonus;
     public RangePreviewData RangePreview;
+    /*
     protected ObjPoolCtrl<BulletCtrl> BulletPool;
 
     [Inject]
     private void Initialization(ObjPoolCtrl<BulletCtrl> bulletPool) {
         BulletPool = bulletPool;
+    }
+    */
+    protected IBattleCtrl BattleCtrl;
+    [Inject]
+    private void Initialization(IBattleCtrl battleCtrl) {
+        BattleCtrl = battleCtrl;
     }
 
     public abstract void OnShoot(AvaterStateData data);

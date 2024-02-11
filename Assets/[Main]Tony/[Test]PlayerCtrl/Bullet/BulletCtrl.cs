@@ -12,9 +12,10 @@ public class BulletCtrl : MonoBehaviour
         transform.position = genPos;
         transform.eulerAngles = new Vector3(0, 0, angle);
         OnDead = onDead;
-//(Vector2)transform.forward
+
         transform.DOMove((genPos + angle.ToVec2() * maxDis), moveSec).SetEase(Ease.Linear).OnComplete(() => {
             OnDead.Invoke();
         });
+        
     }
 }

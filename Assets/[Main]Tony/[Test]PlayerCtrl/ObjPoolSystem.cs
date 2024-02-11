@@ -6,11 +6,11 @@ using Zenject;
 public class ObjPoolSystem : MonoInstaller {
     
     public GameObject HealthBarPrefab;
-    public GameObject ButtetPrefab;
+    //public GameObject ButtetPrefab;
     
     public override void InstallBindings() {
         Container.Bind<ObjPoolCtrl<HealthBarCtrl>>().FromInstance(new ObjPoolCtrl<HealthBarCtrl>(HealthBarPrefab,null)).AsSingle();
-        Container.Bind<ObjPoolCtrl<BulletCtrl>>().FromInstance(new ObjPoolCtrl<BulletCtrl>(ButtetPrefab,null)).AsSingle();
+        //Container.Bind<ObjPoolCtrl<BulletCtrl>>().FromInstance(new ObjPoolCtrl<BulletCtrl>(ButtetPrefab,null)).AsSingle();
     }
     
 }

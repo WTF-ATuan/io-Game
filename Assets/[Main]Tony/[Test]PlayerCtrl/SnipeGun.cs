@@ -7,8 +7,9 @@ public class SnipeGun : Weapon {
     }
 
     public override void OnShoot(AvaterStateData data) {
-        var bullet = BulletPool.Get();
-        bullet.Ctrl.Setup(data.Pos, data.Towards, 0.3f, RangePreview.Dis, () => {bullet.Dispose(); });
+        //var bullet = BulletPool.Get();
+        //bullet.Ctrl.Setup(data.Pos, data.Towards, 0.3f, RangePreview.Dis, () => {bullet.Dispose(); });
+        BattleCtrl.GetSpawner().SpawnBulletServerRpc(data.Pos, data.Towards, 0.3f, RangePreview.Dis);
     }
 
 
