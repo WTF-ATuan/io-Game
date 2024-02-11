@@ -697,7 +697,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cb56393469fde24e9a9ce71ccb6acfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectToSpawnPrefab: {fileID: 6241490092801916763, guid: 65cdc8585c4055c4185e26a1338e8979, type: 3}
+  ButtetPrefab: {fileID: 6241490092801916763, guid: 65cdc8585c4055c4185e26a1338e8979, type: 3}
 --- !u!4 &584436125
 Transform:
   m_ObjectHideFlags: 0
@@ -1661,7 +1661,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HealthBarPrefab: {fileID: 5559527280960405735, guid: a5908252a2065934fb02a8ad3768bea6, type: 3}
-  ButtetPrefab: {fileID: 6241490092801916763, guid: 65cdc8585c4055c4185e26a1338e8979, type: 3}
 --- !u!1 &8969108613730107242
 GameObject:
   m_ObjectHideFlags: 0

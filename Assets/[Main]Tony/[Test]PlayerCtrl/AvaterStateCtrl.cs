@@ -79,6 +79,7 @@ public class AvaterStateCtrl  {
         if (Avater.IsOwner()) {
             //--Input
             Data.TargetVec = Avater.GetInput().MoveJoy();
+            Data.LastAimPos = Data.AimPos;
             Data.AimPos = Avater.GetInput().AimJoy();
             //--Input
             
@@ -107,6 +108,7 @@ public class AvaterStateCtrl  {
             //--Rot
             
             //--Shoot
+            Data.Power = Mathf.Clamp01(Data.Power + missTime / Avater.GetLoadOut().NowAttribute.PowerChargeToFullSec);
             var weapon = Avater.GetLoadOut().GetWeaponInfo();
             if (weapon != null && weapon.CanShoot(Data)) {
                 Data.Towards = Data.AimPos.Angle();

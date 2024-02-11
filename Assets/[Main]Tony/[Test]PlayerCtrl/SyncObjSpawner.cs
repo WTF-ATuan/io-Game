@@ -19,8 +19,8 @@ public class SyncObjSpawner : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void SpawnBulletServerRpc(Vector2 genPos, float angle, float moveSec, float maxDis)
     {
-        var bullet = Instantiate(ButtetPrefab).GetComponent<NetworkObject>();
+        var bullet = Instantiate(ButtetPrefab, genPos, Quaternion.Euler(0,0,angle)).GetComponent<NetworkObject>();
         bullet.Spawn();
-        bullet.GetComponent<BulletCtrl>().Setup(genPos, angle, moveSec, maxDis, () => {bullet.Despawn(); });
+        bullet.GetComponent<BulletCtrl>().Setup(genPos, angle, moveSec, maxDis, () => {});//bullet.Despawn(); 
     }
 }
