@@ -10,7 +10,7 @@ public class Shotgun : Weapon {
         
     }
 
-    public override void OnShoot(AvaterSyncData3 data) {
+    public override void OnShoot(AvaterState data) {
         int bulletAmount = 6;
         float angleRange = RangePreview.Width;
         for (int i = 0; i < bulletAmount; i++) {

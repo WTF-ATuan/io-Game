@@ -20,7 +20,7 @@ public interface IGetIInput {
 }
 
 [Serializable]
-public class AvaterSyncData3 : INetworkSerializable
+public class AvaterState : INetworkSerializable
 {
     public Vector2 Pos;
     public Vector2 TargetVec;
@@ -51,21 +51,21 @@ public class AvaterSyncData3 : INetworkSerializable
 }
 
 public interface IAvaterSync : IGetLoadOut,IGetTransform,IGetIInput{
-    public NetworkVariable<AvaterSyncData3> GetSyncData();
-    public void AvaterDataSyncServerRpc(AvaterSyncData3 data);
+    public NetworkVariable<AvaterState> GetSyncData();
+    public void AvaterDataSyncServerRpc(AvaterState data);
     public bool IsOwner();
 }
 
-public class AvaterStateData2  {
+public class AvaterStateCtrl  {
     
     private IAvaterSync Avater;
-    public AvaterSyncData3 Data{ get;private set; }
+    public AvaterState Data{ get;private set; }
 
     private Transform RotCenter;
 
-    public AvaterStateData2(IAvaterSync avater) {
+    public AvaterStateCtrl(IAvaterSync avater) {
         Avater = avater;
-        Data = new AvaterSyncData3();
+        Data = new AvaterState();
         RotCenter = Avater.GetTransform().Find("RotCenter");
     }
     

@@ -8,7 +8,7 @@ public class RangePreviewCtrl : MonoBehaviour
 {
     public MeshRenderer Mesh;
     private Material M;
-    private AvaterStateData2 PlayerData;
+    private AvaterStateCtrl PlayerData;
     
     private static readonly int Width = Shader.PropertyToID("_Width");
     private static readonly int Type = Shader.PropertyToID("_Type");
@@ -18,7 +18,7 @@ public class RangePreviewCtrl : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Init(AvaterStateData2 data)
+    public void Init(AvaterStateCtrl data)
     {
         PlayerData = data;
     }

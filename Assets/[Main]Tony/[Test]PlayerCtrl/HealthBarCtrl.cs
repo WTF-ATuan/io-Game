@@ -9,9 +9,9 @@ public class HealthBarCtrl : MonoBehaviour
 
     public Transform PowerLine;
     private AvaterAttribute Attribute;
-    private AvaterStateData2 StateData;
+    private AvaterStateCtrl StateData;
     
-    public void Setup(AvaterAttribute attribute, AvaterStateData2 stateData) {
+    public void Setup(AvaterAttribute attribute, AvaterStateCtrl stateData) {
         Attribute = attribute;
         StateData = stateData;
       

@@ -64,9 +64,9 @@ public abstract class Weapon : InsertThing
         BattleCtrl = battleCtrl;
     }
 
-    public abstract void OnShoot(AvaterSyncData3 data);
+    public abstract void OnShoot(AvaterState data);
 
-    public virtual bool CanShoot(AvaterSyncData3 data) {
+    public virtual bool CanShoot(AvaterState data) {
         float powerNeed = (1f / (int) AttributeBonus[AttributeType.MaxBullet]);
         float nowTime = Time.time;
         if (data.AimPos == Vector2.zero && 

@@ -15,7 +15,7 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 
 	private List<IDisposable> _recycleThings;
 	private RangePreviewCtrl RangePreview;
-	private AvaterStateData2 StateData2{ get; set; }
+	private AvaterStateCtrl StateCtrl{ get; set; }
 
 	[Inject]
 	private void Initialization(
@@ -36,18 +36,18 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		Loadout.SetWeapon(weapon, out var unload);
 		
 		///
-		StateData2 = new AvaterStateData2(this);
+		StateCtrl = new AvaterStateCtrl(this);
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
-		RangePreview.Init(StateData2);
+		RangePreview.Init(StateCtrl);
 		
 		HealthBar = healthBarPool.Get();
-		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateData2);
+		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateCtrl);
 		HealthBar.Obj.transform.parent = transform;
 		_recycleThings.Add(HealthBar);
 	}
 
 	private void Start() {
-		if(IsOwner())BattleCtrl.SetLocalPlayer(this); //Todo add condition => if(currentPlayer == ownerPlayer)
+		if(IsOwner())BattleCtrl.SetLocalPlayer(this);
 	}
 
 	public override void OnDestroy(){
@@ -57,13 +57,13 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		}
 	}
 	
-	private NetworkVariable<AvaterSyncData3> AvaterSyncData = new();
-	public NetworkVariable<AvaterSyncData3> GetSyncData() {
+	private NetworkVariable<AvaterState> AvaterSyncData = new();
+	public NetworkVariable<AvaterState> GetSyncData() {
 		return AvaterSyncData;
 	}
 	
 	[ServerRpc(RequireOwnership = false)]
-	public void AvaterDataSyncServerRpc(AvaterSyncData3 data) {
+	public void AvaterDataSyncServerRpc(AvaterState data) {
 		AvaterSyncData.Value = data;
 	}
 	
@@ -84,11 +84,11 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 	}
 
 	private void Update() {
-		StateData2.DataSync();
+		StateCtrl.DataSync();
 		if(IsOwner())RangePreview.Setup(Loadout.GetWeaponInfo().RangePreview);
 	}
 
 	private void FixedUpdate() {
-		StateData2.ClientUpdate();
+		StateCtrl.ClientUpdate();
 	}
 }
