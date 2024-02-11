@@ -58,6 +58,11 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		return AvaterSyncData;
 	}
 	
+	[ServerRpc(RequireOwnership = false)]
+	public void AvaterDataSyncServerRpc(AvaterSyncData3 data) {
+		AvaterSyncData.Value = data;
+	}
+	
 	public PlayerLoadout GetLoadOut() {
 		return Loadout;
 	}
@@ -70,15 +75,9 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		return InputCtrl;
 	}
 
-	[ServerRpc(RequireOwnership = false)]
-	public void AvaterDataSyncServerRpc(AvaterSyncData3 data) {
-		AvaterSyncData.Value = data;
-	}
-
 	public bool IsOwner() {
 		return base.IsOwner && base.IsClient;
 	}
-
 
 	private void Update() {
 		StateData2.DataSync();
