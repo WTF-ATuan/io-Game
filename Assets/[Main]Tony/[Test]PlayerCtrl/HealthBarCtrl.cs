@@ -9,15 +9,15 @@ public class HealthBarCtrl : MonoBehaviour
 
     public Transform PowerLine;
     private AvaterAttribute Attribute;
-    private AvaterStateData StateData;
+    private AvaterStateData2 StateData;
     
-    public void Setup(AvaterAttribute attribute, AvaterStateData stateData) {
+    public void Setup(AvaterAttribute attribute, AvaterStateData2 stateData) {
         Attribute = attribute;
         StateData = stateData;
       
     }
 
     private void Update() {
-        PowerLine.localScale = new Vector3(StateData.Power, 1, 1);
+        PowerLine.localScale = new Vector3(StateData.Data.Power, 1, 1);
     }
 }

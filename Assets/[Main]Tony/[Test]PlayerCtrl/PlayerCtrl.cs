@@ -10,7 +10,6 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 	private IBattleCtrl BattleCtrl;
 	private IInput InputCtrl{ get; set; }
 	private AvaterAttribute BaseAttribute{ get; set; }
-	private AvaterStateData StateData{ get; set; }
 	private PlayerLoadout Loadout{ get; set; }
 	private PoolObj<HealthBarCtrl> HealthBar{ get; set; }
 
@@ -32,14 +31,7 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		InputCtrl = inputCtrl;
 		BaseAttribute = avaterAttributeCtrl.GetData();
 		Loadout = new PlayerLoadout(BaseAttribute);
-
-		StateData = new AvaterStateData(InputCtrl, Loadout, transform, BaseAttribute);
-		HealthBar = healthBarPool.Get();
-		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateData);
-		HealthBar.Obj.transform.parent = transform;
-		_recycleThings.Add(HealthBar);
-
-
+		
 		var weapon = weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f,new RangePreviewData{Type = RangePreviewType.Sector,Dis = 6,Width = 36});
 		Loadout.SetWeapon(weapon, out var unload);
 		
@@ -47,6 +39,11 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		StateData2 = new AvaterStateData2(this);
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 		RangePreview.Init(StateData2);
+		
+		HealthBar = healthBarPool.Get();
+		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateData2);
+		HealthBar.Obj.transform.parent = transform;
+		_recycleThings.Add(HealthBar);
 	}
 
 	private void Start() {

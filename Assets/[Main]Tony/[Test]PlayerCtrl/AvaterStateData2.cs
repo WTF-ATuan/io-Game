@@ -30,6 +30,8 @@ public class AvaterSyncData3 : INetworkSerializable
     public float Towards;
     public float RotVec;
     public float ClientUpdateTimeStamp;
+    public float Power;
+    public float ShootCd;
     
     public bool IsAim => AimPos != Vector2.zero;
 
@@ -43,6 +45,8 @@ public class AvaterSyncData3 : INetworkSerializable
         serializer.SerializeValue(ref Towards);
         serializer.SerializeValue(ref RotVec);
         serializer.SerializeValue(ref ClientUpdateTimeStamp);
+        serializer.SerializeValue(ref Power);
+        serializer.SerializeValue(ref ShootCd);
     }
 }
 
@@ -101,6 +105,14 @@ public class AvaterStateData2  {
                 : Data.AimPos.Angle();
             Data.Towards = Mathf.SmoothDampAngle(Data.Towards, targetTowards, ref Data.RotVec, AvaterAttribute.RotSpeed, Mathf.Infinity, missTime);
             //--Rot
+            
+            //--Shoot
+            var weapon = Avater.GetLoadOut().GetWeaponInfo();
+            if (weapon != null && weapon.CanShoot(Data)) {
+                Data.Towards = Data.AimPos.Angle();
+                Data.RotVec = 0;
+            } 
+            //--Shoot
         } else {
             Data = Avater.GetSyncData().Value;
         }
