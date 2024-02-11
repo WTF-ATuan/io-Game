@@ -41,8 +41,7 @@ public class PlayerCtrl : NetworkBehaviour{
 		_recycleThings.Add(HealthBar);
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 
-		var weapon =
-				weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f, new RangePreviewData{ Dis = 6, SectorAngle = 0.1f });
+		var weapon = weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f,new RangePreviewData{Type = RangePreviewType.Sector,Dis = 6,Width = 36});
 		Loadout.SetWeapon(weapon, out var unload);
 	}
 

@@ -8,8 +8,8 @@ public class RangePreviewCtrl : MonoBehaviour
     public MeshRenderer Mesh;
     private Material M;
     
-    private static readonly int Towards = Shader.PropertyToID("_Towards");
-    private static readonly int SectorAngle = Shader.PropertyToID("_SectorAngle");
+    private static readonly int Width = Shader.PropertyToID("_Width");
+    private static readonly int Type = Shader.PropertyToID("_Type");
 
     private void Start() {
         M = Mesh.material;
@@ -20,15 +20,22 @@ public class RangePreviewCtrl : MonoBehaviour
     }
 
     public void Setup(RangePreviewData data, float towards) {
-        M.SetFloat(Towards, towards);
-        M.SetFloat(SectorAngle, data.SectorAngle);
+        transform.eulerAngles = new Vector3(0, 0, towards);
+        M.SetFloat(Width, data.Width/360);
+        M.SetFloat(Type, (int)data.Type);
         transform.localScale = Vector3.one*data.Dis*0.2f;
         if(!gameObject.activeSelf) gameObject.SetActive(true);
     }
 }
 
+public enum RangePreviewType {
+    Sector,
+    Straight,
+    Throw
+}
 public struct RangePreviewData {
+    public RangePreviewType Type;
     public float Dis;
-    public float SectorAngle;
+    public float Width;
     
 }

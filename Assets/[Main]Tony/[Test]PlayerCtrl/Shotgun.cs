@@ -12,7 +12,7 @@ public class Shotgun : Weapon {
 
     public override void OnShoot(AvaterStateData data) {
         int bulletAmount = 6;
-        float angleRange = RangePreview.SectorAngle*360f;
+        float angleRange = RangePreview.Width;
         for (int i = 0; i < bulletAmount; i++) {
             var bullet = BulletPool.Get();
             float ang = (data.Towards - angleRange / 2) + i*(angleRange / bulletAmount);
