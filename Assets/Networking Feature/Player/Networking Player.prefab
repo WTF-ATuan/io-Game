@@ -283,7 +283,7 @@ GameObject:
   - component: {fileID: 7345683096110492609}
   - component: {fileID: 1924783817153411531}
   m_Layer: 0
-  m_Name: Mesh
+  m_Name: RotCenter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

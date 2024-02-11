@@ -4,10 +4,10 @@ using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
-
 public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 	public Transform body;
 
+	private IBattleCtrl BattleCtrl;
 	private IInput InputCtrl{ get; set; }
 	private AvaterAttribute BaseAttribute{ get; set; }
 	private AvaterStateData StateData{ get; set; }
@@ -25,8 +25,9 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		IBattleCtrl battleCtrl,
 		ObjPoolCtrl<HealthBarCtrl> healthBarPool,
 		IWeaponFactory weaponFactory
-	){
-		battleCtrl.SetLocalPlayer(this); //Todo add condition => if(currentPlayer == ownerPlayer)
+	)
+	{
+		BattleCtrl = battleCtrl;
 		_recycleThings = new List<IDisposable>();
 		InputCtrl = inputCtrl;
 		BaseAttribute = avaterAttributeCtrl.GetData();
@@ -37,13 +38,19 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateData);
 		HealthBar.Obj.transform.parent = transform;
 		_recycleThings.Add(HealthBar);
-		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
+
 
 		var weapon = weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f,new RangePreviewData{Type = RangePreviewType.Sector,Dis = 6,Width = 36});
 		Loadout.SetWeapon(weapon, out var unload);
 		
 		///
 		StateData2 = new AvaterStateData2(this);
+		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
+		RangePreview.Init(StateData2);
+	}
+
+	private void Start() {
+		if(IsOwner())BattleCtrl.SetLocalPlayer(this); //Todo add condition => if(currentPlayer == ownerPlayer)
 	}
 
 	public override void OnDestroy(){
@@ -81,78 +88,10 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 
 	private void Update() {
 		StateData2.DataSync();
+		if(IsOwner())RangePreview.Setup(Loadout.GetWeaponInfo().RangePreview);
 	}
 
 	private void FixedUpdate() {
 		StateData2.ClientUpdate();
 	}
-
-	/*
-	[ServerRpc(RequireOwnership = false)]
-	private void MovementRequestServerRpc(Vector3 position, float towardEuler){
-		_syncPosition.Value = position;
-		_syncTowardEuler.Value = towardEuler;
-	}
-	
-	private NetworkVariable<Vector3> _syncPosition = new();
-	private NetworkVariable<float> _syncTowardEuler = new();
-	
-	private void FixedUpdate(){
-		if(IsOwner && IsClient){
-			CalculateActionData();
-		}
-
-		UpdateClientData();
-	}
-
-	private void CalculateActionData(){
-		MovementRequestServerRpc(CalculatePlayerMove(), CalculatePlayerRotate());
-	}
-
-	[ServerRpc(RequireOwnership = false)]
-	private void MovementRequestServerRpc(Vector3 position, float towardEuler){
-		_syncPosition.Value = position;
-		_syncTowardEuler.Value = towardEuler;
-	}
-
-	private void UpdateClientData(){
-		transform.position = Vector3.Lerp(transform.position, _syncPosition.Value,
-			NetworkManager.ServerTime.FixedDeltaTime * 2);
-		body.eulerAngles = new Vector3(0, 0, _syncTowardEuler.Value);
-	}
-
-	private Vector2 _nowVec;
-
-	private double _timeStamp;
-
-	private Vector3 CalculatePlayerMove(){
-		var targetVec = InputCtrl.MoveJoy();
-		var vec = targetVec - _nowVec;
-		var direction = vec.normalized;
-		var newVec = targetVec;
-		var distance = vec.magnitude;
-		const float moveFriction = AvaterAttribute.MoveFriction;
-		if(distance > moveFriction){
-			newVec = _nowVec + direction * Mathf.Min(moveFriction, distance);
-		}
-
-		_nowVec = newVec;
-		Vector2 pos = transform.position;
-		pos += _nowVec * BaseAttribute.MoveSpeed;
-		return pos;
-	}
-
-	private float _towards;
-
-	private float CalculatePlayerRotate(){
-		var targetVec = InputCtrl.MoveJoy();
-		var aimPos = InputCtrl.AimJoy();
-		float refVec = 0;
-		var targetTowards = !(aimPos != Vector2.zero)
-				? targetVec != Vector2.zero ? targetVec.Angle() : _towards
-				: aimPos.Angle();
-		_towards = Mathf.SmoothDampAngle(_towards, targetTowards, ref refVec, AvaterAttribute.RotSpeed);
-		return _towards;
-	}
-	*/
 }

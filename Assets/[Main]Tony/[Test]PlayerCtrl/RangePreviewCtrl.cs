@@ -4,28 +4,36 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class RangePreviewCtrl : NetworkBehaviour
+public class RangePreviewCtrl : MonoBehaviour
 {
     public MeshRenderer Mesh;
     private Material M;
+    private AvaterStateData2 PlayerData;
     
     private static readonly int Width = Shader.PropertyToID("_Width");
     private static readonly int Type = Shader.PropertyToID("_Type");
 
     private void Start() {
         M = Mesh.material;
-    }
-    
-    public void Setup() {
-        if(gameObject.activeSelf)gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 
-    public void Setup(RangePreviewData data, float towards) {
-        transform.eulerAngles = new Vector3(0, 0, towards);
-        M.SetFloat(Width, data.Width/360);
-        M.SetFloat(Type, (int)data.Type);
-        transform.localScale = Vector3.one*data.Dis*0.2f;
-        if(!gameObject.activeSelf) gameObject.SetActive(true);
+    public void Init(AvaterStateData2 data)
+    {
+        PlayerData = data;
+    }
+    
+    public void Setup(RangePreviewData data) {
+        if (PlayerData == null) return;
+        if (PlayerData.Data.IsAim) {
+            transform.eulerAngles = new Vector3(0, 0, PlayerData.Data.AimPos.Angle());
+            M.SetFloat(Width, data.Width/360);
+            M.SetFloat(Type, (int)data.Type);
+            transform.localScale = Vector3.one*data.Dis*0.2f;
+            if(!gameObject.activeSelf) gameObject.SetActive(true);
+        } else {
+            if(gameObject.activeSelf)gameObject.SetActive(false);
+        }
     }
 }
 
