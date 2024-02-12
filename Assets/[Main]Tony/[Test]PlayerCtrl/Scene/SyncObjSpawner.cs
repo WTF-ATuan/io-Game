@@ -1,27 +1,27 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using DG.Tweening;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
-public class SyncObjSpawner : NetworkBehaviour
-{
+public class SyncObjSpawner : NetworkBehaviour{
+	[Inject]
+	private void Initialization(IBattleCtrl battleCtrl){
+		battleCtrl.SetSpawner(this);
+	}
 
-    [Inject]
-    private void Initialization(IBattleCtrl battleCtrl) {
-        battleCtrl.SetSpawner(this);
-    }
-    
-    public GameObject ButtetPrefab;
+	public GameObject ButtetPrefab;
 
-    [ServerRpc(RequireOwnership = false)]
-    public void SpawnBulletServerRpc(Vector2 genPos, float angle, float moveSec, float maxDis)
-    {
-        var bullet = Instantiate(ButtetPrefab, genPos, Quaternion.Euler(0,0,angle)).GetComponent<NetworkObject>();
-        bullet.Spawn();
-        var bulletCtrl = bullet.GetComponent<BulletCtrl>();
-        bulletCtrl.ServerRequest(genPos, angle, moveSec, maxDis);
-    }
+	[ServerRpc(RequireOwnership = false)]
+	public void SpawnBulletServerRpc(Vector2 genPos, float angle, float moveSec, float maxDis){
+		var bulletClone = Instantiate(ButtetPrefab, genPos, Quaternion.Euler(0, 0, angle)).GetComponent<NetworkObject>();
+		bulletClone.Spawn();
+		var bulletID = bulletClone.NetworkObjectId;
+		UpdateClientBulletDataClientRpc(bulletID,genPos, angle, moveSec, maxDis);
+	}
+	//Todo using class to wrap all value
+	[ClientRpc]
+	private void UpdateClientBulletDataClientRpc(ulong bulletID ,Vector2 genPos, float angle, float moveSec, float maxDis){
+		var bulletObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[bulletID];
+		var bulletCtrl = bulletObj.GetComponent<BulletCtrl>();
+		bulletCtrl.UpdateBulletData(genPos , angle , moveSec , maxDis);
+	}
 }
