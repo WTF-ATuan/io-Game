@@ -32,7 +32,7 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		BaseAttribute = avaterAttributeCtrl.GetData();
 		Loadout = new PlayerLoadout(BaseAttribute);
 		
-		var weapon = weaponFactory.Create<Shotgun>(3, 6, 1000, 0.5f,new RangePreviewData{Type = RangePreviewType.Sector,Dis = 6,Width = 36});
+		var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,new RangePreviewData{Type = RangePreviewType.Straight,Dis = 6,Width = 10});
 		Loadout.SetWeapon(weapon, out var unload);
 		
 		///
@@ -46,10 +46,10 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		_recycleThings.Add(HealthBar);
 	}
 
-	private void Start() {
+	public override void OnNetworkSpawn() {
 		if(IsOwner())BattleCtrl.SetLocalPlayer(this);
 	}
-
+	
 	public override void OnDestroy(){
 		base.OnDestroy();
 		foreach(var thing in _recycleThings){
@@ -82,7 +82,7 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 	public bool IsOwner() {
 		return base.IsOwner && base.IsClient;
 	}
-
+	
 	private void Update() {
 		StateCtrl.DataSync();
 		if(IsOwner())RangePreview.Setup(Loadout.GetWeaponInfo().RangePreview);

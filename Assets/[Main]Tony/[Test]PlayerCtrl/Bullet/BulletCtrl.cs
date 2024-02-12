@@ -2,20 +2,39 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Unity.Netcode;
 using UnityEngine;
 
-public class BulletCtrl : MonoBehaviour
+[Serializable]
+public class BulletState : INetworkSerializable {
+    public Vector3 Pos;
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
+        serializer.SerializeValue(ref Pos);
+    }
+}
+
+public class BulletCtrl : NetworkBehaviour
 {
     private Action OnDead;
+    private NetworkVariable<BulletState> SyncData= new NetworkVariable<BulletState>(new BulletState(),
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    public void Setup(Vector2 genPos, float angle, float moveSec, float maxDis, Action onDead) {
-        transform.position = genPos;
-        transform.eulerAngles = new Vector3(0, 0, angle);
-        OnDead = onDead;
-
+    [ServerRpc]
+    public void SetupServerRpc(Vector2 genPos, float angle, float moveSec, float maxDis) {
+        SyncData = new NetworkVariable<BulletState>(new BulletState {Pos = genPos},
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         transform.DOMove((genPos + angle.ToVec2() * maxDis), moveSec).SetEase(Ease.Linear).OnComplete(() => {
-            OnDead.Invoke();
+            gameObject.GetComponent<NetworkObject>().Despawn();
         });
-        
+    }
+
+    public void Update() {
+        if (IsServer) {
+            Debug.Log("Server:"+SyncData.Value.Pos);
+            SyncData.Value.Pos = transform.position;
+        } else {
+            Debug.Log("Client:"+SyncData.Value.Pos);
+            transform.position = SyncData.Value.Pos;
+        }
     }
 }
