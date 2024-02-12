@@ -21,6 +21,7 @@ public class SyncObjSpawner : NetworkBehaviour
     {
         var bullet = Instantiate(ButtetPrefab, genPos, Quaternion.Euler(0,0,angle)).GetComponent<NetworkObject>();
         bullet.Spawn();
-        bullet.GetComponent<BulletCtrl>().SetupServerRpc(genPos, angle, moveSec, maxDis);
+        var bulletCtrl = bullet.GetComponent<BulletCtrl>();
+        bulletCtrl.ServerRequest(genPos, angle, moveSec, maxDis);
     }
 }

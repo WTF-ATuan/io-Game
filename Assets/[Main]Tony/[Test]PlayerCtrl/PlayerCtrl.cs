@@ -42,7 +42,7 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		
 		HealthBar = healthBarPool.Get();
 		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateCtrl);
-		HealthBar.Obj.transform.parent = transform;
+		HealthBar.Obj.transform.SetParent(transform);
 		_recycleThings.Add(HealthBar);
 	}
 
