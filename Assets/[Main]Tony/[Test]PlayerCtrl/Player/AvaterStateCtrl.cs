@@ -113,7 +113,7 @@ public class AvaterStateCtrl  {
             Data.Power = Mathf.Clamp01(Data.Power + missTime / Avater.GetLoadOut().NowAttribute.PowerChargeToFullSec);
             var weapon = Avater.GetLoadOut().GetWeaponInfo();
             if (weapon != null && weapon.CanShoot(Data)) {
-                Data.Towards = Data.AimPos.Angle();
+                Data.Towards = Data.LastAimPos.Angle();
                 Data.RotVec = 0;
             } 
             //--Shoot

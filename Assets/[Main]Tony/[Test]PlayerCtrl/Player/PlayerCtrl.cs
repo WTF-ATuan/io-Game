@@ -32,18 +32,18 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 		RangePreview.Init(StateCtrl);
 		
-		HealthBar = healthBarPool.Get();
-		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateCtrl);
-		HealthBar.Obj.transform.SetParent(transform);
-		_recycleThings.Add(HealthBar);
-		
 		BaseAttribute = avaterAttributeCtrl.GetData();
 		Loadout = new PlayerLoadout(BaseAttribute);
 		var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,new RangePreviewData{Type = RangePreviewType.Straight,Dis = 6,Width = 10});
 		Loadout.SetWeapon(weapon, out var unload);
 
-		var ultSkill = ultSkillFactory.Create<UltSkill>();
-		Loadout.SetUltSkill(ultSkill, out var unload2);
+		//var ultSkill = ultSkillFactory.Create<UltSkill>();
+		//Loadout.SetUltSkill(ultSkill, out var unload2);
+		
+		HealthBar = healthBarPool.Get();
+		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateCtrl);
+		HealthBar.Obj.transform.SetParent(transform);
+		_recycleThings.Add(HealthBar);
 	}
 
 	public override void OnNetworkSpawn() {
