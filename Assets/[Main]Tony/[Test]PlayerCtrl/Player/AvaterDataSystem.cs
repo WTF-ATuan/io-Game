@@ -20,44 +20,60 @@ public abstract class InsertThing:Item {
     
 }
 
-public class UltSkill : InsertThing
+public abstract class UltSkill : InsertThing
 {
+    public RangePreviewData RangePreview;
+    protected IBattleCtrl BattleCtrl;
+    [Inject]
+    private void Initialization(IBattleCtrl battleCtrl) {
+        BattleCtrl = battleCtrl;
+    }
+
+    protected abstract void OnShoot(AvaterState data);
+    public virtual bool CanShoot(AvaterState data) {
+        if (data.UltPower >= 1) {
+            data.UltPower = 0;
+            OnShoot(data);
+            return true;
+        }
+        return false;
+    }
 }
 
 
-public interface IWeaponFactory
-{
-    T Create<T>(params object[] parameters) where T : Weapon;
-}
-
-public class WeaponFactory : IWeaponFactory
-{
+public interface IWeaponFactory { T Create<T>(params object[] parameters) where T : Weapon; }
+public class WeaponFactory : IWeaponFactory {
     private readonly DiContainer _container;
-
-    public WeaponFactory(DiContainer container)
-    {
+    public WeaponFactory(DiContainer container) {
         _container = container;
     }
 
-    public T Create<T>(params object[] parameters) where T : Weapon
-    {
+    public T Create<T>(params object[] parameters) where T : Weapon {
         var instance = (T)Activator.CreateInstance(typeof(T), parameters);
         _container.Inject(instance);
         return instance;
     }
 }
+
+public interface IUltSkillFactory { T Create<T>(params object[] parameters) where T : UltSkill; }
+public class UltSkillFactory : IUltSkillFactory {
+    private readonly DiContainer _container;
+    public UltSkillFactory(DiContainer container) {
+        _container = container;
+    }
+
+    public T Create<T>(params object[] parameters) where T : UltSkill {
+        var instance = (T)Activator.CreateInstance(typeof(T), parameters);
+        _container.Inject(instance);
+        return instance;
+    }
+}
+
 public abstract class Weapon : InsertThing
 {
     public Dictionary<AttributeType, float> AttributeBonus;
     public RangePreviewData RangePreview;
-    /*
-    protected ObjPoolCtrl<BulletCtrl> BulletPool;
 
-    [Inject]
-    private void Initialization(ObjPoolCtrl<BulletCtrl> bulletPool) {
-        BulletPool = bulletPool;
-    }
-    */
     protected IBattleCtrl BattleCtrl;
     [Inject]
     private void Initialization(IBattleCtrl battleCtrl) {
@@ -248,6 +264,7 @@ public class AvaterAttribute {
     public const float RotSpeed = 0.1f;
     public const float MoveFriction = 0.07f;
     public const float CureStartCD = 2;
+    public const float UltPowerChargeToFullSec = 6;
     
     public AvaterAttribute(float moveSpeed, float maxHealth) {
         MaxHealth = maxHealth;
@@ -332,9 +349,8 @@ public class DemoAvaterAttributeCtrl : AvaterAttributeCtrl { }
 public class AvaterDataSystem : MonoInstaller 
 {
     public override void InstallBindings() {
-        //todo 
-        //Container.Bind<IAvaterDataCtrl>().To<ServerAvaterDataCtrl>().FromNew().AsSingle();
         Container.Bind<IAvaterAttributeCtrl>().To<DemoAvaterAttributeCtrl>().FromNew().AsSingle().NonLazy();
         Container.Bind<IWeaponFactory>().To<WeaponFactory>().AsSingle().WithArguments(Container);
+        Container.Bind<IUltSkillFactory>().To<UltSkillFactory>().AsSingle().WithArguments(Container);
     }
 }

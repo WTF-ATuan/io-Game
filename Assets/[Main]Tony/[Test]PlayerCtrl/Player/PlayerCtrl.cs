@@ -5,17 +5,15 @@ using UnityEngine;
 using Zenject;
 
 public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
-	public Transform body;
-
+	
 	private IBattleCtrl BattleCtrl;
-	private IInput InputCtrl{ get; set; }
-	private AvaterAttribute BaseAttribute{ get; set; }
-	private PlayerLoadout Loadout{ get; set; }
-	private PoolObj<HealthBarCtrl> HealthBar{ get; set; }
-
+	private IInput InputCtrl;
+	private AvaterAttribute BaseAttribute;
+	private PlayerLoadout Loadout;
+	private PoolObj<HealthBarCtrl> HealthBar;
 	private List<IDisposable> _recycleThings;
 	private RangePreviewCtrl RangePreview;
-	private AvaterStateCtrl StateCtrl{ get; set; }
+	private AvaterStateCtrl StateCtrl;
 
 	[Inject]
 	private void Initialization(
@@ -23,19 +21,13 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		IInput inputCtrl,
 		IBattleCtrl battleCtrl,
 		ObjPoolCtrl<HealthBarCtrl> healthBarPool,
-		IWeaponFactory weaponFactory
-	)
-	{
+		IWeaponFactory weaponFactory,
+		IUltSkillFactory ultSkillFactory
+	) {
 		BattleCtrl = battleCtrl;
-		_recycleThings = new List<IDisposable>();
 		InputCtrl = inputCtrl;
-		BaseAttribute = avaterAttributeCtrl.GetData();
-		Loadout = new PlayerLoadout(BaseAttribute);
-		
-		var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,new RangePreviewData{Type = RangePreviewType.Straight,Dis = 6,Width = 10});
-		Loadout.SetWeapon(weapon, out var unload);
-		
-		///
+		_recycleThings = new List<IDisposable>();
+
 		StateCtrl = new AvaterStateCtrl(this);
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 		RangePreview.Init(StateCtrl);
@@ -44,6 +36,14 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateCtrl);
 		HealthBar.Obj.transform.SetParent(transform);
 		_recycleThings.Add(HealthBar);
+		
+		BaseAttribute = avaterAttributeCtrl.GetData();
+		Loadout = new PlayerLoadout(BaseAttribute);
+		var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,new RangePreviewData{Type = RangePreviewType.Straight,Dis = 6,Width = 10});
+		Loadout.SetWeapon(weapon, out var unload);
+
+		var ultSkill = ultSkillFactory.Create<UltSkill>();
+		Loadout.SetUltSkill(ultSkill, out var unload2);
 	}
 
 	public override void OnNetworkSpawn() {

@@ -32,6 +32,7 @@ public class AvaterState : INetworkSerializable
     public float ClientUpdateTimeStamp;
     public float Power;
     public float ShootCd;
+    public float UltPower;
     
     public bool IsAim => AimPos != Vector2.zero;
 
@@ -47,6 +48,7 @@ public class AvaterState : INetworkSerializable
         serializer.SerializeValue(ref ClientUpdateTimeStamp);
         serializer.SerializeValue(ref Power);
         serializer.SerializeValue(ref ShootCd);
+        serializer.SerializeValue(ref UltPower);
     }
 }
 
@@ -115,6 +117,10 @@ public class AvaterStateCtrl  {
                 Data.RotVec = 0;
             } 
             //--Shoot
+            
+            //--Ult
+            Data.UltPower = Mathf.Clamp01(Data.UltPower + missTime / AvaterAttribute.UltPowerChargeToFullSec);
+            //--Ult
         } else {
             Data = Avater.GetSyncData().Value;
         }
