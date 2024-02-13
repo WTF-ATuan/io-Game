@@ -24,18 +24,21 @@ public class SyncObjSpawner : NetworkBehaviour{
 
 	//Server Only
 	private void OnBulletHit(Collision obj, ulong playerId){
-		if(!obj.transform.root.TryGetComponent<PlayerCtrl>(out var hitPlayer)){
+		if(!obj.transform.parent.TryGetComponent<PlayerCtrl>(out var hitPlayer)){
 			return;
 		}
 
 		var hitPlayerId = hitPlayer.GetComponent<NetworkObject>().OwnerClientId;
 		if(playerId != hitPlayerId){
-			PlayerHitRequestServerRpc(playerId, hitPlayerId, 5);
+			PlayerHitRequestServerRpc(playerId, hitPlayerId, 100);
 		}
 	}
 
 	[ServerRpc(RequireOwnership = false)]
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage){
 		Debug.Log($"Receive Hit Request {hitId} by {attackerId} ");
+		var hitPlayer = NetworkManager.Singleton.ConnectedClients[hitId].PlayerObject;
+		var playerCtrl = hitPlayer.GetComponent<PlayerCtrl>();
+		playerCtrl.ModifyHealth(-damage);
 	}
 }

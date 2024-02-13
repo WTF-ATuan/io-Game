@@ -33,6 +33,7 @@ public class AvaterState : INetworkSerializable
     public float Power;
     public float ShootCd;
     public float UltPower;
+    public float Health = 1000; //Todo at init we can set Health to maxHealth
     
     public bool IsAim => AimPos != Vector2.zero;
 
@@ -49,6 +50,7 @@ public class AvaterState : INetworkSerializable
         serializer.SerializeValue(ref Power);
         serializer.SerializeValue(ref ShootCd);
         serializer.SerializeValue(ref UltPower);
+        serializer.SerializeValue(ref Health);
     }
 }
 
@@ -78,7 +80,7 @@ public class AvaterStateCtrl  {
     }
 
     public void ClientUpdate() {
-        if (Avater.IsOwner()) {
+        if (Avater.IsOwner()){
             //--Input
             Data.TargetVec = Avater.GetInput().MoveJoy();
             Data.LastAimPos = Data.AimPos;
@@ -127,5 +129,15 @@ public class AvaterStateCtrl  {
 
         Avater.GetTransform().position = Data.Pos;
         RotCenter.eulerAngles = Vector3.forward*Data.Towards;
-    }   
+    }
+
+    public void ModifyHealth(float amount){
+        if(Avater.IsOwner()){
+            Data.Health = Mathf.Clamp(Data.Health + amount, 0, Avater.GetLoadOut().NowAttribute.MaxHealth);
+        }
+        else{
+            Data = Avater.GetSyncData().Value;
+        }
+        
+    }
 }

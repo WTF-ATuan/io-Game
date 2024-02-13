@@ -78,6 +78,10 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 	public IInput GetInput() {
 		return InputCtrl;
 	}
+	
+	public void ModifyHealth(int amount){
+		StateCtrl.ModifyHealth(amount);
+	}
 
 	public bool IsOwner() {
 		return base.IsOwner && base.IsClient;
