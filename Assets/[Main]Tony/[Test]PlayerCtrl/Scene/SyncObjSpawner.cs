@@ -5,9 +5,11 @@ using UnityEngine;
 using Zenject;
 
 public class SyncObjSpawner : NetworkBehaviour{
+	private IBattleCtrl _battleCtrl;
 	[Inject]
 	private void Initialization(IBattleCtrl battleCtrl){
 		battleCtrl.SetSpawner(this);
+		_battleCtrl = battleCtrl;
 	}
 
 	public GameObject ButtetPrefab;
@@ -30,15 +32,7 @@ public class SyncObjSpawner : NetworkBehaviour{
 
 		var hitPlayerId = hitPlayer.GetComponent<NetworkObject>().OwnerClientId;
 		if(playerId != hitPlayerId){
-			PlayerHitRequestServerRpc(playerId, hitPlayerId, 100);
+			_battleCtrl.PlayerHitRequestServerRpc(playerId, hitPlayerId, 100);
 		}
-	}
-
-	[ServerRpc(RequireOwnership = false)]
-	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage){
-		Debug.Log($"Receive Hit Request {hitId} by {attackerId} ");
-		var hitPlayer = NetworkManager.Singleton.ConnectedClients[hitId].PlayerObject;
-		var playerCtrl = hitPlayer.GetComponent<PlayerCtrl>();
-		playerCtrl.ModifyHealth(-damage);
 	}
 }

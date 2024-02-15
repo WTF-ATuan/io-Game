@@ -78,9 +78,10 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 	public IInput GetInput() {
 		return InputCtrl;
 	}
-	
-	public void ModifyHealth(int amount){
+	[ClientRpc]
+	public void ModifyHealthClientRpc(int amount){
 		StateCtrl.ModifyHealth(amount);
+		Debug.Log($"Client? {NetworkManager.Singleton.IsClient}");
 	}
 
 	public bool IsOwner() {

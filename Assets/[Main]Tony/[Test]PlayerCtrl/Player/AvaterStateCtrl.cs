@@ -132,12 +132,7 @@ public class AvaterStateCtrl  {
     }
 
     public void ModifyHealth(float amount){
-        if(Avater.IsOwner()){
-            Data.Health = Mathf.Clamp(Data.Health + amount, 0, Avater.GetLoadOut().NowAttribute.MaxHealth);
-        }
-        else{
-            Data = Avater.GetSyncData().Value;
-        }
-        
+        Data.Health = Mathf.Clamp(Data.Health + amount, 0, Avater.GetLoadOut().NowAttribute.MaxHealth);
+        DataSync();
     }
 }
