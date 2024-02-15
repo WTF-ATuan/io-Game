@@ -30,7 +30,7 @@ public class SyncObjSpawner : NetworkBehaviour{
 			return;
 		}
 
-		var hitPlayerId = hitPlayer.GetComponent<NetworkObject>().OwnerClientId;
+		var hitPlayerId = hitPlayer.OwnerClientId;
 		if(playerId != hitPlayerId){
 			_battleCtrl.PlayerHitRequestServerRpc(playerId, hitPlayerId, 100);
 		}

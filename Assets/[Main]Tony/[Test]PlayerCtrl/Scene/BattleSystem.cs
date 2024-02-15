@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -6,9 +6,9 @@ using Zenject;
 
 public interface IBattleCtrl
 {
-    public void SetLocalPlayer(PlayerCtrl player);
+    public void AddPlayer(PlayerCtrl player);
     public PlayerCtrl GetLocalPlayer();
-    
+    public ulong GetLocalPlayerID();
     public void SetSpawner(SyncObjSpawner player);
     public SyncObjSpawner GetSpawner();
     public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage);
@@ -16,29 +16,36 @@ public interface IBattleCtrl
 
 public class DemoBattleCtrl : IBattleCtrl
 {
-    private PlayerCtrl LocalPlayer;
-    private SyncObjSpawner Spawner;
+    private SyncObjSpawner _spawner;
+    private readonly List<PlayerCtrl> _playerList = new (); 
 
-    public void SetLocalPlayer(PlayerCtrl player) {
-        LocalPlayer = player;
+    public void AddPlayer(PlayerCtrl player) {
+        _playerList.Add(player);
+        Debug.Log($"{_playerList.Count}");
     }
     
-    public PlayerCtrl GetLocalPlayer() {
-        return LocalPlayer;
+    public PlayerCtrl GetLocalPlayer(){
+        var localClientId = NetworkManager.Singleton.LocalClientId;
+        var playerCtrl = _playerList.Find(x => x.OwnerClientId == localClientId);
+        if(!playerCtrl) throw new NullReferenceException($"Can't find local player with{localClientId}");
+        return playerCtrl;
+    }
+
+    public ulong GetLocalPlayerID(){
+        return NetworkManager.Singleton.LocalClientId;
     }
 
     public void SetSpawner(SyncObjSpawner spawner)
     {
-        Spawner = spawner;
+        _spawner = spawner;
     }
 
     public SyncObjSpawner GetSpawner()
     {
-        return Spawner;
+        return _spawner;
     }
     [ServerRpc(RequireOwnership = false)]
     public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage){
-        Debug.Log($"Receive Hit Request {hitId} by {attackerId} ");
         var hitPlayer = NetworkManager.Singleton.ConnectedClients[hitId].PlayerObject;
         var playerCtrl = hitPlayer.GetComponent<PlayerCtrl>();
         playerCtrl.ModifyHealthClientRpc(-damage);

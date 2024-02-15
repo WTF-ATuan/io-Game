@@ -27,6 +27,7 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		BattleCtrl = battleCtrl;
 		InputCtrl = inputCtrl;
 		_recycleThings = new List<IDisposable>();
+		BattleCtrl.AddPlayer(this);
 
 		StateCtrl = new AvaterStateCtrl(this);
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
@@ -45,11 +46,6 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		HealthBar.Obj.transform.SetParent(transform);
 		_recycleThings.Add(HealthBar);
 	}
-
-	public override void OnNetworkSpawn() {
-		if(IsOwner())BattleCtrl.SetLocalPlayer(this);
-	}
-	
 	public override void OnDestroy(){
 		base.OnDestroy();
 		foreach(var thing in _recycleThings){
@@ -81,11 +77,10 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 	[ClientRpc]
 	public void ModifyHealthClientRpc(int amount){
 		StateCtrl.ModifyHealth(amount);
-		Debug.Log($"Client? {NetworkManager.Singleton.IsClient}");
 	}
 
-	public bool IsOwner() {
-		return base.IsOwner && base.IsClient;
+	public new bool IsOwner() {
+		return base.IsOwner && IsClient;
 	}
 	
 	private void Update() {
