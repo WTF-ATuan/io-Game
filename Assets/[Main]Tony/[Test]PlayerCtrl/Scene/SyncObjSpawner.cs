@@ -1,3 +1,4 @@
+using _Main_Tony._Test_PlayerCtrl.Runes;
 using UniRx;
 using UniRx.Triggers;
 using Unity.Netcode;
@@ -33,6 +34,7 @@ public class SyncObjSpawner : NetworkBehaviour{
 		var hitPlayerId = hitPlayer.OwnerClientId;
 		if(playerId != hitPlayerId){
 			_battleCtrl.PlayerHitRequestServerRpc(playerId, hitPlayerId, 100);
+			_battleCtrl.RuneCastingRequestServerRpc(playerId, hitPlayerId, "FrozenRune" ,RunesCastType.AutoAttack);
 		}
 	}
 }
