@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Main_Tony._Test_PlayerCtrl.Runes;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -14,6 +15,7 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 	private List<IDisposable> _recycleThings;
 	private RangePreviewCtrl RangePreview;
 	private AvaterStateCtrl StateCtrl;
+	private RunesCastHelper _runesCastHelper;
 
 	[Inject]
 	private void Initialization(
@@ -45,6 +47,7 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateCtrl);
 		HealthBar.Obj.transform.SetParent(transform);
 		_recycleThings.Add(HealthBar);
+		_runesCastHelper = new RunesCastHelper(this);
 	}
 	public override void OnDestroy(){
 		base.OnDestroy();
@@ -78,13 +81,18 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 	public void ModifyHealthClientRpc(int amount){
 		StateCtrl.ModifyHealth(amount);
 	}
+	[ClientRpc]
+	public void RunesCastedByClientRpc(ulong playerId, string runesId, RunesCastType runesCastType){
+		_runesCastHelper.CastingRunesEffect(runesId , runesCastType);
+	}
 
 	public new bool IsOwner() {
 		return base.IsOwner && IsClient;
 	}
-	
+
 	private void Update() {
 		StateCtrl.DataSync();
+		_runesCastHelper.SyncServerTime();
 		if(IsOwner())RangePreview.Setup(Loadout.GetWeaponInfo().RangePreview);
 	}
 
