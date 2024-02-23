@@ -12,7 +12,8 @@ public class SnipeGun : Weapon{
 			angle = data.Towards,
 			moveSec = 0.3f,
 			maxDis =  RangePreview.Dis,
-			playerId = BattleCtrl.GetLocalPlayerID()
+			playerId = BattleCtrl.GetLocalPlayerID(),
+			runesId = "Frozen"
 		};
 		BattleCtrl.GetSpawner()
 				.SpawnBulletServerRpc(bulletData);
