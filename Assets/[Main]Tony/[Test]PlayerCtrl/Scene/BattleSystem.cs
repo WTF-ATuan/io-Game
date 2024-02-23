@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using _Main_Tony._Test_PlayerCtrl.Runes;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -12,7 +11,6 @@ public interface IBattleCtrl{
 	public void SetSpawner(SyncObjSpawner player);
 	public SyncObjSpawner GetSpawner();
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage);
-	void RuneCastingRequestServerRpc(ulong playerId, ulong hitPlayerId, string runeId, RunesCastType runesCastType);
 }
 //Todo we can split Get Interface , Set Interface and Battle API Interface if IBattleCtrl is to large.
 public class DemoBattleCtrl : IBattleCtrl{
@@ -47,15 +45,6 @@ public class DemoBattleCtrl : IBattleCtrl{
 		var hitPlayer = NetworkManager.Singleton.ConnectedClients[hitId].PlayerObject;
 		var playerCtrl = hitPlayer.GetComponent<PlayerCtrl>();
 		playerCtrl.ModifyHealthClientRpc(-damage);
-	}
-
-	[ServerRpc(RequireOwnership = false)]
-	public void RuneCastingRequestServerRpc(ulong playerId, ulong hitPlayerId, string runesId,
-		RunesCastType runesCastType){
-		var hitPlayer = NetworkManager.Singleton.ConnectedClients[hitPlayerId].PlayerObject;
-		var playerCtrl = hitPlayer.GetComponent<PlayerCtrl>();
-		playerCtrl.RunesCastedByClientRpc(playerId , runesId , runesCastType);
-		Debug.Log($"{playerId} cast {runesId} to {hitPlayerId} with {runesCastType} ");
 	}
 }
 
