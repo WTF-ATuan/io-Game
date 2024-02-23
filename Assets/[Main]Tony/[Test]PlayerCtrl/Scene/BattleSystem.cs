@@ -14,7 +14,7 @@ public interface IBattleCtrl{
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage);
 	void RuneCastingRequestServerRpc(ulong playerId, ulong hitPlayerId, string runeId, RunesCastType runesCastType);
 }
-
+//Todo we can split Get Interface , Set Interface and Battle API Interface if IBattleCtrl is to large.
 public class DemoBattleCtrl : IBattleCtrl{
 	private SyncObjSpawner _spawner;
 	private readonly List<PlayerCtrl> _playerList = new();
@@ -52,6 +52,9 @@ public class DemoBattleCtrl : IBattleCtrl{
 	[ServerRpc(RequireOwnership = false)]
 	public void RuneCastingRequestServerRpc(ulong playerId, ulong hitPlayerId, string runesId,
 		RunesCastType runesCastType){
+		var hitPlayer = NetworkManager.Singleton.ConnectedClients[hitPlayerId].PlayerObject;
+		var playerCtrl = hitPlayer.GetComponent<PlayerCtrl>();
+		playerCtrl.RunesCastedByClientRpc(playerId , runesId , runesCastType);
 		Debug.Log($"{playerId} cast {runesId} to {hitPlayerId} with {runesCastType} ");
 	}
 }
