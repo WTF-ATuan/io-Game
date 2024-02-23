@@ -2,10 +2,12 @@ using UniRx;
 using UniRx.Triggers;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 public class SyncObjSpawner : NetworkBehaviour{
 	private IBattleCtrl _battleCtrl;
+
 	[Inject]
 	private void Initialization(IBattleCtrl battleCtrl){
 		battleCtrl.SetSpawner(this);
@@ -15,13 +17,12 @@ public class SyncObjSpawner : NetworkBehaviour{
 	public GameObject ButtetPrefab;
 
 	[ServerRpc(RequireOwnership = false)]
-	public void SpawnBulletServerRpc(Vector2 genPos, float angle, float moveSec, float maxDis,
-		ulong playerId = default){
-		var bulletClone = Instantiate(ButtetPrefab, genPos, Quaternion.Euler(0, 0, angle))
+	public void SpawnBulletServerRpc(BulletData data){
+		var bulletClone = Instantiate(ButtetPrefab, data.genPos, Quaternion.Euler(0, 0, data.angle))
 				.GetComponent<NetworkObject>();
 		bulletClone.Spawn();
-		bulletClone.GetComponent<BulletCtrl>().Setup(genPos, angle, moveSec, maxDis, () => { bulletClone.Despawn(); });
-		bulletClone.OnCollisionEnterAsObservable().Subscribe(x => OnBulletHit(x, playerId));
+		bulletClone.GetComponent<BulletCtrl>().Setup(data.genPos, data.angle, data.moveSec, data.maxDis, () => { bulletClone.Despawn(); });
+		bulletClone.OnCollisionEnterAsObservable().Subscribe(x => OnBulletHit(x, data.playerId));
 	}
 
 	//Server Only
@@ -34,5 +35,22 @@ public class SyncObjSpawner : NetworkBehaviour{
 		if(playerId != hitPlayerId){
 			_battleCtrl.PlayerHitRequestServerRpc(playerId, hitPlayerId, 100);
 		}
+	}
+}
+
+[System.Serializable]
+public class BulletData : INetworkSerializable{
+	public Vector2 genPos;
+	public float angle;
+	public float moveSec;
+	public float maxDis;
+	public ulong playerId;
+	
+	public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter{
+		serializer.SerializeValue(ref genPos);
+		serializer.SerializeValue(ref angle);
+		serializer.SerializeValue(ref moveSec);
+		serializer.SerializeValue(ref maxDis);
+		serializer.SerializeValue(ref playerId);
 	}
 }

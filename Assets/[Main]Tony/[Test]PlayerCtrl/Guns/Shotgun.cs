@@ -15,7 +15,13 @@ public class Shotgun : Weapon {
         float angleRange = RangePreview.Width;
         for (int i = 0; i < bulletAmount; i++) {
             float ang = (data.Towards - angleRange / 2) + i*(angleRange / bulletAmount);
-            BattleCtrl.GetSpawner().SpawnBulletServerRpc(data.Pos, ang, 0.3f, RangePreview.Dis);
+            var bulletData = new BulletData{
+                genPos = data.Pos,
+                angle = data.Towards,
+                moveSec = 0.3f,
+                maxDis =  RangePreview.Dis,
+            };
+            BattleCtrl.GetSpawner().SpawnBulletServerRpc(bulletData);
             //var bullet = BulletPool.Get();
             //bullet.Ctrl.Setup(data.Pos, ang, 0.3f, RangePreview.Dis, () => { bullet.Dispose(); });
         }
