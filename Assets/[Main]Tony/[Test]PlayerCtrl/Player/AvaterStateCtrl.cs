@@ -122,6 +122,11 @@ public class AvaterStateCtrl  {
             
             //--Ult
             Data.UltPower = Mathf.Clamp01(Data.UltPower + missTime / AvaterAttribute.UltPowerChargeToFullSec);
+            var ultSkill = Avater.GetLoadOut().GetUltSkillInfo();
+            if (ultSkill != null && ultSkill.CanShoot(Data)) {
+                // Data.Towards = Data.LastAimPos.Angle();
+                // Data.RotVec = 0;
+            } 
             //--Ult
         } else {
             Data = Avater.GetSyncData().Value;

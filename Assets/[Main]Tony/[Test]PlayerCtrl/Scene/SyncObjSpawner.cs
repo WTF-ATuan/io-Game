@@ -31,6 +31,7 @@ public class SyncObjSpawner : NetworkBehaviour{
 
 	[ClientRpc]
 	private void GenerateBulletViewClientRpc(ulong bulletId, string runesId){
+		if(runesId != "Frozen") return;
 		var spawnedObject = NetworkManager.SpawnManager.SpawnedObjects[bulletId];
 		var viewObject = _mapper.GetViewObjectById(runesId);
 		Instantiate(viewObject, spawnedObject.transform.position, Quaternion.identity, spawnedObject.transform);
@@ -55,6 +56,7 @@ public class BulletData : INetworkSerializable{
 	public float angle;
 	public float moveSec;
 	public float maxDis;
+	public float damage;
 	public ulong playerId;
 	public string runesId;
 
@@ -65,5 +67,6 @@ public class BulletData : INetworkSerializable{
 		serializer.SerializeValue(ref maxDis);
 		serializer.SerializeValue(ref playerId);
 		serializer.SerializeValue(ref runesId);
+		serializer.SerializeValue(ref damage);
 	}
 }
