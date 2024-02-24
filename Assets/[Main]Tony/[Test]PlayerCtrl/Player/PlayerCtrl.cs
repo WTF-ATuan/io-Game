@@ -39,9 +39,9 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,new RangePreviewData{Type = RangePreviewType.Straight,Dis = 6,Width = 10});
 		Loadout.SetWeapon(weapon, out var unload);
 
-		//var ultSkill = ultSkillFactory.Create<UltSkill>();
-		//Loadout.SetUltSkill(ultSkill, out var unload2);
-		
+		var bigGunUlt = ultSkillFactory.Create<BigGunUltSkill>();
+		Loadout.SetUltSkill(bigGunUlt, out var unloadUlt);
+
 		HealthBar = healthBarPool.Get();
 		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateCtrl);
 		HealthBar.Obj.transform.SetParent(transform);
