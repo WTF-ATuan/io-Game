@@ -12,6 +12,7 @@ namespace Assets.Scenes{
 
 
 		private void Start(){
+			if(_clientGameManager == null) return;
 			_clientGameManager = ClientSingleton.Instance.Manager;
 		}
 
@@ -21,7 +22,7 @@ namespace Assets.Scenes{
 			connectingText.text = "Connecting...";
 			await _clientGameManager.MatchmakeAsync(OnMatchMade);
 		}
-		
+
 		private void OnMatchMade(MatchmakerPollingResult result){
 			connectingText.gameObject.SetActive(false);
 			playerIdText.transform.parent.gameObject.SetActive(true);

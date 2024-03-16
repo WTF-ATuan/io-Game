@@ -11,7 +11,7 @@ public class ApplicationController : MonoBehaviour
     private ApplicationData appData;
     public static bool IsServer;
 
-    private async void Awake()
+    private async void Start()
     {
         Application.targetFrameRate = 60;
         DontDestroyOnLoad(gameObject);
@@ -44,6 +44,7 @@ public class ApplicationController : MonoBehaviour
             Instantiate(hostSingleton);
 
             await clientSingleton.CreateClient();
+            clientSingleton.Manager.ToMainMenu();
         }
     }
 }

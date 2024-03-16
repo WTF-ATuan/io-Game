@@ -94,7 +94,7 @@ public class ClientGameManager : IDisposable
 
     public void ToMainMenu()
     {
-        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+        SceneManager.LoadScene("MatchMaking Scene", LoadSceneMode.Single);
     }
 
     public void AddMatchPlayer(Matchplayer player)
