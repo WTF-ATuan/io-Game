@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BigGunUltSkill : UltSkill {
+
+    public BigGunUltSkill()
+    {
+        RangePreview = new RangePreviewData{Type = RangePreviewType.Straight,Dis = 6,Width = 10};
+    }
     protected override void OnShoot(AvaterState data)
     {
         var bulletData = new BulletData{

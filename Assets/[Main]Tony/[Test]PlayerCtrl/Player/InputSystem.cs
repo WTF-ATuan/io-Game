@@ -6,6 +6,8 @@ using Zenject;
 public interface IInput {
     public Vector2 MoveJoy();
     public Vector2 AimJoy();
+    
+    public Vector2 UtlJoy();
 }
 
 public class PCInput : IInput
@@ -22,18 +24,33 @@ public class PCInput : IInput
         return data.normalized;
     }
 
+    private Vector2 GetMouseJoy() {
+        Vector2 data = Vector2.zero;
+        var localPlayer = BattleCtrl.GetLocalPlayer();
+        if(!localPlayer) return Vector2.zero;
+        Vector3 playerPos = localPlayer.transform.position;
+        playerPos = Camera.main.WorldToScreenPoint(playerPos);
+        Vector3 mousePos = Input.mousePosition;
+        data = mousePos - playerPos;
+        return data.normalized;
+    }
+    
     public Vector2 AimJoy()
     {
         Vector2 data = Vector2.zero;
         if (Input.GetMouseButton(0)) {
-            var localPlayer = BattleCtrl.GetLocalPlayer();
-            if(!localPlayer) return Vector2.zero;
-            Vector3 playerPos = localPlayer.transform.position;
-            playerPos = Camera.main.WorldToScreenPoint(playerPos);
-            Vector3 mousePos = Input.mousePosition;
-            data = mousePos - playerPos;
+            data = GetMouseJoy();
         }
-        return data.normalized;
+        return data;
+    }
+
+    public Vector2 UtlJoy()
+    {
+        Vector2 data = Vector2.zero;
+        if (Input.GetMouseButton(1)) {
+            data = GetMouseJoy();
+        }
+        return data;
     }
 }
 
@@ -50,6 +67,13 @@ public class AndroidInput : IInput {
         //todo
         return data;
     }
+    
+    public Vector2 UtlJoy()
+    {
+        Vector2 data = new Vector2();
+        //todo
+        return data;
+    }
 }
 
 public class IPhoneInput : IInput {
@@ -59,6 +83,13 @@ public class IPhoneInput : IInput {
         return data;
     }
     public Vector2 AimJoy()
+    {
+        Vector2 data = new Vector2();
+        //todo
+        return data;
+    }
+    
+    public Vector2 UtlJoy()
     {
         Vector2 data = new Vector2();
         //todo

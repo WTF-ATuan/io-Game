@@ -9,6 +9,7 @@ public class RangePreviewCtrl : MonoBehaviour
     public MeshRenderer Mesh;
     private Material M;
     private AvaterStateCtrl PlayerData;
+    private IGetPlayerLoadout PlayerLoadout;
     
     private static readonly int Width = Shader.PropertyToID("_Width");
     private static readonly int Type = Shader.PropertyToID("_Type");
@@ -18,22 +19,38 @@ public class RangePreviewCtrl : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Init(AvaterStateCtrl data)
-    {
+    public void Init(AvaterStateCtrl data, IGetPlayerLoadout playerLoadout) {
         PlayerData = data;
+        PlayerLoadout = playerLoadout;
     }
     
-    public void Setup(RangePreviewData data) {
+    public void Update() {
         if (PlayerData == null) return;
+        RangePreviewData data = null;
+        float ang = 0;
         if (PlayerData.Data.IsAim) {
-            transform.eulerAngles = new Vector3(0, 0, PlayerData.Data.AimPos.Angle());
-            M.SetFloat(Width, data.Width/360);
-            M.SetFloat(Type, (int)data.Type);
-            transform.localScale = Vector3.one*data.Dis*0.2f;
-            if(!gameObject.activeSelf) gameObject.SetActive(true);
-        } else {
-            if(gameObject.activeSelf)gameObject.SetActive(false);
+            var weapon = PlayerLoadout.GetWeaponInfo();
+            if (weapon.TryShoot(PlayerData.Data, false)) {
+                data = weapon.RangePreview;
+                ang = PlayerData.Data.AimPos.Angle();
+            }
         }
+        if (PlayerData.Data.IsUtl) {
+            var utl = PlayerLoadout.GetUtlInfo();
+            if (utl.TryShoot(PlayerData.Data, false)) {
+                data = utl.RangePreview;
+                ang = PlayerData.Data.UtlPos.Angle();
+            }
+        }
+        if (data == null) {
+            if(gameObject.activeSelf)gameObject.SetActive(false);
+            return;
+        }
+        transform.eulerAngles = new Vector3(0, 0, ang);
+        M.SetFloat(Width, data.Width/360);
+        M.SetFloat(Type, (int)data.Type);
+        transform.localScale = Vector3.one*data.Dis*0.2f;
+        if(!gameObject.activeSelf) gameObject.SetActive(true);
     }
 }
 
@@ -42,7 +59,7 @@ public enum RangePreviewType {
     Straight,
     Throw
 }
-public struct RangePreviewData {
+public class RangePreviewData {
     public RangePreviewType Type;
     public float Dis;
     public float Width;

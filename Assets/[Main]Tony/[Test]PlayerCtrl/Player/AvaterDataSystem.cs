@@ -30,10 +30,13 @@ public abstract class UltSkill : InsertThing
     }
 
     protected abstract void OnShoot(AvaterState data);
-    public virtual bool CanShoot(AvaterState data) {
-        if (data.UltPower >= 1) {
-            data.UltPower = 0;
-            OnShoot(data);
+    public virtual bool TryShoot(AvaterState data, bool forceShoot = true) {
+        if (((data.UtlPos == Vector2.zero && data.LastUtlPos != Vector2.zero) || !forceShoot) && 
+            data.UltPower >= 1) {
+            if (forceShoot) {
+                data.UltPower = 0;
+                OnShoot(data);
+            }
             return true;
         }
         return false;
@@ -82,16 +85,17 @@ public abstract class Weapon : InsertThing
 
     public abstract void OnShoot(AvaterState data);
 
-    public virtual bool CanShoot(AvaterState data) {
+    public virtual bool TryShoot(AvaterState data, bool forceShoot = true) {
         float powerNeed = (1f / (int) AttributeBonus[AttributeType.MaxBullet]);
         float nowTime = Time.time;
-        if (data.AimPos == Vector2.zero && 
-            data.LastAimPos != Vector2.zero && 
+        if (((data.AimPos == Vector2.zero && data.LastAimPos != Vector2.zero) || !forceShoot) && 
             data.ShootCd < nowTime && 
             data.Power >= powerNeed) {
-            data.Power = Mathf.Clamp01(data.Power - powerNeed);
-            data.ShootCd = nowTime + AttributeBonus[AttributeType.ShootCD];
-            OnShoot(data);
+            if (forceShoot) {
+                data.Power = Mathf.Clamp01(data.Power - powerNeed);
+                data.ShootCd = nowTime + AttributeBonus[AttributeType.ShootCD];
+                OnShoot(data);
+            }
             return true;
         }
         return false;
@@ -111,7 +115,19 @@ public class Armor : InsertThing
 {
     public Dictionary<AttributeType, int> AttributeBonus;
 }
-public class PlayerLoadout
+
+public interface IGetPlayerLoadout
+{
+    public Weapon GetWeaponInfo();
+    public Armor GetArmorInfo();
+    public UltSkill GetUtlInfo();
+    public Weapon GetWeaponInfo(out Item[] inserts);
+    public Armor GetArmorInfo(out Item[] inserts);
+    public UltSkill GetUtlInfo(out Item[] inserts);
+
+}
+
+public class PlayerLoadout : IGetPlayerLoadout
 {
     protected Weapon Weapon;
     protected Armor Armor;
@@ -137,8 +153,8 @@ public class PlayerLoadout
         return GetArmorInfo(out Item[] inserts);
     }
     
-    public UltSkill GetUltSkillInfo() {
-        return GetUltSkillInfo(out Item[] inserts);
+    public UltSkill GetUtlInfo() {
+        return GetUtlInfo(out Item[] inserts);
     }
     
     public Weapon GetWeaponInfo(out Item[] inserts) {
@@ -149,7 +165,7 @@ public class PlayerLoadout
         return GetInfo(Armor,ArmorPassives,out inserts);
     }
     
-    public UltSkill GetUltSkillInfo(out Item[] inserts) {
+    public UltSkill GetUtlInfo(out Item[] inserts) {
         return GetInfo(UltSkill,UltSkillRunes,out inserts);
     }
 

@@ -27,6 +27,8 @@ public class AvaterState : INetworkSerializable
     public Vector2 NowVec;
     public Vector2 AimPos;
     public Vector2 LastAimPos;
+    public Vector2 UtlPos;
+    public Vector2 LastUtlPos;
     public float Towards;
     public float RotVec;
     public float ClientUpdateTimeStamp;
@@ -34,9 +36,9 @@ public class AvaterState : INetworkSerializable
     public float ShootCd;
     public float UltPower;
     public float Health = 1000; //Todo at init we can set Health to maxHealth
-    
-    public bool IsAim => AimPos != Vector2.zero;
 
+    public bool IsAim => AimPos != Vector2.zero;
+    public bool IsUtl => UtlPos != Vector2.zero;
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref Pos);
@@ -44,6 +46,8 @@ public class AvaterState : INetworkSerializable
         serializer.SerializeValue(ref NowVec);
         serializer.SerializeValue(ref AimPos);
         serializer.SerializeValue(ref LastAimPos);
+        serializer.SerializeValue(ref UtlPos);
+        serializer.SerializeValue(ref LastUtlPos);
         serializer.SerializeValue(ref Towards);
         serializer.SerializeValue(ref RotVec);
         serializer.SerializeValue(ref ClientUpdateTimeStamp);
@@ -85,6 +89,8 @@ public class AvaterStateCtrl  {
             Data.TargetVec = Avater.GetInput().MoveJoy();
             Data.LastAimPos = Data.AimPos;
             Data.AimPos = Avater.GetInput().AimJoy();
+            Data.LastUtlPos = Data.UtlPos;
+            Data.UtlPos = Avater.GetInput().UtlJoy();
             //--Input
             
             float missTime = Time.time - Data.ClientUpdateTimeStamp;
@@ -104,17 +110,20 @@ public class AvaterStateCtrl  {
             Data.Pos = Data.Pos + Data.NowVec * Avater.GetLoadOut().NowAttribute.MoveSpeed * missTime;
             //--Move
             
+            var weapon = Avater.GetLoadOut().GetWeaponInfo();
+            var ultSkill = Avater.GetLoadOut().GetUtlInfo();
             //--Rot
-            float targetTowards =  !Data.IsAim
-                ? Data.TargetVec != Vector2.zero ? Data.TargetVec.Angle() : Data.Towards
-                : Data.AimPos.Angle();
+            float targetTowards =  
+                Data.IsAim && weapon.TryShoot(Data,false) ? Data.AimPos.Angle() : 
+                Data.IsUtl && ultSkill.TryShoot(Data,false) ? Data.UtlPos.Angle() : 
+                Data.TargetVec != Vector2.zero ? Data.TargetVec.Angle() : 
+                Data.Towards;
             Data.Towards = Mathf.SmoothDampAngle(Data.Towards, targetTowards, ref Data.RotVec, AvaterAttribute.RotSpeed, Mathf.Infinity, missTime);
             //--Rot
             
             //--Shoot
             Data.Power = Mathf.Clamp01(Data.Power + missTime / Avater.GetLoadOut().NowAttribute.PowerChargeToFullSec);
-            var weapon = Avater.GetLoadOut().GetWeaponInfo();
-            if (weapon != null && weapon.CanShoot(Data)) {
+            if (weapon != null && weapon.TryShoot(Data)) {
                 Data.Towards = Data.LastAimPos.Angle();
                 Data.RotVec = 0;
             } 
@@ -122,10 +131,9 @@ public class AvaterStateCtrl  {
             
             //--Ult
             Data.UltPower = Mathf.Clamp01(Data.UltPower + missTime / AvaterAttribute.UltPowerChargeToFullSec);
-            var ultSkill = Avater.GetLoadOut().GetUltSkillInfo();
-            if (ultSkill != null && ultSkill.CanShoot(Data)) {
-                // Data.Towards = Data.LastAimPos.Angle();
-                // Data.RotVec = 0;
+            if (ultSkill != null && ultSkill.TryShoot(Data)) {
+                Data.Towards = Data.LastUtlPos.Angle();
+                Data.RotVec = 0;
             } 
             //--Ult
         } else {

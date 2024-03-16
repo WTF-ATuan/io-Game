@@ -31,9 +31,6 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		BattleCtrl.AddPlayer(this);
 
 		StateCtrl = new AvaterStateCtrl(this);
-		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
-		RangePreview.Init(StateCtrl);
-		
 		BaseAttribute = avaterAttributeCtrl.GetData();
 		Loadout = new PlayerLoadout(BaseAttribute);
 		var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,new RangePreviewData{Type = RangePreviewType.Straight,Dis = 6,Width = 10});
@@ -42,6 +39,9 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		var bigGunUlt = ultSkillFactory.Create<BigGunUltSkill>();
 		Loadout.SetUltSkill(bigGunUlt, out var unloadUlt);
 
+		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
+		RangePreview.Init(StateCtrl, Loadout);
+		
 		HealthBar = healthBarPool.Get();
 		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateCtrl);
 		HealthBar.Obj.transform.SetParent(transform);
@@ -86,7 +86,8 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 
 	private void Update() {
 		StateCtrl.DataSync();
-		if(IsOwner())RangePreview.Setup(Loadout.GetWeaponInfo().RangePreview);
+		if(IsOwner())
+			RangePreview.Update();
 	}
 
 	private void FixedUpdate() {
