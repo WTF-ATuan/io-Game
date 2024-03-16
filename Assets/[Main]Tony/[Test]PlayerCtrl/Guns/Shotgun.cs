@@ -5,9 +5,8 @@ using Zenject;
 
 public class Shotgun : Weapon {
     public Shotgun(
-        int maxBullet, float powerChargeToFullSec, float damage, float shootCD, RangePreviewData rangePreview) : 
-        base(maxBullet, powerChargeToFullSec, damage, shootCD, rangePreview) {
-        
+        int maxBullet, float powerChargeToFullSec, float damage, float shootCD, float flySec, RangePreviewData rangePreview) : 
+        base(maxBullet, powerChargeToFullSec, damage, shootCD, flySec, rangePreview.Dis,rangePreview) {
     }
 
     public override void OnShoot(AvaterState data) {
@@ -18,8 +17,11 @@ public class Shotgun : Weapon {
             var bulletData = new BulletData{
                 genPos = data.Pos,
                 angle = data.Towards,
-                moveSec = 0.3f,
-                maxDis =  RangePreview.Dis,
+                flySec = AttributeBonus[AttributeType.FlySec],
+                flyDis = AttributeBonus[AttributeType.FlyDis],
+                damage = AttributeBonus[AttributeType.Damage],
+                playerId = BattleCtrl.GetLocalPlayerID(),
+                runesId = "Shotgun"
             };
             BattleCtrl.GetSpawner().SpawnBulletServerRpc(bulletData);
             //var bullet = BulletPool.Get();

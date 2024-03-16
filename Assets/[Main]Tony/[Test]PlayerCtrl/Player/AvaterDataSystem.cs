@@ -101,12 +101,14 @@ public abstract class Weapon : InsertThing
         return false;
     }
     
-    public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, RangePreviewData rangePreview) {
+    public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, float flySec, float flyDis, RangePreviewData rangePreview) {
         AttributeBonus = new Dictionary<AttributeType, float>();
         AttributeBonus.Add(AttributeType.MaxBullet, maxBullet);
         AttributeBonus.Add(AttributeType.PowerChargeToFullSec, powerChargeToFullSec);
         AttributeBonus.Add(AttributeType.Damage, damage);
         AttributeBonus.Add(AttributeType.ShootCD, shootCD);
+        AttributeBonus.Add(AttributeType.FlySec, flySec);
+        AttributeBonus.Add(AttributeType.FlyDis, flyDis);
         RangePreview = rangePreview;
     }
 }
@@ -262,6 +264,8 @@ public enum AttributeType {
     PowerChargeToFullSec,
     Damage,
     ShootCD,
+    FlySec,
+    FlyDis
 }
 
 public class AvaterAttribute {

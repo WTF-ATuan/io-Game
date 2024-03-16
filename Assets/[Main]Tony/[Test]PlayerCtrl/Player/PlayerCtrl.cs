@@ -33,10 +33,10 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 		StateCtrl = new AvaterStateCtrl(this);
 		BaseAttribute = avaterAttributeCtrl.GetData();
 		Loadout = new PlayerLoadout(BaseAttribute);
-		var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,new RangePreviewData{Type = RangePreviewType.Straight,Dis = 6,Width = 10});
+		var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,0.3f,new RangePreviewData(RangePreviewType.Straight,6,10));
 		Loadout.SetWeapon(weapon, out var unload);
 
-		var bigGunUlt = ultSkillFactory.Create<BigGunUltSkill>();
+		var bigGunUlt = ultSkillFactory.Create<BigGunUltSkill>(weapon);
 		Loadout.SetUltSkill(bigGunUlt, out var unloadUlt);
 
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();

@@ -1,8 +1,8 @@
 using Unity.Netcode;
 
 public class SnipeGun : Weapon{
-	public SnipeGun(int maxBullet, float powerChargeToFullSec, float damage, float shootCD,
-		RangePreviewData rangePreview) : base(maxBullet, powerChargeToFullSec, damage, shootCD, rangePreview){ }
+	public SnipeGun(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, float flySec,
+		RangePreviewData rangePreview) : base(maxBullet, powerChargeToFullSec, damage, shootCD, flySec, rangePreview.Dis,rangePreview){ }
 
 	public override void OnShoot(AvaterState data){
 		//var bullet = BulletPool.Get();
@@ -10,8 +10,9 @@ public class SnipeGun : Weapon{
 		var bulletData = new BulletData{
 			genPos = data.Pos,
 			angle = data.Towards,
-			moveSec = 0.3f,
-			maxDis =  RangePreview.Dis,
+			flySec = AttributeBonus[AttributeType.FlySec],
+			flyDis = AttributeBonus[AttributeType.FlyDis],
+			damage = AttributeBonus[AttributeType.Damage],
 			playerId = BattleCtrl.GetLocalPlayerID(),
 			runesId = "Frozen"
 		};

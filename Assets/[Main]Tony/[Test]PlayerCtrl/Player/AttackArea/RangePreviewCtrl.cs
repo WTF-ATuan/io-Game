@@ -63,5 +63,11 @@ public class RangePreviewData {
     public RangePreviewType Type;
     public float Dis;
     public float Width;
+
+    public RangePreviewData(RangePreviewType type,float dis,float width) {
+        Type = type;
+        Dis = dis;
+        Width = width;
+    }
     
 }

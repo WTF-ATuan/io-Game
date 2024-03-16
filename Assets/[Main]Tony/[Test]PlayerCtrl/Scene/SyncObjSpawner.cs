@@ -23,7 +23,7 @@ public class SyncObjSpawner : NetworkBehaviour{
 		var bulletClone = Instantiate(ButtetPrefab, data.genPos, Quaternion.Euler(0, 0, data.angle))
 				.GetComponent<NetworkObject>();
 		bulletClone.Spawn();
-		bulletClone.GetComponent<BulletCtrl>().Setup(data.genPos, data.angle, data.moveSec, data.maxDis,
+		bulletClone.GetComponent<BulletCtrl>().Setup(data.genPos, data.angle, data.flySec, data.flyDis,
 			() => { bulletClone.Despawn(); });
 		bulletClone.OnCollisionEnterAsObservable().Subscribe(x => OnBulletHit(x, data.playerId));
 		GenerateBulletViewClientRpc(bulletClone.NetworkObjectId, data.runesId);
@@ -54,8 +54,8 @@ public class SyncObjSpawner : NetworkBehaviour{
 public class BulletData : INetworkSerializable{
 	public Vector2 genPos;
 	public float angle;
-	public float moveSec;
-	public float maxDis;
+	public float flySec;
+	public float flyDis;
 	public float damage;
 	public ulong playerId;
 	public string runesId;
@@ -63,8 +63,8 @@ public class BulletData : INetworkSerializable{
 	public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter{
 		serializer.SerializeValue(ref genPos);
 		serializer.SerializeValue(ref angle);
-		serializer.SerializeValue(ref moveSec);
-		serializer.SerializeValue(ref maxDis);
+		serializer.SerializeValue(ref flySec);
+		serializer.SerializeValue(ref flyDis);
 		serializer.SerializeValue(ref playerId);
 		serializer.SerializeValue(ref runesId);
 		serializer.SerializeValue(ref damage);
