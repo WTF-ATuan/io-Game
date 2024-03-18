@@ -8,16 +8,45 @@ using UnityEngine;
 
 [Serializable]
 public class BulletState : INetworkSerializable {
+    
     public Vector3 Pos;
+    public float TimeStamp;
+
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
         serializer.SerializeValue(ref Pos);
+        serializer.SerializeValue(ref TimeStamp);
+    }
+}
+
+public class SyncVec3 : NetworkVariable<Vector3> {
+    private float LastValueChangeTime;
+    private Vector3 LastValue;
+    private Vector3 NowVec;
+    
+    public SyncVec3() {
+        OnValueChanged += (oldValue, newValue) => {
+            var nowTime = Time.time;
+            var timeSpace = nowTime - LastValueChangeTime;
+            var dis = LastValue - newValue;
+            NowVec = dis * (1f / timeSpace);
+            LastValueChangeTime = nowTime;
+            LastValue = newValue;
+        };
+    }
+    
+    public Vector3 GetNow(Vector3 nowVec) {
+        var target = Value+(Time.time-LastValueChangeTime)*NowVec;
+        var dis = (nowVec - target).magnitude;
+        return dis>1?target:Vector2.Lerp(nowVec, target, 0.1f);
     }
 }
 
 public class BulletCtrl : NetworkBehaviour
 {
     private Action OnDead;
-    private NetworkVariable<BulletState> SyncData= new(new BulletState());
+    private SyncVec3 Data = new();
+
+    public override void OnNetworkSpawn() {}
     
     public void Setup(Vector2 genPos, float angle, float moveSec, float maxDis,Action onFinish)
     {
@@ -28,9 +57,9 @@ public class BulletCtrl : NetworkBehaviour
     
     private void Update() {
         if (IsServer) {
-            SyncData.Value = new BulletState{Pos = transform.position};
+            Data.Value = new Vector3(transform.position.x, transform.position.y, transform.position.z);
         } else {
-            transform.position = SyncData.Value.Pos;
+            transform.position = Data.GetNow(transform.position);
         }
     }
 }
