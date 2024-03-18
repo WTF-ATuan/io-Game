@@ -103,7 +103,8 @@ public class GameInfo
     public Map map;
     public GameMode gameMode;
     public GameQueue gameQueue;
-
+    public string LobbySceneName => "PlayerReadyLobby";
+    
     public int MaxUsers = 20;
     public string ToSceneName => ConvertToScene(map);
 
