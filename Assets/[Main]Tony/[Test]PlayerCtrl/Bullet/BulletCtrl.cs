@@ -23,11 +23,20 @@ public class BulletCtrl : NetworkBehaviour
     private Action OnDead;
     private NetworkVariable<Vector3> Data = new();
     private NetworkValue.Vec3Smoother _vec3Smoother;
-        
+    private bool IsInit = false;
+    
     public override void OnNetworkSpawn()
     {
         _vec3Smoother = new NetworkValue.Vec3Smoother(() => Data.Value, () => transform.position);
-        Data.OnValueChanged+= (value, newValue) => _vec3Smoother.Update();
+        if (IsClient) {
+            Data.OnValueChanged+= (value, newValue) => {
+                _vec3Smoother.Update();
+                if (IsInit) {
+                    transform.position = Data.Value;
+                }
+                IsInit = true;
+            };
+        }
     }
     
     public void Setup(Vector2 genPos, float angle, float moveSec, float maxDis,Action onFinish) {

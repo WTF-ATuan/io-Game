@@ -88,7 +88,7 @@ public static class NetworkValue
             var nowPos = LocalData.Invoke();
             var target = SyncData.Invoke()+(Time.time-LastValueChangeTime)*NowVec;
             var dis = (nowPos - target).magnitude;
-            return dis>1?target:Vector3.Lerp(nowPos, target, 0.1f);
+            return dis>1?target:Vector3.Lerp(nowPos, target,0.1f);
         }
     }
     
@@ -96,6 +96,7 @@ public static class NetworkValue
         private float LastValueChangeTime;
         private Vector2 LastValue;
         private Vector2 NowVec;
+        private Vector2 SmoothVec;
         private GetVec2 SyncData;
         private GetVec2 LocalData;
         
@@ -105,6 +106,7 @@ public static class NetworkValue
         }
 
         public void Update() {
+            /*
             var newValue = SyncData.Invoke();
             var nowTime = Time.time;
             var timeSpace = nowTime - LastValueChangeTime;
@@ -112,13 +114,13 @@ public static class NetworkValue
             NowVec = dis * (1f / timeSpace);
             LastValueChangeTime = nowTime;
             LastValue = newValue;
+            */
         }
         
         public Vector2 Get() {
             var nowPos = LocalData.Invoke();
-            var target = SyncData.Invoke()+(Time.time-LastValueChangeTime)*NowVec;
-            //var dis = (nowPos - target).magnitude;
-            return Vector2.Lerp(nowPos, target, 0.1f);//dis>2?target:Vector2.Lerp(nowPos, target, 0.1f);
+            var target = SyncData.Invoke();//+(Time.time-LastValueChangeTime)*NowVec;
+            return Vector2.SmoothDamp(nowPos, target, ref SmoothVec, 0.03f);
         }
     }
     
@@ -135,6 +137,7 @@ public static class NetworkValue
         }
 
         public void Update() {
+            /*
             var newValue = SyncData.Invoke();
             var nowTime = Time.time;
             var timeSpace = nowTime - LastValueChangeTime;
@@ -142,12 +145,13 @@ public static class NetworkValue
             NowVec = dis * (1f / timeSpace);
             LastValueChangeTime = nowTime;
             LastValue = newValue;
+            */
         }
         
         public float Get() {
             var nowPos = LocalData.Invoke();
             var target = SyncData.Invoke();
-            return Mathf.LerpAngle(nowPos, target, 1f);
+            return Mathf.SmoothDampAngle(nowPos, target, ref NowVec, 0.03f);
         }
     }
 }
