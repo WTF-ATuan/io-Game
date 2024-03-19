@@ -4,13 +4,15 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class LobbyEventHandler : NetworkBehaviour{
-	[SerializeField] private VerticalLayoutGroup playerTabList;
+	[SerializeField] private Transform playerTabRoot;
+	[SerializeField] private Button readyButton;
 	[SerializeField] private GameObject playerTabPrefab;
 
 	private NetworkList<PlayerLobbyState> _playerStatesList;
 
 	private void Awake(){
 		_playerStatesList = new NetworkList<PlayerLobbyState>();
+		readyButton.onClick.AddListener(Ready);
 	}
 
 	public override void OnNetworkSpawn(){
@@ -32,6 +34,7 @@ public class LobbyEventHandler : NetworkBehaviour{
 			var state = _playerStatesList[index];
 			if(serverRpcParams.Receive.SenderClientId != state.ClientID) continue;
 			_playerStatesList[index] = new PlayerLobbyState(state.ClientID, state.ViewID, true);
+			readyButton.image.color = _playerStatesList[index].IsReady ? Color.gray : Color.white;
 			UpdatePlayerTab();
 		}
 
@@ -53,7 +56,7 @@ public class LobbyEventHandler : NetworkBehaviour{
 	private void HandleClientConnected(ulong clientID){
 		var playerTab = Instantiate(playerTabPrefab, Vector3.zero, Quaternion.identity);
 		playerTab.GetComponent<NetworkObject>().Spawn();
-		playerTab.transform.SetParent(playerTabList.transform);
+		playerTab.transform.SetParent(playerTabRoot);
 		_playerStatesList.Add(new PlayerLobbyState(clientID, playerTab.GetComponent<NetworkObject>().NetworkObjectId));
 		UpdatePlayerTab();
 	}
@@ -73,7 +76,6 @@ public class LobbyEventHandler : NetworkBehaviour{
 
 	private void UpdatePlayerTab(){
 		foreach(var state in _playerStatesList){
-			Debug.Log($"{state.ClientID} {state.ViewID}");
 			var playerTab = NetworkManager.Singleton.SpawnManager.SpawnedObjects[state.ViewID];
 			var text = playerTab.GetComponentInChildren<Text>();
 			var image = playerTab.GetComponentsInChildren<Image>()[1];

@@ -206,19 +206,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 13854051}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 284893877}
-        m_TargetAssemblyTypeName: LobbyEventHandler, Assembly-CSharp
-        m_MethodName: Ready
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &13854051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,7 +256,7 @@ GameObject:
   - component: {fileID: 142359238}
   - component: {fileID: 142359240}
   - component: {fileID: 142359239}
-  - component: {fileID: 142359241}
+  - component: {fileID: 142359243}
   - component: {fileID: 142359242}
   m_Layer: 5
   m_Name: Player List
@@ -335,32 +323,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 142359237}
   m_CullTransparentMesh: 1
---- !u!114 &142359241
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 142359237}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 1
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
 --- !u!114 &142359242
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -381,6 +343,30 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &142359243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 142359237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 500, y: 100}
+  m_Spacing: {x: 0, y: 0}
+  m_Constraint: 0
+  m_ConstraintCount: 2
 --- !u!1 &284893874
 GameObject:
   m_ObjectHideFlags: 0
@@ -426,7 +412,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 530acdd4f775afb48a6b1e5c655c777f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTabList: {fileID: 142359241}
+  playerTabRoot: {fileID: 142359238}
+  readyButton: {fileID: 13854050}
   playerTabPrefab: {fileID: 239430903628917703, guid: 7ca5de650edbfe548b59dac848ae3f38, type: 3}
 --- !u!114 &284893878
 MonoBehaviour:
