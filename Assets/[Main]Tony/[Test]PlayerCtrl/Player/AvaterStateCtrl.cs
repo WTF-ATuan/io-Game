@@ -67,14 +67,25 @@ public interface IAvaterSync : IGetLoadOut,IGetTransform,IGetIInput{
 public class AvaterStateCtrl  {
     
     private IAvaterSync Avater;
-    public AvaterState Data{ get;private set; }
-
     private Transform RotCenter;
+    
+    public AvaterState Data{ get;private set; }
+    private NetworkValue.Vec2Smoother PosSmoother;
+    private NetworkValue.RotSmoother RotSmoother;
 
     public AvaterStateCtrl(IAvaterSync avater) {
         Avater = avater;
-        Data = new AvaterState();
         RotCenter = Avater.GetTransform().Find("RotCenter");
+        Data = new AvaterState();
+        
+        if (!Avater.IsOwner()) {
+            PosSmoother = new NetworkValue.Vec2Smoother(() => Data.Pos, () => Avater.GetTransform().position);
+            RotSmoother = new NetworkValue.RotSmoother(() => Data.Towards, () => RotCenter.eulerAngles.z);
+            Avater.GetSyncData().OnValueChanged += (value, newValue) => {
+                PosSmoother.Update();
+                RotSmoother.Update();
+            };
+        }
     }
     
     public void DataSync() {
@@ -136,12 +147,18 @@ public class AvaterStateCtrl  {
                 Data.RotVec = 0;
             } 
             //--Ult
+            
+            Avater.GetTransform().position = Data.Pos;
+            RotCenter.eulerAngles = Vector3.forward*Data.Towards;
         } else {
             Data = Avater.GetSyncData().Value;
+            
+            Avater.GetTransform().position = PosSmoother.Get();
+            RotCenter.eulerAngles = Vector3.forward*RotSmoother.Get();
         }
 
-        Avater.GetTransform().position = Data.Pos;
-        RotCenter.eulerAngles = Vector3.forward*Data.Towards;
+
+     
     }
 
     public void ModifyHealth(float amount){
