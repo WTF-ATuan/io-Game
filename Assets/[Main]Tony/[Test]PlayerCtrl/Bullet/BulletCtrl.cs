@@ -18,38 +18,19 @@ public class BulletState : INetworkSerializable {
     }
 }
 
-public class SyncVec3 : NetworkVariable<Vector3> {
-    private float LastValueChangeTime;
-    private Vector3 LastValue;
-    private Vector3 NowVec;
-    
-    public SyncVec3() {
-        OnValueChanged += (oldValue, newValue) => {
-            var nowTime = Time.time;
-            var timeSpace = nowTime - LastValueChangeTime;
-            var dis = LastValue - newValue;
-            NowVec = dis * (1f / timeSpace);
-            LastValueChangeTime = nowTime;
-            LastValue = newValue;
-        };
-    }
-    
-    public Vector3 GetNow(Vector3 nowVec) {
-        var target = Value+(Time.time-LastValueChangeTime)*NowVec;
-        var dis = (nowVec - target).magnitude;
-        return dis>1?target:Vector2.Lerp(nowVec, target, 0.1f);
-    }
-}
-
 public class BulletCtrl : NetworkBehaviour
 {
     private Action OnDead;
-    private SyncVec3 Data = new();
-
-    public override void OnNetworkSpawn() {}
-    
-    public void Setup(Vector2 genPos, float angle, float moveSec, float maxDis,Action onFinish)
+    private NetworkVariable<Vector3> Data = new();
+    private NetworkValue.Vec3Smoother _vec3Smoother;
+        
+    public override void OnNetworkSpawn()
     {
+        _vec3Smoother = new NetworkValue.Vec3Smoother(() => Data.Value, () => transform.position);
+        Data.OnValueChanged+= (value, newValue) => _vec3Smoother.Update();
+    }
+    
+    public void Setup(Vector2 genPos, float angle, float moveSec, float maxDis,Action onFinish) {
         transform.position = genPos;
         transform.eulerAngles = Vector3.forward*angle;
         transform.DOMove(genPos + angle.ToVec2() * maxDis, moveSec).OnComplete(() => { onFinish.Invoke();});
@@ -59,7 +40,7 @@ public class BulletCtrl : NetworkBehaviour
         if (IsServer) {
             Data.Value = new Vector3(transform.position.x, transform.position.y, transform.position.z);
         } else {
-            transform.position = Data.GetNow(transform.position);
+            transform.position = _vec3Smoother.Get();
         }
     }
 }
