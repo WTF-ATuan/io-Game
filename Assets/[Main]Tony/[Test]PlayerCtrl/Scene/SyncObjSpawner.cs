@@ -1,3 +1,4 @@
+using System;
 using _Main_Tony._Test_PlayerCtrl.Runes;
 using UniRx;
 using UniRx.Triggers;
@@ -15,7 +16,25 @@ public class SyncObjSpawner : NetworkBehaviour{
 		_battleCtrl = battleCtrl;
 		_mapper = mapper;
 	}
+	public override void OnNetworkSpawn(){
+		if(IsServer) {
+			NetworkManager.Singleton.OnClientConnectedCallback += a;
+		}
+	}
 
+	private void a(ulong clientID){
+		SpawnMobServerRpc();
+		NetworkManager.Singleton.OnClientConnectedCallback -= a;
+	}
+
+	public GameObject MobPrefab;
+	[ServerRpc(RequireOwnership = false)]
+	public void SpawnMobServerRpc(){
+		var bulletClone = Instantiate(MobPrefab).GetComponent<NetworkObject>();
+		bulletClone.Spawn();
+		bulletClone.GetComponent<MobCtrl>().Setup();
+	}
+	
 	public GameObject ButtetPrefab;
 
 	[ServerRpc(RequireOwnership = false)]

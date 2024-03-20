@@ -2,12 +2,13 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class LobbyEventHandler : NetworkBehaviour{
 	[SerializeField] private Transform playerTabRoot;
 	[SerializeField] private Button readyButton;
 	[SerializeField] private GameObject playerTabPrefab;
-
+	
 	private NetworkList<PlayerLobbyState> _playerStatesList;
 
 	private void Awake(){
