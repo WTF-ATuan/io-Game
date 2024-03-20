@@ -5,27 +5,29 @@ using UnityEngine;
 using Zenject;
 
 public interface IBattleCtrl{
-	public void AddPlayer(PlayerCtrl player);
+	public void AddCreature(CreatureCtrl player);
 	public PlayerCtrl GetLocalPlayer();
 	public ulong GetLocalPlayerID();
 	public void SetSpawner(SyncObjSpawner player);
 	public SyncObjSpawner GetSpawner();
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage);
+
+	public List<CreatureCtrl> GetCreatureList();
 }
 //Todo we can split Get Interface , Set Interface and Battle API Interface if IBattleCtrl is to large.
 public class DemoBattleCtrl : IBattleCtrl{
 	private SyncObjSpawner _spawner;
-	private readonly List<PlayerCtrl> _playerList = new();
+	private readonly List<CreatureCtrl> _creatureList = new();
 
-	public void AddPlayer(PlayerCtrl player){
-		_playerList.Add(player);
+	public void AddCreature(CreatureCtrl player){
+		_creatureList.Add(player);
 	}
 
 	public PlayerCtrl GetLocalPlayer(){
 		var localClientId = NetworkManager.Singleton.LocalClientId;
-		var playerCtrl = _playerList.Find(x => x.OwnerClientId == localClientId);
+		var playerCtrl = _creatureList.Find(x => x.OwnerClientId == localClientId);
 		if(!playerCtrl) throw new NullReferenceException($"Can't find local player with{localClientId}");
-		return playerCtrl;
+		return (PlayerCtrl)playerCtrl;
 	}
 
 	public ulong GetLocalPlayerID(){
@@ -45,6 +47,10 @@ public class DemoBattleCtrl : IBattleCtrl{
 		var hitPlayer = NetworkManager.Singleton.ConnectedClients[hitId].PlayerObject;
 		var playerCtrl = hitPlayer.GetComponent<PlayerCtrl>();
 		playerCtrl.ModifyHealthClientRpc(-damage);
+	}
+
+	public List<CreatureCtrl> GetCreatureList() {
+		return new List<CreatureCtrl>(_creatureList);
 	}
 }
 

@@ -5,9 +5,8 @@ using UnityEngine;
 
 using Zenject;
 
-public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
+public class PlayerCtrl : CreatureCtrl,IAvaterSync{
 	
-	private IBattleCtrl BattleCtrl;
 	private IInput InputCtrl;
 	private AvaterAttribute BaseAttribute;
 	private PlayerLoadout Loadout;
@@ -20,15 +19,12 @@ public class PlayerCtrl : NetworkBehaviour,IAvaterSync{
 	private void Initialization(
 		IAvaterAttributeCtrl avaterAttributeCtrl,
 		IInput inputCtrl,
-		IBattleCtrl battleCtrl,
 		ObjPoolCtrl<HealthBarCtrl> healthBarPool,
 		IWeaponFactory weaponFactory,
 		IUltSkillFactory ultSkillFactory
 	) {
-		BattleCtrl = battleCtrl;
 		InputCtrl = inputCtrl;
 		_recycleThings = new List<IDisposable>();
-		BattleCtrl.AddPlayer(this);
 
 		StateCtrl = new AvaterStateCtrl(this);
 		BaseAttribute = avaterAttributeCtrl.GetData();
