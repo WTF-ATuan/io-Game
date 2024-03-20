@@ -19,7 +19,7 @@ public class MatchplayNetworkClient : IDisposable
 
     private DisconnectReason DisconnectReason { get; } = new DisconnectReason();
 
-    private const string MenuSceneName = "Menu";
+    private const string MenuSceneName = "MatchMaking Scene";
 
     public MatchplayNetworkClient()
     {
