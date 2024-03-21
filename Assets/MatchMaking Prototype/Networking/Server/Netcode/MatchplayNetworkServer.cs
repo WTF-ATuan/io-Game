@@ -51,6 +51,7 @@ public class MatchplayNetworkServer : IDisposable
 
     public async Task<SynchedServerData> ConfigureServer(GameInfo startingGameInfo)
     {
+        networkManager.SceneManager.SetClientSynchronizationMode(LoadSceneMode.Additive);
         networkManager.SceneManager.LoadScene(startingGameInfo.LobbySceneName, LoadSceneMode.Single);
 
         bool localNetworkedSceneLoaded = false;
@@ -108,7 +109,7 @@ public class MatchplayNetworkServer : IDisposable
     {
         gameHasStarted = true;
 
-        NetworkManager.Singleton.SceneManager.LoadScene("Gameplay", LoadSceneMode.Single);
+        NetworkManager.Singleton.SceneManager.LoadScene("BattleScene", LoadSceneMode.Single);
     }
 
     private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)

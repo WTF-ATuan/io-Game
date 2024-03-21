@@ -8,7 +8,7 @@ public class LobbyEventHandler : NetworkBehaviour{
 	[SerializeField] private Transform playerTabRoot;
 	[SerializeField] private Button readyButton;
 	[SerializeField] private GameObject playerTabPrefab;
-	
+
 	private NetworkList<PlayerLobbyState> _playerStatesList;
 
 	private void Awake(){
@@ -20,8 +20,21 @@ public class LobbyEventHandler : NetworkBehaviour{
 		if(IsServer){
 			HandleServer();
 		}
-		else{
+
+		if(IsClient){
 			_playerStatesList.OnListChanged += x => UpdatePlayerTab();
+		}
+	}
+
+	public override void OnNetworkDespawn(){
+		if(IsServer){
+			NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
+			NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnected;
+		}
+
+		if(IsClient){
+			// ReSharper disable once EventUnsubscriptionViaAnonymousDelegate
+			_playerStatesList.OnListChanged -= x => UpdatePlayerTab();
 		}
 	}
 
@@ -55,24 +68,21 @@ public class LobbyEventHandler : NetworkBehaviour{
 	}
 
 	private void HandleClientConnected(ulong clientID){
-		var playerTab = Instantiate(playerTabPrefab, Vector3.zero, Quaternion.identity);
-		playerTab.GetComponent<NetworkObject>().Spawn();
+		var playerTab = Instantiate(playerTabPrefab, Vector3.zero, Quaternion.identity).GetComponent<NetworkObject>();
+		playerTab.Spawn();
 		playerTab.transform.SetParent(playerTabRoot);
-		_playerStatesList.Add(new PlayerLobbyState(clientID, playerTab.GetComponent<NetworkObject>().NetworkObjectId));
+		_playerStatesList.Add(new PlayerLobbyState(clientID, playerTab.NetworkObjectId));
 		UpdatePlayerTab();
 	}
 
 	private void HandleClientDisconnected(ulong clientID){
-		PlayerLobbyState lobbyState = default;
-		foreach(var state in _playerStatesList){
-			if(state.ClientID == clientID){
-				lobbyState = state;
-			}
+		for(var index = 0; index < _playerStatesList.Count; index++){
+			if (_playerStatesList[index].ClientID != clientID) { continue; }
+			_playerStatesList.RemoveAt(index);
+			var foundChild = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_playerStatesList[index].ViewID];
+			foundChild.Despawn();
+			break;
 		}
-
-		var foundChild = NetworkManager.Singleton.SpawnManager.SpawnedObjects[lobbyState.ViewID];
-		foundChild.Despawn();
-		_playerStatesList.Remove(lobbyState);
 	}
 
 	private void UpdatePlayerTab(){
