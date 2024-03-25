@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7019212907234965363}
   - component: {fileID: 3534271193295651153}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: RotCenter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -116,6 +116,7 @@ GameObject:
   - component: {fileID: 7043813894943541494}
   - component: {fileID: 1330949742192120427}
   - component: {fileID: 3655843181005691221}
+  - component: {fileID: 4839566942267592574}
   m_Layer: 0
   m_Name: Mob
   m_TagString: Untagged
@@ -137,7 +138,7 @@ Transform:
   m_Children:
   - {fileID: 6656404808558492881}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1330949742192120427
 MonoBehaviour:
@@ -171,3 +172,16 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &4839566942267592574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7232538553159370399}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 717a02054ef2699498e6bd4234fd7995, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _containerSource: 0

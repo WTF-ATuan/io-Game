@@ -5,33 +5,23 @@ using UnityEngine;
 
 using Zenject;
 
-public class PlayerCtrl : CreatureCtrl,IAvaterSync{
+public class PlayerCtrl : CreatureCtrl{
 	
 	private IInput InputCtrl;
-	private AvaterAttribute BaseAttribute;
-	private PlayerLoadout Loadout;
 	private PoolObj<HealthBarCtrl> HealthBar;
-	private List<IDisposable> _recycleThings;
 	private RangePreviewCtrl RangePreview;
-	private AvaterStateCtrl StateCtrl;
-
+	
 	[Inject]
 	private void Initialization(
-		IAvaterAttributeCtrl avaterAttributeCtrl,
 		IInput inputCtrl,
 		ObjPoolCtrl<HealthBarCtrl> healthBarPool,
 		IWeaponFactory weaponFactory,
 		IUltSkillFactory ultSkillFactory
 	) {
 		InputCtrl = inputCtrl;
-		_recycleThings = new List<IDisposable>();
-
-		StateCtrl = new AvaterStateCtrl(this);
-		BaseAttribute = avaterAttributeCtrl.GetData();
-		Loadout = new PlayerLoadout(BaseAttribute);
+		
 		var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,1f,new RangePreviewData(RangePreviewType.Straight,6,10));
 		Loadout.SetWeapon(weapon, out var unload);
-
 		var bigGunUlt = ultSkillFactory.Create<BigGunUltSkill>(weapon);
 		Loadout.SetUltSkill(bigGunUlt, out var unloadUlt);
 
@@ -41,52 +31,26 @@ public class PlayerCtrl : CreatureCtrl,IAvaterSync{
 		HealthBar = healthBarPool.Get();
 		HealthBar.Ctrl.Setup(Loadout.NowAttribute, StateCtrl);
 		HealthBar.Obj.transform.SetParent(transform);
-		_recycleThings.Add(HealthBar);
-	}
-	public override void OnDestroy(){
-		base.OnDestroy();
-		foreach(var thing in _recycleThings){
-			thing.Dispose();
-		}
-	}
-	
-	private NetworkVariable<AvaterState> AvaterSyncData = new();
-	public NetworkVariable<AvaterState> GetSyncData() {
-		return AvaterSyncData;
-	}
-	
-	[ServerRpc(RequireOwnership = false)]
-	public void AvaterDataSyncServerRpc(AvaterState data) {
-		AvaterSyncData.Value = data;
-	}
-	
-	public PlayerLoadout GetLoadOut() {
-		return Loadout;
-	}
-	
-	public Transform GetTransform() {
-		return transform;
+		RecycleThings.Add(HealthBar);
 	}
 
-	public IInput GetInput() {
+	public override IInput GetInput() {
 		return InputCtrl;
 	}
+	
 	[ClientRpc]
 	public void ModifyHealthClientRpc(int amount){
 		StateCtrl.ModifyHealth(amount);
 	}
 
-	public new bool IsOwner() {
-		return base.IsOwner && IsClient;
+	public override bool IsController() {
+		return IsOwner && IsClient;
 	}
 
-	private void Update() {
-		StateCtrl.DataSync();
-		if(IsOwner())
+
+	protected override void Update() {
+		base.Update();
+		if(IsController())
 			RangePreview.Update();
-	}
-
-	private void FixedUpdate() {
-		StateCtrl.ClientUpdate();
 	}
 }

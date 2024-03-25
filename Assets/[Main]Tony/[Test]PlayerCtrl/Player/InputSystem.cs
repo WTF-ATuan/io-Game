@@ -10,6 +10,25 @@ public interface IInput {
     public Vector2 UtlJoy();
 }
 
+public class ServerInput : IInput
+{
+    public Vector2 _MoveJoy;
+    public Vector2 _AimJoy;
+    public Vector2 _UtlJoy;
+    
+    public Vector2 MoveJoy() {
+        return _MoveJoy.normalized;
+    }
+    
+    public Vector2 AimJoy() {
+        return _AimJoy.normalized;
+    }
+
+    public Vector2 UtlJoy() {
+        return _UtlJoy.normalized;
+    }
+}
+
 public class PCInput : IInput
 {
     [Inject] 

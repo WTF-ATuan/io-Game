@@ -1,10 +1,60 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
+using Zenject;
 
-public class MobCtrl : CreatureCtrl {
-    public void Setup() {
+public class MobCtrl : CreatureCtrl
+{
+    private ServerInput Input;
+    private Transform Target;
+
+    [Inject]
+    private void Initialization(IAvaterAttributeCtrl avaterAttributeCtrl)
+    {
+        Input = new ServerInput();
+    }
+    public override void OnNetworkSpawn()
+    {
+        async Task RepeatActionEvery(TimeSpan interval, Func<Task> action) {
+            while (true) {
+                await Task.Delay(interval);
+                await action();
+            }
+        }
         
+        if (IsServer) {
+            RepeatActionEvery(TimeSpan.FromSeconds(0.1f), async () => {
+                var list = BattleCtrl.GetCreatureList();
+                var minDis = 0f;
+                CreatureCtrl target = null;
+                foreach (var creature in list) {
+                    if (creature == this) continue;
+                    var dis = (transform.position - creature.transform.position).magnitude;
+                    if (target == null || dis < minDis) {
+                        minDis = dis;
+                        target = creature;
+                    }
+                }
+
+                if(target!=null)Target = target.transform;
+
+                Vector2 moveJoy = Vector2.zero;
+                if (Target != null) {
+                    moveJoy = (Target.position - transform.position).normalized;
+                }
+                Input._MoveJoy = moveJoy;
+            });
+        }
+    }
+
+    public override IInput GetInput() {
+        return Input;
+    }
+    
+    public override bool IsController() {
+        return IsServer;
     }
 }

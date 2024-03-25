@@ -214,7 +214,7 @@ public class PlayerLoadout : IGetPlayerLoadout
 
     private T GetInfo<T>(T thing,Item[] array, out Item[] inserts)where T : InsertThing
     {
-        inserts = array.ToArray();
+        inserts = array==null? Array.Empty<Item>(): array.ToArray();
         return thing;//(T)thing.Clone();
     }
     

@@ -32,7 +32,7 @@ public class SyncObjSpawner : NetworkBehaviour{
 	public void SpawnMobServerRpc(){
 		var bulletClone = Instantiate(MobPrefab).GetComponent<NetworkObject>();
 		bulletClone.Spawn();
-		bulletClone.GetComponent<MobCtrl>().Setup();
+		//bulletClone.GetComponent<MobCtrl>().Setup();
 	}
 	
 	public GameObject ButtetPrefab;

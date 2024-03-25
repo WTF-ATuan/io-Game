@@ -61,7 +61,7 @@ public class AvaterState : INetworkSerializable
 public interface IAvaterSync : IGetLoadOut,IGetTransform,IGetIInput{
     public NetworkVariable<AvaterState> GetSyncData();
     public void AvaterDataSyncServerRpc(AvaterState data);
-    public bool IsOwner();
+    public bool IsController();
 }
 
 public class AvaterStateCtrl  {
@@ -78,7 +78,7 @@ public class AvaterStateCtrl  {
         RotCenter = Avater.GetTransform().Find("RotCenter");
         Data = new AvaterState();
         
-        if (!Avater.IsOwner()) {
+        if (!Avater.IsController()) {
             PosSmoother = new NetworkValue.Vec2Smoother(() => Data.Pos, () => Avater.GetTransform().position);
             RotSmoother = new NetworkValue.RotSmoother(() => Data.Towards, () => RotCenter.eulerAngles.z);
             Avater.GetSyncData().OnValueChanged += (value, newValue) => {
@@ -89,13 +89,13 @@ public class AvaterStateCtrl  {
     }
     
     public void DataSync() {
-        if (Avater.IsOwner()) {
+        if (Avater.IsController()) {
             Avater.AvaterDataSyncServerRpc(Data);
         }
     }
 
     public void ClientUpdate() {
-        if (Avater.IsOwner()){
+        if (Avater.IsController()){
             //--Input
             Data.TargetVec = Avater.GetInput().MoveJoy();
             Data.LastAimPos = Data.AimPos;
