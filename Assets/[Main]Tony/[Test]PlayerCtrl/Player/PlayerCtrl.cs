@@ -19,8 +19,7 @@ public class PlayerCtrl : CreatureCtrl{
 		IUltSkillFactory ultSkillFactory
 	) {
 		InputCtrl = inputCtrl;
-		
-		var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,1f,new RangePreviewData(RangePreviewType.Straight,6,10));
+		var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,0.3f,0.2f,new RangePreviewData(RangePreviewType.Straight,6,10));
 		Loadout.SetWeapon(weapon, out var unload);
 		var bigGunUlt = ultSkillFactory.Create<BigGunUltSkill>(weapon);
 		Loadout.SetUltSkill(bigGunUlt, out var unloadUlt);

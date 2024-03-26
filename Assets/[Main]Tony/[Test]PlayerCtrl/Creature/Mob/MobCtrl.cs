@@ -18,7 +18,7 @@ public class MobCtrl : CreatureCtrl
         BaseAttribute = avaterAttributeCtrl.GetData(1);
         Loadout = new PlayerLoadout(BaseAttribute);
         Input = new ServerInput();
-        var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,1f,new RangePreviewData(RangePreviewType.Straight,6,10));
+        var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,0.3f,0.1f,new RangePreviewData(RangePreviewType.Straight,6,10));
         Loadout.SetWeapon(weapon, out var unload);
     }
     
@@ -50,10 +50,9 @@ public class MobCtrl : CreatureCtrl
                 Vector2 moveJoy = Vector2.zero;
                 Vector2 aimJoy = Vector2.zero;
                 if (Target != null) {
-                    var vec = Target.position - transform.position;
+                    var vec = (Target.position+(Vector3)target.GetInput().MoveJoy()*1.5f) - transform.position;
                     moveJoy = vec.magnitude>1?vec.normalized:vec;
-                    var canShoot = Loadout.GetWeaponInfo().TryShoot(StateCtrl.Data,false);
-                    aimJoy = !canShoot ? vec.normalized : Vector2.zero;
+                    aimJoy = Loadout.GetWeaponInfo().TryShoot(StateCtrl.Data, false) && Input._AimJoy==Vector2.zero ? vec.normalized : Vector2.zero;
                 }
                 Input._MoveJoy = moveJoy;
                 Input._AimJoy = aimJoy;

@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
 public class Shotgun : Weapon {
     public Shotgun(
         int maxBullet, float powerChargeToFullSec, float damage, float shootCD, float flySec, RangePreviewData rangePreview) : 
-        base(maxBullet, powerChargeToFullSec, damage, shootCD, flySec, rangePreview.Dis,rangePreview) {
+        base(maxBullet, powerChargeToFullSec, damage, shootCD, flySec, rangePreview.Dis,rangePreview.Dis,rangePreview) {
     }
 
     public override void OnShoot(AvaterState data) {
+
+        
         int bulletAmount = 6;
         float angleRange = RangePreview.Width;
         for (int i = 0; i < bulletAmount; i++) {

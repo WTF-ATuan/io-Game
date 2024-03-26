@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DG.Tweening.Plugins.Options;
 using UnityEngine;
 using Zenject;
@@ -76,6 +77,7 @@ public abstract class Weapon : InsertThing
 {
     public Dictionary<AttributeType, float> AttributeBonus;
     public RangePreviewData RangePreview;
+    public bool IsShootDelay { protected set; get; }
 
     protected IBattleCtrl BattleCtrl;
     [Inject]
@@ -85,7 +87,20 @@ public abstract class Weapon : InsertThing
 
     public abstract void OnShoot(AvaterState data);
 
+    protected virtual void Shoot(AvaterState data) {
+        async Task ShootDelay(float delay, Action action) {
+            await Task.Delay((int)(delay*1000));
+            action.Invoke();
+        }
+        IsShootDelay = true;
+        ShootDelay(AttributeBonus[AttributeType.ShootDelay], () => {
+            OnShoot(data);
+            IsShootDelay = false;
+        });
+    }
+
     public virtual bool TryShoot(AvaterState data, bool forceShoot = true) {
+        if (IsShootDelay) return false;
         float powerNeed = (1f / (int) AttributeBonus[AttributeType.MaxBullet]);
         float nowTime = Time.time;
         if (((data.AimPos == Vector2.zero && data.LastAimPos != Vector2.zero) || !forceShoot) && 
@@ -94,14 +109,14 @@ public abstract class Weapon : InsertThing
             if (forceShoot) {
                 data.Power = Mathf.Clamp01(data.Power - powerNeed);
                 data.ShootCd = nowTime + AttributeBonus[AttributeType.ShootCD];
-                OnShoot(data);
+                Shoot(data);
             }
             return true;
         }
         return false;
     }
     
-    public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, float flySec, float flyDis, RangePreviewData rangePreview) {
+    public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, float flySec, float flyDis, float shootDelay, RangePreviewData rangePreview) {
         AttributeBonus = new Dictionary<AttributeType, float>();
         AttributeBonus.Add(AttributeType.MaxBullet, maxBullet);
         AttributeBonus.Add(AttributeType.PowerChargeToFullSec, powerChargeToFullSec);
@@ -109,6 +124,7 @@ public abstract class Weapon : InsertThing
         AttributeBonus.Add(AttributeType.ShootCD, shootCD);
         AttributeBonus.Add(AttributeType.FlySec, flySec);
         AttributeBonus.Add(AttributeType.FlyDis, flyDis);
+        AttributeBonus.Add(AttributeType.ShootDelay, shootDelay);
         RangePreview = rangePreview;
     }
 }
@@ -265,7 +281,8 @@ public enum AttributeType {
     Damage,
     ShootCD,
     FlySec,
-    FlyDis
+    FlyDis,
+    ShootDelay
 }
 
 public class AvaterAttribute {
