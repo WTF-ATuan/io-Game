@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8162679781953338235}
   - component: {fileID: 5567842356967170234}
   - component: {fileID: 7693630473451979352}
-  - component: {fileID: 5898841272705229067}
+  - component: {fileID: -3926864461608103207}
   m_Layer: 0
   m_Name: Networking Player
   m_TagString: Untagged
@@ -68,7 +68,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &5898841272705229067
+--- !u!114 &-3926864461608103207
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -80,7 +80,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 717a02054ef2699498e6bd4234fd7995, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _containerSource: 0
+  _containerSource: 1
 --- !u!1 &1975740620458498087
 GameObject:
   m_ObjectHideFlags: 0
