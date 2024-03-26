@@ -139,7 +139,9 @@ public class ServerGameManager : IDisposable
     private void CloseServer()
     {
         Debug.Log("Closing Server");
+        NetworkLog.LogInfo("Closing Server");
         Dispose();
+        NetworkManager.Singleton.Shutdown();
         Application.Quit();
     }
 
