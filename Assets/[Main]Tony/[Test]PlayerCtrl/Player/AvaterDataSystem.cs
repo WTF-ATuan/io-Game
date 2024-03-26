@@ -285,7 +285,7 @@ public class AvaterAttribute {
     public const float MoveFriction = 0.07f;
     public const float CureStartCD = 2;
     public const float UltPowerChargeToFullSec = 6;
-    
+
     public AvaterAttribute(float moveSpeed, float maxHealth) {
         MaxHealth = maxHealth;
         MoveSpeed = moveSpeed;
@@ -309,11 +309,12 @@ public class AvaterAttribute {
         ShootCD = copy.ShootCD;
     }
 
-    public void AddAttribute(AttributeType type, float value) {
-        switch (type)
-        {
+    public void AddAttribute(AttributeType type, float value)
+    {
+        switch (type) {
             case AttributeType.MoveSpeed:
                 MoveSpeed += value;
+                MoveSpeed = Mathf.Max(MoveSpeed, 0.1f);
                 break;
             case AttributeType.MaxHealth:
                 MaxHealth += value;
@@ -345,6 +346,7 @@ public class AvaterAttributeCtrl : IAvaterAttributeCtrl {
     public virtual Dictionary<int, AvaterAttribute> DataLoad() {
         var data = new Dictionary<int, AvaterAttribute>();
         data.Add(0,new AvaterAttribute(7, 1000));
+        data.Add(1,new AvaterAttribute(4, 500));
         return data;
     }
 

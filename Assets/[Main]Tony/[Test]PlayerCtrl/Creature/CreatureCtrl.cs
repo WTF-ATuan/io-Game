@@ -18,13 +18,12 @@ public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync{
         IBattleCtrl battleCtrl) {
         BattleCtrl = battleCtrl;
         BattleCtrl.AddCreature(this);
-        
         RecycleThings = new List<IDisposable>();
         StateCtrl = new AvaterStateCtrl(this);
         BaseAttribute = avaterAttributeCtrl.GetData();
         Loadout = new PlayerLoadout(BaseAttribute);
     }
-    
+
     public override void OnDestroy(){
         base.OnDestroy();
         foreach(var thing in RecycleThings){

@@ -12,10 +12,16 @@ public class MobCtrl : CreatureCtrl
     private Transform Target;
 
     [Inject]
-    private void Initialization(IAvaterAttributeCtrl avaterAttributeCtrl)
-    {
+    private void Initialization(
+        IAvaterAttributeCtrl avaterAttributeCtrl,
+        IWeaponFactory weaponFactory) {
+        BaseAttribute = avaterAttributeCtrl.GetData(1);
+        Loadout = new PlayerLoadout(BaseAttribute);
         Input = new ServerInput();
+        var weapon = weaponFactory.Create<SnipeGun>(3, 6, 1000, 0.5f,1f,new RangePreviewData(RangePreviewType.Straight,6,10));
+        Loadout.SetWeapon(weapon, out var unload);
     }
+    
     public override void OnNetworkSpawn()
     {
         async Task RepeatActionEvery(TimeSpan interval, Func<Task> action) {
@@ -42,10 +48,15 @@ public class MobCtrl : CreatureCtrl
                 if(target!=null)Target = target.transform;
 
                 Vector2 moveJoy = Vector2.zero;
+                Vector2 aimJoy = Vector2.zero;
                 if (Target != null) {
-                    moveJoy = (Target.position - transform.position).normalized;
+                    var vec = Target.position - transform.position;
+                    moveJoy = vec.magnitude>1?vec.normalized:vec;
+                    var canShoot = Loadout.GetWeaponInfo().TryShoot(StateCtrl.Data,false);
+                    aimJoy = !canShoot ? vec.normalized : Vector2.zero;
                 }
                 Input._MoveJoy = moveJoy;
+                Input._AimJoy = aimJoy;
             });
         }
     }

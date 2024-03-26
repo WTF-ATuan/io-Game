@@ -119,6 +119,7 @@ public class AvaterStateCtrl  {
             
             Data.NowVec = newVec;
             Data.Pos = Data.Pos + Data.NowVec * Avater.GetLoadOut().NowAttribute.MoveSpeed * missTime;
+            Debug.Log(Avater.GetLoadOut().NowAttribute.MoveSpeed);
             //--Move
             
             var weapon = Avater.GetLoadOut().GetWeaponInfo();
