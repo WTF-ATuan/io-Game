@@ -6,6 +6,11 @@ namespace MatchMaking_Prototype.Battle{
 	public class PlayerSpawner : NetworkBehaviour{
 		[SerializeField] private NetworkObject playerPrefab;
 
+		private void Start()
+		{
+			TestCreate();
+		}
+
 		public override void OnNetworkSpawn()
 		{
 			if (!IsServer) { return; }

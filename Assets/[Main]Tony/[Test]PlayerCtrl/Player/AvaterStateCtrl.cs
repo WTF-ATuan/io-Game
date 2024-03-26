@@ -77,7 +77,7 @@ public class AvaterStateCtrl  {
         Avater = avater;
         RotCenter = Avater.GetTransform().Find("RotCenter");
         Data = new AvaterState();
-        
+      
         if (!Avater.IsController()) {
             PosSmoother = new NetworkValue.Vec2Smoother(() => Data.Pos, () => Avater.GetTransform().position);
             RotSmoother = new NetworkValue.RotSmoother(() => Data.Towards, () => RotCenter.eulerAngles.z);
@@ -107,23 +107,23 @@ public class AvaterStateCtrl  {
             float missTime = Time.time - Data.ClientUpdateTimeStamp;
             Data.ClientUpdateTimeStamp = Time.time; //todo change to serverSyncTime
 
+            var weapon = Avater.GetLoadOut().GetWeaponInfo();
+            var ultSkill = Avater.GetLoadOut().GetUtlInfo();
+            
+            bool isStop = weapon.IsShootDelay;
+            if(isStop)Data.TargetVec = Vector2.zero;
             //--Move
             Vector2 vec = Data.TargetVec - Data.NowVec;
             Vector2 direction = vec.normalized;
-            Vector2 newVec = Data.TargetVec;
             float distance = vec.magnitude;
             float moveFriction = AvaterAttribute.MoveFriction;
-            if(distance > moveFriction){
-                newVec = Data.NowVec + direction * Mathf.Min(moveFriction, distance);
-            }
-            
-            Data.NowVec = newVec;
-            Data.Pos = Data.Pos + Data.NowVec * Avater.GetLoadOut().NowAttribute.MoveSpeed * missTime;
-            Debug.Log(Avater.GetLoadOut().NowAttribute.MoveSpeed);
+
+            Data.NowVec = distance > moveFriction ? 
+                Data.NowVec + direction * Mathf.Min(moveFriction, distance) :
+                Data.TargetVec;
+            Data.Pos = Data.Pos+ Data.NowVec * Avater.GetLoadOut().NowAttribute.MoveSpeed * missTime;
             //--Move
             
-            var weapon = Avater.GetLoadOut().GetWeaponInfo();
-            var ultSkill = Avater.GetLoadOut().GetUtlInfo();
             //--Rot
             float targetTowards =  
                 Data.IsAim && weapon.TryShoot(Data,false) ? Data.AimPos.Angle() : 
@@ -157,9 +157,6 @@ public class AvaterStateCtrl  {
             Avater.GetTransform().position = PosSmoother.Get();
             RotCenter.eulerAngles = Vector3.forward*RotSmoother.Get();
         }
-
-
-     
     }
 
     public void ModifyHealth(float amount){
