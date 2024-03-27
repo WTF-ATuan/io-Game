@@ -17,6 +17,10 @@ public static class Mathff
         return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
     }
     
+    public static Vector2Int ToVec2Int(this Vector3 vec){
+        return new Vector2Int(Mathf.RoundToInt(vec.x), Mathf.RoundToInt(vec.y));
+    }
+    
     public static float AngleBetween(this float angle1, float angle2)
     {
         float difference = angle2 - angle1;

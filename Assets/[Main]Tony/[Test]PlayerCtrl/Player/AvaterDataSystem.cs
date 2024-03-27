@@ -363,7 +363,7 @@ public class AvaterAttributeCtrl : IAvaterAttributeCtrl {
     public virtual Dictionary<int, AvaterAttribute> DataLoad() {
         var data = new Dictionary<int, AvaterAttribute>();
         data.Add(0,new AvaterAttribute(7, 1000));
-        data.Add(1,new AvaterAttribute(4, 500));
+        data.Add(1,new AvaterAttribute(2, 500));
         return data;
     }
 

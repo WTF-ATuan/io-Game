@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -11,13 +12,16 @@ public interface IBattleCtrl{
 	public void SetSpawner(SyncObjSpawner player);
 	public SyncObjSpawner GetSpawner();
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage);
-
 	public List<CreatureCtrl> GetCreatureList();
+	public List<GroundCtrl> GetGroundList();
+	public bool AddPad(GroundCtrl ctrl);
+	public bool RemovePad(GroundCtrl ctrl);
 }
 //Todo we can split Get Interface , Set Interface and Battle API Interface if IBattleCtrl is to large.
 public class DemoBattleCtrl : IBattleCtrl{
 	private SyncObjSpawner _spawner;
 	private readonly List<CreatureCtrl> _creatureList = new();
+	public Dictionary<Vector2Int, GroundCtrl> _padsList = new();
 
 	public void AddCreature(CreatureCtrl player){
 		_creatureList.Add(player);
@@ -51,6 +55,22 @@ public class DemoBattleCtrl : IBattleCtrl{
 
 	public List<CreatureCtrl> GetCreatureList() {
 		return new List<CreatureCtrl>(_creatureList);
+	}
+
+	public List<GroundCtrl> GetGroundList() {
+		return _padsList.Values.ToList();
+	}
+
+	public bool AddPad(GroundCtrl ctrl) {
+		if (_padsList.ContainsKey(ctrl.GetPos())) return false;
+		_padsList.Add(ctrl.GetPos(),ctrl);
+		return true;
+	}
+
+	public bool RemovePad(GroundCtrl ctrl) {
+		if (!_padsList.ContainsKey(ctrl.GetPos())) return false;
+		_padsList.Remove(ctrl.GetPos());
+		return true;
 	}
 }
 
