@@ -17,6 +17,7 @@ public interface IBattleCtrl{
 	public bool AddPad(GroundCtrl ctrl);
 	public bool RemovePad(GroundCtrl ctrl);
 }
+
 //Todo we can split Get Interface , Set Interface and Battle API Interface if IBattleCtrl is to large.
 public class DemoBattleCtrl : IBattleCtrl{
 	private SyncObjSpawner _spawner;
@@ -52,26 +53,32 @@ public class DemoBattleCtrl : IBattleCtrl{
 		var playerCtrl = hitPlayer.GetComponent<PlayerCtrl>();
 		var avaterState = playerCtrl.GetSyncData().Value;
 		var avaterMaxHealth = playerCtrl.GetLoadOut().NowAttribute.MaxHealth;
-		var newAvaterHealth = Mathf.Clamp(avaterState.Health + damage, 0, avaterMaxHealth);
-		playerCtrl.SetHealthClientRpc(newAvaterHealth);
+		if(avaterState.Health - damage <= 0){
+			playerCtrl.DeathClientRpc();
+			hitPlayer.Despawn();
+		}
+		else{
+			var newAvaterHealth = Mathf.Clamp(avaterState.Health - damage, 0, avaterMaxHealth);
+			playerCtrl.SetHealthClientRpc(newAvaterHealth);
+		}
 	}
 
-	public List<CreatureCtrl> GetCreatureList() {
+	public List<CreatureCtrl> GetCreatureList(){
 		return new List<CreatureCtrl>(_creatureList);
 	}
 
-	public List<GroundCtrl> GetGroundList() {
+	public List<GroundCtrl> GetGroundList(){
 		return _padsList.Values.ToList();
 	}
 
-	public bool AddPad(GroundCtrl ctrl) {
-		if (_padsList.ContainsKey(ctrl.GetPos())) return false;
-		_padsList.Add(ctrl.GetPos(),ctrl);
+	public bool AddPad(GroundCtrl ctrl){
+		if(_padsList.ContainsKey(ctrl.GetPos())) return false;
+		_padsList.Add(ctrl.GetPos(), ctrl);
 		return true;
 	}
 
-	public bool RemovePad(GroundCtrl ctrl) {
-		if (!_padsList.ContainsKey(ctrl.GetPos())) return false;
+	public bool RemovePad(GroundCtrl ctrl){
+		if(!_padsList.ContainsKey(ctrl.GetPos())) return false;
 		_padsList.Remove(ctrl.GetPos());
 		return true;
 	}

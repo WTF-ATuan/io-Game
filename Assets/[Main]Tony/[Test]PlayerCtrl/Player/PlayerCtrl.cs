@@ -1,4 +1,5 @@
 using Unity.Netcode;
+using UnityEngine;
 using Zenject;
 
 public class PlayerCtrl : CreatureCtrl{
@@ -37,6 +38,11 @@ public class PlayerCtrl : CreatureCtrl{
 	public void SetHealthClientRpc(float value){
 		StateCtrl.Data.Health = value;
 		StateCtrl.DataSync();
+	}
+
+	[ClientRpc]
+	public void DeathClientRpc(){
+		Debug.Log($"You are Dead!");
 	}
 
 	public override bool IsController() {
