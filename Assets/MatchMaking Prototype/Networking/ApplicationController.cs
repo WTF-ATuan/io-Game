@@ -1,8 +1,10 @@
 using System.Threading.Tasks;
+using Unity.Netcode;
 using UnityEngine;
 
 public class ApplicationController : MonoBehaviour
 {
+    [Header("Setting")] [SerializeField] private bool editorTestingMode = true;
     [Header("References")]
     [SerializeField] private ServerSingleton serverPrefab;
     [SerializeField] private ClientSingleton clientPrefab;
@@ -44,7 +46,12 @@ public class ApplicationController : MonoBehaviour
             Instantiate(hostSingleton);
 
             await clientSingleton.CreateClient();
-            clientSingleton.Manager.ToMainMenu();
+            if(editorTestingMode){
+                clientSingleton.Manager.ToMainMenu();
+            }
+            else{
+                await hostSingleton.StartHostAsync();
+            }
         }
     }
 }
