@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEngine;
-
 using Zenject;
 
 public class PlayerCtrl : CreatureCtrl{
@@ -38,8 +34,9 @@ public class PlayerCtrl : CreatureCtrl{
 	}
 	
 	[ClientRpc]
-	public void ModifyHealthClientRpc(int amount){
-		StateCtrl.ModifyHealth(amount);
+	public void SetHealthClientRpc(float value){
+		StateCtrl.Data.Health = value;
+		StateCtrl.DataSync();
 	}
 
 	public override bool IsController() {

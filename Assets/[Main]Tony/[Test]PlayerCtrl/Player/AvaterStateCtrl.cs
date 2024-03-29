@@ -159,8 +159,4 @@ public class AvaterStateCtrl  {
         }
     }
 
-    public void ModifyHealth(float amount){
-        Data.Health = Mathf.Clamp(Data.Health + amount, 0, Avater.GetLoadOut().NowAttribute.MaxHealth);
-        DataSync();
-    }
 }

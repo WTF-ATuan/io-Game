@@ -50,7 +50,10 @@ public class DemoBattleCtrl : IBattleCtrl{
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage){
 		var hitPlayer = NetworkManager.Singleton.ConnectedClients[hitId].PlayerObject;
 		var playerCtrl = hitPlayer.GetComponent<PlayerCtrl>();
-		playerCtrl.ModifyHealthClientRpc(-damage);
+		var avaterState = playerCtrl.GetSyncData().Value;
+		var avaterMaxHealth = playerCtrl.GetLoadOut().NowAttribute.MaxHealth;
+		var newAvaterHealth = Mathf.Clamp(avaterState.Health + damage, 0, avaterMaxHealth);
+		playerCtrl.SetHealthClientRpc(newAvaterHealth);
 	}
 
 	public List<CreatureCtrl> GetCreatureList() {
