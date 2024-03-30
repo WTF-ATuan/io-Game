@@ -21,6 +21,6 @@ public class HealthBarCtrl : MonoBehaviour{
 	private void Update(){
 		PowerLine.localScale = new Vector3(StateData.Data.Power, 1, 1);
 		HelthLine.localScale = new Vector3(StateData.Data.Health / Attribute.MaxHealth, 1, 1);
-		_ultControlUI.fillAmount = StateData.Data.UltPower;
+		//_ultControlUI.fillAmount = StateData.Data.UltPower;
 	}
 }

@@ -37,6 +37,7 @@ public class MobCtrl : CreatureCtrl
                 var list = BattleCtrl.GetCreatureList();
                 var minDis = 0f;
                 CreatureCtrl target = null;
+                print(list.Count);
                 foreach (var creature in list) {
                     if (creature == this) continue;
                     var dis = (transform.position - creature.transform.position).magnitude;
@@ -54,15 +55,16 @@ public class MobCtrl : CreatureCtrl
                     var aimVec = Vector3.zero;
                     var moveVec = Vector3.zero;
                     
-                    if (AStarCtrl.AStar(transform.position.ToVec2Int(),Target.position.ToVec2Int(),//transform.position.ToVec2Int(), Target.position.ToVec2Int(),
+                    if (AStarCtrl.AStar(transform.position.ToVec2Int(),Target.position.ToVec2Int(),
                         BattleCtrl.GetGroundList().Cast<IAStarGround>().ToList(), out Stack<IAStarGround> path)) {
                         if(transform.position.ToVec2Int()==path.Peek().GetPos())path.Pop();
                         if (path.Count > 0) {
-                            aimVec = (Target.position+(Vector3)target.GetInput().MoveJoy()*1.5f) - transform.position;
-                            moveVec = ((Vector3)(Vector2)path.Peek().GetPos()) - transform.position;
-                            
+                            moveVec = ((Vector3) (Vector2) path.Peek().GetPos()) - transform.position;
                             moveJoy = moveVec.magnitude>1?moveVec.normalized:moveVec;
-                            //aimJoy = Loadout.GetWeaponInfo().TryShoot(StateCtrl.Data, false) && Input._AimJoy==Vector2.zero ? aimVec.normalized : Vector2.zero;
+                        }
+                        aimVec = (Target.position+(Vector3)target.GetInput().MoveJoy()*1.5f) - transform.position;
+                        if (aimVec.magnitude < Loadout.GetWeaponInfo().AttributeBonus[AttributeType.FlyDis]) {
+                            aimJoy = Loadout.GetWeaponInfo().TryShoot(StateCtrl.Data, false) && Input._AimJoy==Vector2.zero ? aimVec.normalized : Vector2.zero;
                         }
                     }
                 }
