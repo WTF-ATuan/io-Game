@@ -94,8 +94,8 @@ public abstract class Weapon : InsertThing
         }
         IsShootDelay = true;
         ShootDelay(AttributeBonus[AttributeType.ShootDelay], () => {
-            OnShoot(data);
             IsShootDelay = false;
+            OnShoot(data);
         });
     }
 
