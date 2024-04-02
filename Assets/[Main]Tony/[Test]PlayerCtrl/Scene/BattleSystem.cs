@@ -36,7 +36,12 @@ public class DemoBattleCtrl : IBattleCtrl{
 	}
 
 	public ulong GetLocalPlayerID(){
-		return NetworkManager.Singleton.LocalClientId;
+		var network = NetworkManager.Singleton;
+		if(network.IsServer && !network.IsClient){
+			return ulong.MaxValue; //Server Only ID
+		}
+
+		return network.LocalClientId;
 	}
 
 	public void SetSpawner(SyncObjSpawner spawner){
