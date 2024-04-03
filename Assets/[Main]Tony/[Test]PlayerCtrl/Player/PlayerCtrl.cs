@@ -52,7 +52,7 @@ public class PlayerCtrl : CreatureCtrl{
 
 		if(currentVec.magnitude < Mathf.Epsilon){
 			var lerpForce = Mathf.Clamp01((forceCenter - avaterData.Pos).magnitude);
-			avaterData.NowVec = (forceCenter - avaterData.Pos).normalized * lerpForce;
+			avaterData.NowVec = (forceCenter - avaterData.Pos).normalized * (lerpForce * 0.5f);
 			avaterData.Pos += avaterData.NowVec * (Time.time - avaterData.ClientUpdateTimeStamp);
 			StateCtrl.DataSync();
 		}
