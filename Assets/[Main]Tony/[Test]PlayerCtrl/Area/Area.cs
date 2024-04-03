@@ -42,6 +42,7 @@ namespace _Main_Tony._Test_PlayerCtrl.Area{
 				return;
 			}
 
+			_battleCtrl.AddedPlayerMoveForceRequestServerRpc(_targetCreatureID, transform.position);
 			_timer += Time.fixedDeltaTime;
 			if(_timer < duration) return;
 			_battleCtrl.PlayerHitRequestServerRpc(_ownerID, _targetCreatureID, 50);

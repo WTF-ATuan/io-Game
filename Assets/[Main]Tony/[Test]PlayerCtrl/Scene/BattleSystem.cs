@@ -12,6 +12,7 @@ public interface IBattleCtrl{
 	public void SetSpawner(SyncObjSpawner player);
 	public SyncObjSpawner GetSpawner();
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage);
+	void AddedPlayerMoveForceRequestServerRpc(ulong targetId, Vector2 forceCenter);
 	public List<CreatureCtrl> GetCreatureList();
 	public List<GroundCtrl> GetGroundList();
 	public bool AddPad(GroundCtrl ctrl);
@@ -66,6 +67,12 @@ public class DemoBattleCtrl : IBattleCtrl{
 			var newAvaterHealth = Mathf.Clamp(avaterState.Health - damage, 0, avaterMaxHealth);
 			playerCtrl.SetHealthClientRpc(newAvaterHealth);
 		}
+	}
+	[ServerRpc(RequireOwnership = false)]
+	public void AddedPlayerMoveForceRequestServerRpc(ulong targetId, Vector2 forceCenter){
+		var targetPlayer = NetworkManager.Singleton.ConnectedClients[targetId].PlayerObject;
+		var playerCtrl = targetPlayer.GetComponent<PlayerCtrl>();
+		playerCtrl.ForceToClientRpc(forceCenter);
 	}
 
 	public List<CreatureCtrl> GetCreatureList(){

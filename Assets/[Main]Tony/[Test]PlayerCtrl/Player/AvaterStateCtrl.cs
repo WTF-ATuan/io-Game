@@ -91,7 +91,7 @@ public class AvaterStateCtrl{
 		Data.NowVec = distance > moveFriction
 				? Data.NowVec + direction * Mathf.Min(moveFriction, distance)
 				: Data.TargetVec;
-		Data.Pos += Data.NowVec * Avater.GetLoadOut().NowAttribute.MoveSpeed * missTime;
+		Data.Pos += Data.NowVec * (Avater.GetLoadOut().NowAttribute.MoveSpeed * missTime);
 	}
 
 	private void UpdateInput(){
