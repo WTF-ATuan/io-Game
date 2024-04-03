@@ -37,7 +37,6 @@ public class MobCtrl : CreatureCtrl
                 var list = BattleCtrl.GetCreatureList();
                 var minDis = 0f;
                 CreatureCtrl target = null;
-                print(list.Count);
                 foreach (var creature in list) {
                     if (creature == this) continue;
                     var dis = (transform.position - creature.transform.position).magnitude;
