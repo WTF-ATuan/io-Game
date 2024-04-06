@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class AStarCtrl
@@ -8,12 +9,25 @@ public static class AStarCtrl
         new Vector2Int(1, 0), new Vector2Int(-1, 0), new Vector2Int( 0, 1), new Vector2Int(0, -1),
     };
 
-    public static bool CanMovePos(Vector2Int basePos,Vector2Int targetPos){
-        Vector2Int offset = targetPos - basePos;
-        foreach(var nei in neiOffset){
-            if(offset == nei) return true;
+    public static bool CanMovePos(Vector2Int basePos,Vector2Int targetPos, List<IAStarGround> padsList)
+    {
+        var dic = padsList.ToDictionary(pad => pad.GetPos(), pad => pad);
+        float distance = Vector2Int.Distance(basePos, targetPos);
+
+        Vector2Int lastCheckPos = new Vector2Int(-99999, -99999);
+        for (float t = 0; t <= 1; t += 0.1f / distance) {
+            Vector2Int checkPos = new Vector2Int(
+                Mathf.RoundToInt(Mathf.Lerp((float) basePos.x, (float) targetPos.x,t)), 
+                Mathf.RoundToInt(Mathf.Lerp((float) basePos.y, (float) targetPos.y,t)));
+
+            if (lastCheckPos != checkPos) {
+                lastCheckPos = checkPos;
+                if (!dic.ContainsKey(checkPos) || !dic[checkPos].CanCross()) {
+                    return false;
+                }
+            }
         }
-        return false;
+        return true;
     }
 
     public static bool AStar(Vector2Int startPos, Vector2Int targetPos, List<IAStarGround> PadsList, out Stack<IAStarGround> path) {
@@ -26,6 +40,30 @@ public static class AStarCtrl
         {
             var pos = pad.GetPos();
             allList.Add(pos, new Node(pad, targetPos, pad.CanCross()));
+        }
+
+        Stack<IAStarGround> OptimizePath(Node node)
+        {
+            var nowPath = GetPath(node);
+            List<IAStarGround> pathList = new List<IAStarGround>(nowPath);
+            pathList.Reverse();
+            pathList.Add(allList[startPos].Pos);
+            int i = 0;
+            while (i < pathList.Count - 2) {
+                bool foundShortcut = false;
+                for (int j = pathList.Count - 1; j > i + 1; j--) {
+                    if (CanMovePos(pathList[i].GetPos(), pathList[j].GetPos(), PadsList)) {
+                        pathList.RemoveRange(i + 1, j - i - 1);
+                        foundShortcut = true;
+                        break;
+                    }
+                }
+
+                if (!foundShortcut) {
+                    i++;
+                }
+            }
+            return new Stack<IAStarGround>(pathList);
         }
 
         List<Node> openList = new List<Node>();
@@ -53,7 +91,7 @@ public static class AStarCtrl
             closeList.Add(currntN);
 
             if (currntN.Pos.GetPos() == targetPos) {
-                path = GetPath(currntN);
+                path = OptimizePath(currntN);
                 return true;
             }
 
@@ -73,7 +111,7 @@ public static class AStarCtrl
             }
         }
 
-        path = GetPath(closeN);
+        path = OptimizePath(closeN);
         return false;
     }
 
