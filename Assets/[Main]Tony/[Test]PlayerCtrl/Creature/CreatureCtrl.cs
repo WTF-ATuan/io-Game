@@ -5,7 +5,11 @@ using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
-public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync{
+public interface INetEntity {
+    public ulong GetEntityID();
+}
+
+public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync,INetEntity{
     protected IBattleCtrl BattleCtrl;
     protected AvaterAttribute BaseAttribute;
     protected PlayerLoadout Loadout;
@@ -21,7 +25,7 @@ public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync{
         RecycleThings = new List<IDisposable>();
         StateCtrl = new AvaterStateCtrl(this);
         BaseAttribute = avaterAttributeCtrl.GetData();
-        Loadout = new PlayerLoadout(BaseAttribute);
+        Loadout = new PlayerLoadout(BaseAttribute, this);
     }
 
     public override void OnDestroy(){
@@ -63,5 +67,9 @@ public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync{
     protected virtual void FixedUpdate() {
         StateCtrl.ClientUpdate();
     }
-    
+
+    public ulong GetEntityID()
+    {
+        return NetworkObjectId;
+    }
 }

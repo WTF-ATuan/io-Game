@@ -75,6 +75,7 @@ public class UltSkillFactory : IUltSkillFactory {
 
 public abstract class Weapon : InsertThing
 {
+    protected INetEntity Owner;
     public Dictionary<AttributeType, float> AttributeBonus;
     public RangePreviewData RangePreview;
     public bool IsShootDelay { protected set; get; }
@@ -83,6 +84,10 @@ public abstract class Weapon : InsertThing
     [Inject]
     private void Initialization(IBattleCtrl battleCtrl) {
         BattleCtrl = battleCtrl;
+    }
+
+    public void OnEquip(INetEntity owner) {
+        Owner = owner;
     }
 
     public abstract void OnShoot(AvaterState data);
@@ -147,6 +152,8 @@ public interface IGetPlayerLoadout
 
 public class PlayerLoadout : IGetPlayerLoadout
 {
+    protected INetEntity Entity;
+    
     protected Weapon Weapon;
     protected Armor Armor;
     protected UltSkill UltSkill;
@@ -158,7 +165,8 @@ public class PlayerLoadout : IGetPlayerLoadout
     private AvaterAttribute BaseAttribute;
     public AvaterAttribute NowAttribute { private set; get; }
 
-    public PlayerLoadout(AvaterAttribute baseAttribute) {
+    public PlayerLoadout(AvaterAttribute baseAttribute, INetEntity entity) {
+        Entity = entity;
         BaseAttribute = baseAttribute;
         NowAttribute = new AvaterAttribute(BaseAttribute);
     }
@@ -191,6 +199,7 @@ public class PlayerLoadout : IGetPlayerLoadout
         if (SetThing(Weapon,WeaponRunes, weapon, out unload)) {
             Weapon = weapon;
             WeaponRunes = new Rune[Weapon.MaxInsert];
+            Weapon.OnEquip(Entity);
             NowAttributeUpdate();
             return true;
         }

@@ -23,7 +23,7 @@ public class Shotgun : Weapon {
                 flySec = AttributeBonus[AttributeType.FlySec],
                 flyDis = AttributeBonus[AttributeType.FlyDis],
                 damage = AttributeBonus[AttributeType.Damage],
-                playerId = BattleCtrl.GetLocalPlayerID(),
+                playerId = Owner.GetEntityID(),
                 runesId = "Shotgun"
             };
             BattleCtrl.GetSpawner().SpawnBulletServerRpc(bulletData);

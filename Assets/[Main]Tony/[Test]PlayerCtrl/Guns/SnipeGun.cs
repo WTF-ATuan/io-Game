@@ -13,7 +13,7 @@ public class SnipeGun : Weapon{
 			flySec = AttributeBonus[AttributeType.FlySec],
 			flyDis = AttributeBonus[AttributeType.FlyDis],
 			damage = AttributeBonus[AttributeType.Damage],
-			playerId = BattleCtrl.GetLocalPlayerID(),
+			playerId = Owner.GetEntityID(),
 			runesId = "Frozen"
 		};
 		BattleCtrl.GetSpawner()
