@@ -72,6 +72,7 @@ public class AvaterStateCtrl{
 		var weapon = Avater.GetLoadOut().GetWeaponInfo();
 		var ultSkill = Avater.GetLoadOut().GetUtlInfo();
 		float targetTowards =
+				weapon.IsPauseAim ? Data.Towards :
 				Data.IsAim && weapon.TryShoot(Data, false) ? Data.AimPos.Angle() :
 				Data.IsUtl && ultSkill.TryShoot(Data, false) ? Data.UtlPos.Angle() :
 				Data.TargetVec != Vector2.zero ? Data.TargetVec.Angle() :
@@ -82,7 +83,7 @@ public class AvaterStateCtrl{
 
 	private void UpdateMove(float missTime){
 		var weapon = Avater.GetLoadOut().GetWeaponInfo();
-		if(weapon.IsShootDelay) Data.TargetVec = Vector2.zero;
+		if(weapon.IsPauseMove) Data.TargetVec = Vector2.zero;
 		var vec = Data.TargetVec - Data.NowVec;
 		var direction = vec.normalized;
 		var distance = vec.magnitude;

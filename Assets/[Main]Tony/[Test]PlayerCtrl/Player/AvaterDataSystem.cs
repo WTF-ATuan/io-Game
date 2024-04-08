@@ -78,7 +78,9 @@ public abstract class Weapon : InsertThing
     protected INetEntity Owner;
     public Dictionary<AttributeType, float> AttributeBonus;
     public RangePreviewData RangePreview;
-    public bool IsShootDelay { protected set; get; }
+    public bool IsPauseAim { protected set; get; }
+    public bool IsPauseMove { protected set; get; }
+    public bool IsShooting { protected set; get; }
 
     protected IBattleCtrl BattleCtrl;
     [Inject]
@@ -90,22 +92,19 @@ public abstract class Weapon : InsertThing
         Owner = owner;
     }
 
-    public abstract void OnShoot(AvaterState data);
+    public abstract Task OnShoot(AvaterState data);
 
     protected virtual void Shoot(AvaterState data) {
-        async Task ShootDelay(float delay, Action action) {
-            await Task.Delay((int)(delay*1000));
-            action.Invoke();
+        async Task ShootDelay() {
+            IsShooting = true;
+            await OnShoot(data);
+            IsShooting = false;
         }
-        IsShootDelay = true;
-        ShootDelay(AttributeBonus[AttributeType.ShootDelay], () => {
-            IsShootDelay = false;
-            OnShoot(data);
-        });
+        ShootDelay();
     }
 
     public virtual bool TryShoot(AvaterState data, bool forceShoot = true) {
-        if (IsShootDelay) return false;
+        if (IsShooting) return false;
         float powerNeed = (1f / (int) AttributeBonus[AttributeType.MaxBullet]);
         float nowTime = Time.time;
         if (((data.AimPos == Vector2.zero && data.LastAimPos != Vector2.zero) || !forceShoot) && 
@@ -121,7 +120,7 @@ public abstract class Weapon : InsertThing
         return false;
     }
     
-    public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, float flySec, float flyDis, float shootDelay, RangePreviewData rangePreview) {
+    public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, float flySec, float flyDis, RangePreviewData rangePreview) {
         AttributeBonus = new Dictionary<AttributeType, float>();
         AttributeBonus.Add(AttributeType.MaxBullet, maxBullet);
         AttributeBonus.Add(AttributeType.PowerChargeToFullSec, powerChargeToFullSec);
@@ -129,8 +128,20 @@ public abstract class Weapon : InsertThing
         AttributeBonus.Add(AttributeType.ShootCD, shootCD);
         AttributeBonus.Add(AttributeType.FlySec, flySec);
         AttributeBonus.Add(AttributeType.FlyDis, flyDis);
-        AttributeBonus.Add(AttributeType.ShootDelay, shootDelay);
         RangePreview = rangePreview;
+    }
+
+    protected BulletData GetDefaultBullet(AvaterState data) {
+        var bulletData = new BulletData{
+            genPos = data.Pos+data.Towards.ToVec2(),
+            angle = data.Towards,
+            flySec = AttributeBonus[AttributeType.FlySec],
+            flyDis = AttributeBonus[AttributeType.FlyDis],
+            damage = AttributeBonus[AttributeType.Damage],
+            playerId = Owner.GetEntityID(),
+            runesId = "Default"
+        };
+        return bulletData;
     }
 }
 
@@ -290,8 +301,7 @@ public enum AttributeType {
     Damage,
     ShootCD,
     FlySec,
-    FlyDis,
-    ShootDelay
+    FlyDis
 }
 
 public class AvaterAttribute {
