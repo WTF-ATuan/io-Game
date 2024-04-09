@@ -42,7 +42,7 @@ public class DemoBattleCtrl : IBattleCtrl{
 			return ulong.MaxValue; //Server Only ID
 		}
 
-		return network.LocalClientId;
+		return GetLocalPlayer().GetEntityID();
 	}
 
 	public void SetSpawner(SyncObjSpawner spawner){

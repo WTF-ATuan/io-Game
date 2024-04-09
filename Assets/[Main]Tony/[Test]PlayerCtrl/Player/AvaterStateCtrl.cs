@@ -1,9 +1,9 @@
 using UnityEngine;
 
 
-public class AvaterStateCtrl{
+public class AvaterStateCtrl:INetEntity{
 	private IAvaterSync Avater;
-	private Transform RotCenter;
+	public Transform RotCenter{ get; private set; }
 
 	public AvaterState Data{ get; private set; }
 	private NetworkValue.Vec2Smoother PosSmoother;
@@ -101,5 +101,9 @@ public class AvaterStateCtrl{
 		Data.AimPos = Avater.GetInput().AimJoy();
 		Data.LastUtlPos = Data.UtlPos;
 		Data.UtlPos = Avater.GetInput().UtlJoy();
+	}
+
+	public ulong GetEntityID() {
+		return Avater.GetEntityID();
 	}
 }

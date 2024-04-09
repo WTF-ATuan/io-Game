@@ -159,6 +159,16 @@ public interface IGetPlayerLoadout
     public Armor GetArmorInfo(out Item[] inserts);
     public UltSkill GetUtlInfo(out Item[] inserts);
 
+    public AvaterAttribute GetNowAttribute();
+}
+
+public class OnAttributeChange {
+    public AvaterAttribute Attribute;
+    public INetEntity Entity;
+    public OnAttributeChange(INetEntity entity, AvaterAttribute attribute) {
+        Entity = entity;
+        Attribute = attribute;
+    }
 }
 
 public class PlayerLoadout : IGetPlayerLoadout
@@ -204,6 +214,11 @@ public class PlayerLoadout : IGetPlayerLoadout
     
     public UltSkill GetUtlInfo(out Item[] inserts) {
         return GetInfo(UltSkill,UltSkillRunes,out inserts);
+    }
+
+    public AvaterAttribute GetNowAttribute()
+    {
+        return NowAttribute;
     }
 
     public bool SetWeapon(Weapon weapon,out List<Item> unload) {
@@ -289,6 +304,7 @@ public class PlayerLoadout : IGetPlayerLoadout
             }
         }
         NowAttribute.Copy(data);
+        EventAggregator.Publish(new OnAttributeChange(Entity, NowAttribute));
     }
 }
 
