@@ -34,7 +34,7 @@ namespace _Main_Tony._Test_PlayerCtrl.Area{
 		private void OnCreatureEnter(Collider obj){
 			var creature = obj.transform.parent.GetComponent<CreatureCtrl>();
 			if(!creature) return;
-			_targetCreatureID = creature.OwnerClientId;
+			_targetCreatureID = creature.GetEntityID();
 		}
 
 		private void FixedUpdate(){

@@ -59,7 +59,7 @@ public class SyncObjSpawner : NetworkBehaviour{
 	//Server Only
 	private void OnBulletHit(Collision obj, ulong playerId){
 		if(!obj.transform.parent.TryGetComponent<CreatureCtrl>(out var hitPlayer)) return;
-		var hitPlayerId = hitPlayer.OwnerClientId;
+		var hitPlayerId = hitPlayer.GetEntityID();
 		if(playerId != hitPlayerId){
 			_battleCtrl.PlayerHitRequestServerRpc(playerId, hitPlayerId, 100);
 		}

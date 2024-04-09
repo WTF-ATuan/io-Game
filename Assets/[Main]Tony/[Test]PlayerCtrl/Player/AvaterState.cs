@@ -52,7 +52,7 @@ public interface IGetIInput {
 	public IInput GetInput();
 }
 
-public interface IAvaterSync : IGetLoadOut,IGetTransform,IGetIInput{
+public interface IAvaterSync : IGetLoadOut,IGetTransform,IGetIInput,INetEntity{
 	public NetworkVariable<AvaterState> GetSyncData();
 	public void AvaterDataSyncServerRpc(AvaterState data);
 	public bool IsController();

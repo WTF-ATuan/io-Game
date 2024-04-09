@@ -9,23 +9,29 @@ public interface INetEntity {
     public ulong GetEntityID();
 }
 
-public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync,INetEntity{
+public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync{
     protected IBattleCtrl BattleCtrl;
     protected AvaterAttribute BaseAttribute;
     protected PlayerLoadout Loadout;
     protected List<IDisposable> RecycleThings;
     protected AvaterStateCtrl StateCtrl;
+    protected PoolObj<HealthBarCtrl> HealthBar;
     
     [Inject]
     private void Initialization(
         IAvaterAttributeCtrl avaterAttributeCtrl,
-        IBattleCtrl battleCtrl) {
+        IBattleCtrl battleCtrl,
+        ObjPoolCtrl<HealthBarCtrl> healthBarPool) {
         BattleCtrl = battleCtrl;
         BattleCtrl.AddCreature(this);
         RecycleThings = new List<IDisposable>();
         StateCtrl = new AvaterStateCtrl(this);
         BaseAttribute = avaterAttributeCtrl.GetData();
         Loadout = new PlayerLoadout(BaseAttribute, this);
+        
+        HealthBar = healthBarPool.Get();
+        HealthBar.Ctrl.Setup(Loadout, StateCtrl);
+        RecycleThings.Add(HealthBar);
     }
 
     public override void OnDestroy(){
@@ -43,6 +49,17 @@ public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync,INetEntity{
     [ServerRpc(RequireOwnership = false)]
     public void AvaterDataSyncServerRpc(AvaterState data) {
         AvaterSyncData.Value = data;
+    }
+    
+    [ClientRpc]
+    public void DeathClientRpc(){
+        Debug.Log($"You are Dead!");
+    }
+    
+    [ClientRpc]
+    public void SetHealthClientRpc(float value){
+        StateCtrl.Data.Health = value;
+        StateCtrl.DataSync();
     }
 
     public virtual bool IsController() {
