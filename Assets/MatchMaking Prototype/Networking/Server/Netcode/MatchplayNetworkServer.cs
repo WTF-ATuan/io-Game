@@ -27,6 +27,7 @@ public class MatchplayNetworkServer : IDisposable{
 
 	public Dictionary<string, UserData> ClientData{ get; private set; } = new Dictionary<string, UserData>();
 	public Dictionary<ulong, string> ClientIdToAuth{ get; private set; } = new Dictionary<ulong, string>();
+	
 
 	public MatchplayNetworkServer(NetworkManager networkManager){
 		this.networkManager = networkManager;
@@ -48,7 +49,7 @@ public class MatchplayNetworkServer : IDisposable{
 
 	public async Task<SynchedServerData> ConfigureServer(GameInfo startingGameInfo){
 		networkManager.SceneManager.SetClientSynchronizationMode(LoadSceneMode.Additive);
-		networkManager.SceneManager.LoadScene(startingGameInfo.LobbySceneName, LoadSceneMode.Single);
+		//networkManager.SceneManager.LoadScene(startingGameInfo.LobbySceneName, LoadSceneMode.Single);
 
 		bool localNetworkedSceneLoaded = false;
 		networkManager.SceneManager.OnLoadComplete += CreateAndSetSynchedServerData;
@@ -93,11 +94,11 @@ public class MatchplayNetworkServer : IDisposable{
 	public void StartGame(){
 		gameHasStarted = true;
 
-		NetworkManager.Singleton.SceneManager.LoadScene("BattleScene", LoadSceneMode.Single);
+		NetworkManager.Singleton.SceneManager.LoadScene("BackStage", LoadSceneMode.Single);
 	}
 
-	public void NextGame(){
-		
+	public void StartBattle(){
+		NetworkManager.Singleton.SceneManager.LoadScene("BattleScene", LoadSceneMode.Single);
 	}
 
 	private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,

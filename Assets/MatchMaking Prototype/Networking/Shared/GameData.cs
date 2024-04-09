@@ -85,8 +85,8 @@ public class UserData
     public string userAuthId;
     public ulong clientId;
     public GameInfo userGamePreferences;
-    
-    public int characterId = -1;
+
+    public int userHealth; 
 
     public UserData(string userName, string userAuthId, ulong clientId, GameInfo userGamePreferences)
     {
