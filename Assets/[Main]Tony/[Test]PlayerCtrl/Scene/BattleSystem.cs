@@ -56,6 +56,9 @@ public class DemoBattleCtrl : IBattleCtrl{
 	[ServerRpc(RequireOwnership = false)]
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage){
 		var hitPlayer = NetworkManager.Singleton.ConnectedClients[hitId].PlayerObject;
+		if(!hitPlayer || !hitPlayer.IsSpawned){
+			return;
+		}
 		var playerCtrl = hitPlayer.GetComponent<PlayerCtrl>();
 		var avaterState = playerCtrl.GetSyncData().Value;
 		var avaterMaxHealth = playerCtrl.GetLoadOut().NowAttribute.MaxHealth;
@@ -71,6 +74,9 @@ public class DemoBattleCtrl : IBattleCtrl{
 	[ServerRpc(RequireOwnership = false)]
 	public void AddedPlayerMoveForceRequestServerRpc(ulong targetId, Vector2 forceCenter){
 		var targetPlayer = NetworkManager.Singleton.ConnectedClients[targetId].PlayerObject;
+		if(!targetPlayer || !targetPlayer.IsSpawned){
+			return;
+		}
 		var playerCtrl = targetPlayer.GetComponent<PlayerCtrl>();
 		playerCtrl.ForceToClientRpc(forceCenter);
 	}
