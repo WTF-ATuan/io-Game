@@ -50,6 +50,17 @@ public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync{
     public void AvaterDataSyncServerRpc(AvaterState data) {
         AvaterSyncData.Value = data;
     }
+    
+    [ClientRpc]
+    public void DeathClientRpc(){
+        Debug.Log($"You are Dead!");
+    }
+    
+    [ClientRpc]
+    public void SetHealthClientRpc(float value){
+        StateCtrl.Data.Health = value;
+        StateCtrl.DataSync();
+    }
 
     public virtual bool IsController() {
         return false;

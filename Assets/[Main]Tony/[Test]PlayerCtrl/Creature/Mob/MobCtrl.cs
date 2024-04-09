@@ -61,10 +61,12 @@ public class MobCtrl : CreatureCtrl
                             moveVec = ((Vector3) (Vector2) path.Peek().GetPos()) - transform.position;
                             moveJoy = moveVec.magnitude>1?moveVec.normalized:moveVec;
                         }
+                    
                         aimVec = Target.position - transform.position;//aimVec = (Target.position+(Vector3)target.GetInput().MoveJoy()*1.5f) - transform.position;
                         if (true){//aimVec.magnitude < Loadout.GetWeaponInfo().AttributeBonus[AttributeType.FlyDis]) {
                             aimJoy = Loadout.GetWeaponInfo().TryShoot(StateCtrl.Data, false) && Input._AimJoy==Vector2.zero ? aimVec.normalized : Vector2.zero;
                         }
+                
                     }
                 }
                 Input._MoveJoy = moveJoy;

@@ -56,28 +56,26 @@ public class DemoBattleCtrl : IBattleCtrl{
 	[ServerRpc(RequireOwnership = false)]
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage){
 		if(!NetworkManager.Singleton.IsServer) return;
-		var hitPlayer = NetworkManager.Singleton.ConnectedClients[hitId].PlayerObject;
-		if(!hitPlayer || !hitPlayer.IsSpawned){
-			return;
-		}
-		var playerCtrl = hitPlayer.GetComponent<PlayerCtrl>();
-		var avaterState = playerCtrl.GetSyncData().Value;
-		var avaterMaxHealth = playerCtrl.GetLoadOut().NowAttribute.MaxHealth;
+		var hitPlayer = GetCreatureList().Find(e=>e.GetEntityID()==hitId);
+		if(!hitPlayer || !hitPlayer.IsSpawned) return;
+		var creatureCtrl = hitPlayer.GetComponent<CreatureCtrl>();
+		var avaterState = creatureCtrl.GetSyncData().Value;
+		var avaterMaxHealth = creatureCtrl.GetLoadOut().NowAttribute.MaxHealth;
 		if(avaterState.Health - damage <= 0){
-			playerCtrl.DeathClientRpc();
-			hitPlayer.Despawn();
+			creatureCtrl.DeathClientRpc();
+			hitPlayer.NetworkObject.Despawn();
 			CheckWinningPlayer();
 		}
 		else{
 			var newAvaterHealth = Mathf.Clamp(avaterState.Health - damage, 0, avaterMaxHealth);
-			playerCtrl.SetHealthClientRpc(newAvaterHealth);
+			creatureCtrl.SetHealthClientRpc(newAvaterHealth);
 		}
 	}
 
 	private void CheckWinningPlayer(){
 		var playerCreatureList = _creatureList.FindAll(x=> !x.IsOwnedByServer).ToList();
 		if(playerCreatureList.Count > 1) return;
-		var ownerClientId = playerCreatureList.First().OwnerClientId;
+		var ownerClientId = playerCreatureList.First().GetEntityID();
 		Debug.Log($"player:{ownerClientId} is winner");
 	}
 

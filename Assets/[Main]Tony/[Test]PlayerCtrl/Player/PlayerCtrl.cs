@@ -30,17 +30,6 @@ public class PlayerCtrl : CreatureCtrl{
 	}
 
 	[ClientRpc]
-	public void SetHealthClientRpc(float value){
-		StateCtrl.Data.Health = value;
-		StateCtrl.DataSync();
-	}
-
-	[ClientRpc]
-	public void DeathClientRpc(){
-		Debug.Log($"You are Dead!");
-	}
-
-	[ClientRpc]
 	public void ForceToClientRpc(Vector2 forceCenter){
 		var avaterData = StateCtrl.Data;
 		var currentVec = avaterData.NowVec;
