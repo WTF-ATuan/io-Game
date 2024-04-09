@@ -43,22 +43,33 @@ public class PCInput : IInput
         return data.normalized;
     }
 
-    private Vector2 GetMouseJoy() {
+    private Vector2 GetMouseJoy(bool aimOrUlt) {
         Vector2 data = Vector2.zero;
         var localPlayer = BattleCtrl.GetLocalPlayer();
         if(!localPlayer) return Vector2.zero;
+        float maxDis = 0;
+        if (aimOrUlt) {
+            var weapon = localPlayer.GetLoadOut().GetWeaponInfo();
+            if(weapon!=null)maxDis = weapon.RangePreview.Dis;
+        } else {
+            var ult = localPlayer.GetLoadOut().GetUtlInfo();
+            if(ult!=null)maxDis = ult.RangePreview.Dis; 
+        }
+        maxDis *= 60;
+        
         Vector3 playerPos = localPlayer.transform.position;
         playerPos = Camera.main.WorldToScreenPoint(playerPos);
         Vector3 mousePos = Input.mousePosition;
         data = mousePos - playerPos;
-        return data.normalized;
+        data = data.magnitude > maxDis ? data.normalized : (data / maxDis);
+        return data;
     }
     
     public Vector2 AimJoy()
     {
         Vector2 data = Vector2.zero;
         if (Input.GetMouseButton(0)) {
-            data = GetMouseJoy();
+            data = GetMouseJoy(true);
         }
         return data;
     }
@@ -67,7 +78,7 @@ public class PCInput : IInput
     {
         Vector2 data = Vector2.zero;
         if (Input.GetMouseButton(1)) {
-            data = GetMouseJoy();
+            data = GetMouseJoy(false);
         }
         return data;
     }

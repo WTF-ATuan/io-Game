@@ -17,14 +17,14 @@ public class SyncObjSpawner : NetworkBehaviour{
 		_mapper = mapper;
 	}
 	public override void OnNetworkSpawn(){
-		if(IsServer) {
+		/*if(IsServer) {
 			NetworkManager.Singleton.OnClientConnectedCallback += a;
-		}
+		}*/
 	}
 
 	private void a(ulong clientID){
-		SpawnMobServerRpc();
-		NetworkManager.Singleton.OnClientConnectedCallback -= a;
+		/*SpawnMobServerRpc();
+		NetworkManager.Singleton.OnClientConnectedCallback -= a;*/
 	}
 
 	public GameObject MobPrefab;
