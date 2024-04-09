@@ -55,6 +55,7 @@ public class DemoBattleCtrl : IBattleCtrl{
 
 	[ServerRpc(RequireOwnership = false)]
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage){
+		if(!NetworkManager.Singleton.IsServer) return;
 		var hitPlayer = NetworkManager.Singleton.ConnectedClients[hitId].PlayerObject;
 		if(!hitPlayer || !hitPlayer.IsSpawned){
 			return;
@@ -65,14 +66,24 @@ public class DemoBattleCtrl : IBattleCtrl{
 		if(avaterState.Health - damage <= 0){
 			playerCtrl.DeathClientRpc();
 			hitPlayer.Despawn();
+			CheckWinningPlayer();
 		}
 		else{
 			var newAvaterHealth = Mathf.Clamp(avaterState.Health - damage, 0, avaterMaxHealth);
 			playerCtrl.SetHealthClientRpc(newAvaterHealth);
 		}
 	}
+
+	private void CheckWinningPlayer(){
+		var playerCreatureList = _creatureList.FindAll(x=> !x.IsOwnedByServer).ToList();
+		if(playerCreatureList.Count > 1) return;
+		var ownerClientId = playerCreatureList.First().OwnerClientId;
+		Debug.Log($"player:{ownerClientId} is winner");
+	}
+
 	[ServerRpc(RequireOwnership = false)]
 	public void AddedPlayerMoveForceRequestServerRpc(ulong targetId, Vector2 forceCenter){
+		if(!NetworkManager.Singleton.IsServer) return;
 		var targetPlayer = NetworkManager.Singleton.ConnectedClients[targetId].PlayerObject;
 		if(!targetPlayer || !targetPlayer.IsSpawned){
 			return;
