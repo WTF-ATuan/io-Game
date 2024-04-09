@@ -13,6 +13,7 @@ public class RangePreviewCtrl : MonoBehaviour
     
     private static readonly int Width = Shader.PropertyToID("_Width");
     private static readonly int Type = Shader.PropertyToID("_Type");
+    private static readonly int Radius = Shader.PropertyToID("_Radius");
 
     private void Start() {
         M = Mesh.material;
@@ -28,11 +29,13 @@ public class RangePreviewCtrl : MonoBehaviour
         if (PlayerData == null) return;
         RangePreviewData data = null;
         float ang = 0;
+        float radius = 0;
         if (PlayerData.Data.IsAim) {
             var weapon = PlayerLoadout.GetWeaponInfo();
             if (weapon.TryShoot(PlayerData.Data, false)) {
                 data = weapon.RangePreview;
                 ang = PlayerData.Data.AimPos.Angle();
+                radius = PlayerData.Data.AimPos.magnitude;
             }
         }
         if (PlayerData.Data.IsUtl) {
@@ -40,6 +43,7 @@ public class RangePreviewCtrl : MonoBehaviour
             if (utl.TryShoot(PlayerData.Data, false)) {
                 data = utl.RangePreview;
                 ang = PlayerData.Data.UtlPos.Angle();
+                radius = PlayerData.Data.UtlPos.magnitude;
             }
         }
         if (data == null) {
@@ -48,6 +52,7 @@ public class RangePreviewCtrl : MonoBehaviour
         }
         transform.eulerAngles = new Vector3(0, 0, ang);
         M.SetFloat(Width, data.Width/360);
+        M.SetFloat(Radius, radius);
         M.SetFloat(Type, (int)data.Type);
         transform.localScale = Vector3.one*data.Dis*0.2f;
         if(!gameObject.activeSelf) gameObject.SetActive(true);

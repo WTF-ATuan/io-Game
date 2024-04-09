@@ -49,7 +49,6 @@ public class HealthBarCtrl : MonoBehaviour{
 			OnAttributeChange(e.Attribute);
 		}));
 		
-		print(StateData.GetEntityID()+"<  >"+BattleCtrl.GetLocalPlayerID());
 		PowerRoot.SetActive(StateData.GetEntityID()==BattleCtrl.GetLocalPlayerID());
 	}
 	
