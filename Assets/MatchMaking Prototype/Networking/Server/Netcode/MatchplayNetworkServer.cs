@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MatchMaking_Prototype.Battle;
 using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -27,8 +28,8 @@ public class MatchplayNetworkServer : IDisposable{
 
 	public Dictionary<string, UserData> ClientData{ get; private set; } = new Dictionary<string, UserData>();
 	public Dictionary<ulong, string> ClientIdToAuth{ get; private set; } = new Dictionary<ulong, string>();
-	
 
+	private readonly BattleLevelInfo _battleLevelInfo = new BattleLevelInfo();
 	public MatchplayNetworkServer(NetworkManager networkManager){
 		this.networkManager = networkManager;
 
@@ -98,6 +99,7 @@ public class MatchplayNetworkServer : IDisposable{
 	}
 
 	public void StartBattle(){
+		_battleLevelInfo.RandomSelect();
 		NetworkManager.Singleton.SceneManager.LoadScene("BattleScene", LoadSceneMode.Single);
 	}
 
@@ -205,6 +207,10 @@ public class MatchplayNetworkServer : IDisposable{
 		}
 
 		return null;
+	}
+
+	public BattleLevelInfo GetBattleLevelInfo(){
+		return _battleLevelInfo;
 	}
 
 	private Matchplayer GetNetworkedMatchPlayer(ulong clientId){
