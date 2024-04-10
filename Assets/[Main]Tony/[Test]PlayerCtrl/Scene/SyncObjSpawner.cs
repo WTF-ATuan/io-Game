@@ -30,9 +30,8 @@ public class SyncObjSpawner : NetworkBehaviour{
 	public GameObject MobPrefab;
 	[ServerRpc(RequireOwnership = false)]
 	public void SpawnMobServerRpc(Vector2 spawnPos){
-		var entity = Instantiate(MobPrefab).GetComponent<NetworkObject>();
+		var entity = Instantiate(MobPrefab, spawnPos, Quaternion.identity).GetComponent<NetworkObject>();
 		entity.Spawn();
-		entity.transform.position = spawnPos;
 	}
 	
 	public GameObject ButtetPrefab;
@@ -57,8 +56,11 @@ public class SyncObjSpawner : NetworkBehaviour{
 	}
 
 	//Server Only
-	private void OnBulletHit(Collision obj, ulong playerId){
-		if(!obj.transform.parent.TryGetComponent<CreatureCtrl>(out var hitPlayer)) return;
+	private void OnBulletHit(Collision obj, ulong playerId)
+	{
+		var parent = obj.transform.parent;
+		if (parent == null) return;
+		if(!parent.TryGetComponent<CreatureCtrl>(out var hitPlayer)) return;
 		var hitPlayerId = hitPlayer.GetEntityID();
 		if(playerId != hitPlayerId){
 			_battleCtrl.PlayerHitRequestServerRpc(playerId, hitPlayerId, 100);

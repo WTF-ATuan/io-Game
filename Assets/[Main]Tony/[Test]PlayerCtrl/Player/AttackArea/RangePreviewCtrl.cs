@@ -53,7 +53,6 @@ public class RangePreviewCtrl : MonoBehaviour
         transform.eulerAngles = new Vector3(0, 0, ang);
         var width = data.Width / 360;
         if (data.Type == RangePreviewType.Throw) width = data.Width / data.Dis;
-        print(width);
         M.SetFloat(Width, width);
         M.SetFloat(Radius, radius);
         M.SetFloat(Type, (int)data.Type);

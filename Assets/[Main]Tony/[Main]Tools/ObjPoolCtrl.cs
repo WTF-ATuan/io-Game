@@ -16,6 +16,7 @@ public class ObjPoolCtrl<T>:IDisposable where T : Component {
     private int ActivePoolSize;
     private int MinPoolSize;
     private int PoolSize => ActivePoolSize < MinPoolSize ? MinPoolSize : ActivePoolSize;
+    private Transform Pool;
     public bool IsLoaded { private set; get; }
 
     public ObjPoolCtrl(string path, Transform parent, int minSize = 1)
@@ -34,6 +35,9 @@ public class ObjPoolCtrl<T>:IDisposable where T : Component {
         UnActivePool = new List<GameObject>();
         ActivePoolObjs = new List<PoolObj<T>>();
         EveageActiveCount = new List<int>();
+
+        Pool = new GameObject("[Pool]"+typeof(T).Name).transform;
+        Debug.Log("ccc");
     }
     
     public ObjPoolCtrl(GameObject obj, Transform parent, int minSize = 1) : 
@@ -49,6 +53,9 @@ public class ObjPoolCtrl<T>:IDisposable where T : Component {
         ActivePoolObjs = new List<PoolObj<T>>();
         EveageActiveCount = new List<int>();
         IsLoaded = true;
+        
+        Pool = new GameObject("[Pool]"+typeof(T).Name).transform;
+        Debug.Log("ccc");
     }
     
     public List<PoolObj<T>> GetAllActiveObj()
@@ -78,6 +85,8 @@ public class ObjPoolCtrl<T>:IDisposable where T : Component {
         Cheak();
         var obj = new PoolObj<T>(o, (e) => {
             o.SetActive(false);
+            o.transform.parent = Pool;
+            
             ActivePool.Remove(o);
             ActivePoolObjs.Remove(e);
             Cheak();

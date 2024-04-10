@@ -6,7 +6,7 @@ using Zenject;
 public class BearUltSkill : UltSkill {
 
     public BearUltSkill() {
-        RangePreview = new RangePreviewData(RangePreviewType.Throw, 6, 10);
+        RangePreview = new RangePreviewData(RangePreviewType.Throw, 3, 0.5f);
     }
     
     [Inject]

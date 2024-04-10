@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq;using UniRx;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
 public interface IBattleCtrl{
-	public void AddCreature(CreatureCtrl player);
+	public IDisposable AddCreature(CreatureCtrl player);
 	public PlayerCtrl GetLocalPlayer();
 	public ulong GetLocalPlayerID();
 	public void SetSpawner(SyncObjSpawner player);
@@ -25,8 +25,9 @@ public class DemoBattleCtrl : IBattleCtrl{
 	private readonly List<CreatureCtrl> _creatureList = new();
 	public Dictionary<Vector2Int, GroundCtrl> _padsList = new();
 
-	public void AddCreature(CreatureCtrl player){
+	public IDisposable AddCreature(CreatureCtrl player){
 		_creatureList.Add(player);
+		return Disposable.Create(() => { _creatureList.Remove(player); });
 	}
 
 	public PlayerCtrl GetLocalPlayer(){
@@ -63,7 +64,7 @@ public class DemoBattleCtrl : IBattleCtrl{
 		if(avaterState.Health - damage <= 0){
 			creatureCtrl.DeathClientRpc();
 			hitPlayer.NetworkObject.Despawn();
-			CheckWinningPlayer();
+			//CheckWinningPlayer();
 		}
 		else{
 			var newAvaterHealth = Mathf.Clamp(avaterState.Health - damage, 0, avaterMaxHealth);

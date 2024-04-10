@@ -48,15 +48,12 @@ public class HealthBarCtrl : MonoBehaviour{
 			if (e.Entity.GetEntityID() != StateData.GetEntityID()) return;
 			OnAttributeChange(e.Attribute);
 		}));
-		
 		// PowerRoot.SetActive(StateData.GetEntityID()==BattleCtrl.GetLocalPlayerID());
 	}
 	
-	private void Update(){
+	private void Update(){	
 		PowerLine.localScale = new Vector3(1-(StateData.Data.Power), 1, 1);
 		HelthLine.localScale = new Vector3(1-(StateData.Data.Health / Loadout.GetNowAttribute().MaxHealth), 1, 1);
-		
-
 	}
 	
 	
