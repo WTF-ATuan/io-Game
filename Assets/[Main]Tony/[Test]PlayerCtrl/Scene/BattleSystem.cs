@@ -30,11 +30,12 @@ public class DemoBattleCtrl : IBattleCtrl{
 		return Disposable.Create(() => { _creatureList.Remove(player); });
 	}
 
-	public CreatureCtrl GetLocalPlayer(){
+	public PlayerCtrl GetLocalPlayer(){
 		var localClientId = NetworkManager.Singleton.LocalClientId;
 		var playerCtrl = _creatureList.Find(x => x.OwnerClientId == localClientId);
+		if(!playerCtrl is PlayerCtrl) throw new NullReferenceException($"Can't find local player with{localClientId}");
 		if(!playerCtrl) throw new NullReferenceException($"Can't find local player with{localClientId}");
-		return playerCtrl;
+		return (PlayerCtrl)playerCtrl;
 	}
 
 	public ulong GetLocalPlayerID(){

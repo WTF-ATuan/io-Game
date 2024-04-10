@@ -58,7 +58,6 @@ public class PCInput : IInput
         Vector3 playerPos = localPlayer.transform.position;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         data = mousePos - playerPos;
-        Debug.Log(data.magnitude);
         data = data.magnitude > maxDis ? data.normalized : (data / maxDis);
         return data;
     }

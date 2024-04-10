@@ -8,6 +8,7 @@ public class AvaterStateCtrl:INetEntity{
 	public AvaterState Data{ get; private set; }
 	private NetworkValue.Vec2Smoother PosSmoother;
 	private NetworkValue.RotSmoother RotSmoother;
+	private bool IsInit = false;
 
 	public AvaterStateCtrl(IAvaterSync avater){
 		Avater = avater;
@@ -22,6 +23,7 @@ public class AvaterStateCtrl:INetEntity{
 				RotSmoother.Update();
 			};
 		}
+		Data.Pos = Avater.GetTransform().position;
 	}
 
 	public void DataSync(){
@@ -32,6 +34,7 @@ public class AvaterStateCtrl:INetEntity{
 
 	public void ClientUpdate(){
 		if(Avater.IsController()){
+			Debug.Log(Data.Pos+Avater.GetTransform().name);
 			var missTime = Time.time - Data.ClientUpdateTimeStamp;
 			Data.ClientUpdateTimeStamp = Time.time; //todo change to serverSyncTime
 			UpdateInput();
@@ -39,12 +42,13 @@ public class AvaterStateCtrl:INetEntity{
 			UpdateRotate(missTime);
 			Shoot(missTime);
 			Ult(missTime);
+			
 			Avater.GetTransform().position = Data.Pos;
 			RotCenter.eulerAngles = Vector3.forward * Data.Towards;
 		}
 		else{
 			Data = Avater.GetSyncData().Value;
-
+			
 			Avater.GetTransform().position = PosSmoother.Get();
 			RotCenter.eulerAngles = Vector3.forward * RotSmoother.Get();
 		}
