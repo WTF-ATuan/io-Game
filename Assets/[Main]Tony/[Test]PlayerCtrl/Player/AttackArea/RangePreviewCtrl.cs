@@ -51,10 +51,15 @@ public class RangePreviewCtrl : MonoBehaviour
             return;
         }
         transform.eulerAngles = new Vector3(0, 0, ang);
-        M.SetFloat(Width, data.Width/360);
+        var width = data.Width / 360;
+        if (data.Type == RangePreviewType.Throw) width = data.Width / data.Dis;
+        M.SetFloat(Width, width);
         M.SetFloat(Radius, radius);
         M.SetFloat(Type, (int)data.Type);
-        transform.localScale = Vector3.one*data.Dis*0.2f;
+        var scale = Vector3.one * data.Dis;
+        if(data.Type==RangePreviewType.Throw)scale+=Vector3.one * data.Width/2;
+        scale*=0.235f;
+        transform.localScale = scale;
         if(!gameObject.activeSelf) gameObject.SetActive(true);
     }
 }

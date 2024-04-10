@@ -11,7 +11,7 @@ public class ObjPoolSystem : MonoInstaller {
     
     public override void InstallBindings() {
         Container.Bind<ObjPoolCtrl<HealthBarCtrl>>().FromInstance(new ObjPoolCtrl<HealthBarCtrl>(HealthBarPrefab,null)).AsSingle();
-        Container.Bind<Image>().WithId("ult").FromInstance(ultUI).AsSingle();
+        //Container.Bind<Image>().WithId("ult").FromInstance(ultUI).AsSingle();
     }
     
 }

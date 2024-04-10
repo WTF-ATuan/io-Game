@@ -22,9 +22,9 @@ public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync{
         IAvaterAttributeCtrl avaterAttributeCtrl,
         IBattleCtrl battleCtrl,
         ObjPoolCtrl<HealthBarCtrl> healthBarPool) {
-        BattleCtrl = battleCtrl;
-        BattleCtrl.AddCreature(this);
         RecycleThings = new List<IDisposable>();
+        BattleCtrl = battleCtrl;
+        RecycleThings.Add(BattleCtrl.AddCreature(this));
         StateCtrl = new AvaterStateCtrl(this);
         BaseAttribute = avaterAttributeCtrl.GetData();
         Loadout = new PlayerLoadout(BaseAttribute, this);
@@ -34,13 +34,6 @@ public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync{
         RecycleThings.Add(HealthBar);
     }
 
-    public override void OnDestroy(){
-        base.OnDestroy();
-        foreach(var thing in RecycleThings){
-            thing.Dispose();
-        }
-    }
-    
     protected NetworkVariable<AvaterState> AvaterSyncData = new();
     public NetworkVariable<AvaterState> GetSyncData() {
         return AvaterSyncData;
@@ -53,6 +46,10 @@ public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync{
     
     [ClientRpc]
     public void DeathClientRpc(){
+        foreach(var thing in RecycleThings){
+            thing.Dispose();
+        }
+        
         Debug.Log($"You are Dead!");
     }
     

@@ -46,7 +46,7 @@ public class PCInput : IInput
     private Vector2 GetMouseJoy(bool aimOrUlt) {
         Vector2 data = Vector2.zero;
         var localPlayer = BattleCtrl.GetLocalPlayer();
-        if(!localPlayer) return Vector2.zero;
+        if (!localPlayer) return Vector2.zero;
         float maxDis = 0;
         if (aimOrUlt) {
             var weapon = localPlayer.GetLoadOut().GetWeaponInfo();
@@ -55,7 +55,7 @@ public class PCInput : IInput
             var ult = localPlayer.GetLoadOut().GetUtlInfo();
             if(ult!=null)maxDis = ult.RangePreview.Dis; 
         }
-        maxDis *= 60;
+        maxDis *= 160;
         
         Vector3 playerPos = localPlayer.transform.position;
         playerPos = Camera.main.WorldToScreenPoint(playerPos);
