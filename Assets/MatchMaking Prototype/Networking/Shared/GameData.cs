@@ -86,7 +86,7 @@ public class UserData
     public ulong clientId;
     public GameInfo userGamePreferences;
 
-    public int userHealth; 
+    public int userHealth = 100; 
 
     public UserData(string userName, string userAuthId, ulong clientId, GameInfo userGamePreferences)
     {
@@ -94,7 +94,6 @@ public class UserData
         this.userAuthId = userAuthId;
         this.clientId = clientId;
         this.userGamePreferences = userGamePreferences;
-        userHealth = 100;
     }
 }
 

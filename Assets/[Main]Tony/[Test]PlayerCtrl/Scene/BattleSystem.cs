@@ -7,7 +7,7 @@ using Zenject;
 
 public interface IBattleCtrl{
 	public IDisposable AddCreature(CreatureCtrl player);
-	public PlayerCtrl GetLocalPlayer();
+	public CreatureCtrl GetLocalPlayer();
 	public ulong GetLocalPlayerID();
 	public void SetSpawner(SyncObjSpawner player);
 	public SyncObjSpawner GetSpawner();
@@ -64,7 +64,7 @@ public class DemoBattleCtrl : IBattleCtrl{
 		if(avaterState.Health - damage <= 0){
 			creatureCtrl.DeathClientRpc();
 			hitPlayer.NetworkObject.Despawn();
-			//CheckWinningPlayer();
+			CheckWinningPlayer();
 		}
 		else{
 			var newAvaterHealth = Mathf.Clamp(avaterState.Health - damage, 0, avaterMaxHealth);
@@ -73,14 +73,14 @@ public class DemoBattleCtrl : IBattleCtrl{
 	}
 
 	private void CheckWinningPlayer(){
-		var playerCreatureList = _creatureList.FindAll(x => !x.IsOwnedByServer).ToList();
+		var playerCreatureList = _creatureList.FindAll(x => x.IsClient).ToList();
 		if(playerCreatureList.Count > 1) return;
-		var ownerClientId = playerCreatureList.First().GetEntityID();
+		var ownerClientId = playerCreatureList.First().OwnerClientId;
 		foreach(var connectedClient in NetworkManager.Singleton.ConnectedClients){
 			if(connectedClient.Key.Equals(ownerClientId)) continue;
 			var userData = MatchplayNetworkServer.Instance.GetUserDataByClientId(ownerClientId);
 			userData.userHealth -= 10;
-			Debug.Log($"player : {ownerClientId} current hp is {userData.userHealth}");
+			MatchplayNetworkServer.Instance.SetUserData(ownerClientId , userData);
 		}
 		MatchplayNetworkServer.Instance.StartBackStage();
 	}

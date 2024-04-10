@@ -50,7 +50,7 @@ public abstract class CreatureCtrl : NetworkBehaviour ,IAvaterSync{
             thing.Dispose();
         }
         
-        Debug.Log($"You are Dead!");
+        Debug.Log($"player:{OwnerClientId} with {NetworkObjectId} Dead ");
     }
     
     [ClientRpc]
