@@ -53,10 +53,9 @@ public class DemoBattleCtrl : IBattleCtrl{
 		return _spawner;
 	}
 
-	[ServerRpc(RequireOwnership = false)]
+	[ServerRpc(RequireOwnership = true)]
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage){
-		if(!NetworkManager.Singleton.IsServer) return;
-		var hitPlayer = GetCreatureList().Find(e=>e.GetEntityID()==hitId);
+		var hitPlayer = GetCreatureList().Find(e => e.GetEntityID() == hitId);
 		if(!hitPlayer || !hitPlayer.IsSpawned) return;
 		var creatureCtrl = hitPlayer.GetComponent<CreatureCtrl>();
 		var avaterState = creatureCtrl.GetSyncData().Value;
@@ -73,19 +72,19 @@ public class DemoBattleCtrl : IBattleCtrl{
 	}
 
 	private void CheckWinningPlayer(){
-		var playerCreatureList = _creatureList.FindAll(x=> !x.IsOwnedByServer).ToList();
+		var playerCreatureList = _creatureList.FindAll(x => !x.IsOwnedByServer).ToList();
 		if(playerCreatureList.Count > 1) return;
 		var ownerClientId = playerCreatureList.First().GetEntityID();
 		Debug.Log($"player:{ownerClientId} is winner");
 	}
 
-	[ServerRpc(RequireOwnership = false)]
+	[ServerRpc(RequireOwnership = true)]
 	public void AddedPlayerMoveForceRequestServerRpc(ulong targetId, Vector2 forceCenter){
-		if(!NetworkManager.Singleton.IsServer) return;
-		var targetPlayer = NetworkManager.Singleton.ConnectedClients[targetId].PlayerObject;
+		var targetPlayer = GetCreatureList().Find(e => e.GetEntityID() == targetId);
 		if(!targetPlayer || !targetPlayer.IsSpawned){
 			return;
 		}
+
 		var playerCtrl = targetPlayer.GetComponent<PlayerCtrl>();
 		playerCtrl.ForceToClientRpc(forceCenter);
 	}

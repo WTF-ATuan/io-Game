@@ -15,7 +15,8 @@ namespace MatchMaking_Prototype.Battle{
 
 			var battleLevelInfo = MatchplayNetworkServer.Instance.GetBattleLevelInfo();
 			if(battleLevelInfo.battleType == BattleType.Pve){
-				Instantiate(mobPrefab, Vector3.zero, quaternion.identity);
+				var mobObject = Instantiate(mobPrefab, Vector3.zero, quaternion.identity);
+				mobObject.Spawn();
 			}
 
 			foreach(var client in MatchplayNetworkServer.Instance.ClientData){
