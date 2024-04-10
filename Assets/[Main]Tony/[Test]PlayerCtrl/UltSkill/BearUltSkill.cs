@@ -6,7 +6,7 @@ using Zenject;
 public class BearUltSkill : UltSkill {
 
     public BearUltSkill() {
-        RangePreview = new RangePreviewData(RangePreviewType.Throw, 2f, 1f);
+        RangePreview = new RangePreviewData(RangePreviewType.Throw, 6, 10);
     }
     
     [Inject]
@@ -16,6 +16,6 @@ public class BearUltSkill : UltSkill {
 
     protected override void OnShoot(AvaterState data)
     {
-        BattleCtrl.GetSpawner().SpawnMobServerRpc();
+        BattleCtrl.GetSpawner().SpawnMobServerRpc(data.Pos+data.UtlPos*60);
     }
 }

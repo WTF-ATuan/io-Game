@@ -29,10 +29,10 @@ public class SyncObjSpawner : NetworkBehaviour{
 
 	public GameObject MobPrefab;
 	[ServerRpc(RequireOwnership = false)]
-	public void SpawnMobServerRpc(){
-		var bulletClone = Instantiate(MobPrefab).GetComponent<NetworkObject>();
-		bulletClone.Spawn();
-		//bulletClone.GetComponent<MobCtrl>().Setup();
+	public void SpawnMobServerRpc(Vector2 spawnPos){
+		var entity = Instantiate(MobPrefab).GetComponent<NetworkObject>();
+		entity.Spawn();
+		entity.transform.position = spawnPos;
 	}
 	
 	public GameObject ButtetPrefab;
