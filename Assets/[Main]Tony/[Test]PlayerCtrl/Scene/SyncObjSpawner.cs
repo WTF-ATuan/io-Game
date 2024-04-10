@@ -30,7 +30,7 @@ public class SyncObjSpawner : NetworkBehaviour{
 	public GameObject MobPrefab;
 	[ServerRpc(RequireOwnership = false)]
 	public void SpawnMobServerRpc(Vector2 spawnPos){
-		var entity = Instantiate(MobPrefab, spawnPos, Quaternion.identity).GetComponent<NetworkObject>();
+		var entity = Instantiate(ButtetPrefab, spawnPos, Quaternion.identity).GetComponent<NetworkObject>();
 		entity.Spawn();
 	}
 	

@@ -55,7 +55,6 @@ public class ObjPoolCtrl<T>:IDisposable where T : Component {
         IsLoaded = true;
         
         Pool = new GameObject("[Pool]"+typeof(T).Name).transform;
-        Debug.Log("ccc");
     }
     
     public List<PoolObj<T>> GetAllActiveObj()

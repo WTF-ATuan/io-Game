@@ -133,7 +133,7 @@ public abstract class Weapon : InsertThing
 
     protected BulletData GetDefaultBullet(AvaterState data) {
         var bulletData = new BulletData{
-            genPos = data.Pos+data.Towards.ToVec2(),
+            genPos = data.Pos,
             angle = data.Towards,
             flySec = AttributeBonus[AttributeType.FlySec],
             flyDis = AttributeBonus[AttributeType.FlyDis],

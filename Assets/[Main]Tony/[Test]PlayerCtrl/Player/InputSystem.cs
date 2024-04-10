@@ -55,12 +55,10 @@ public class PCInput : IInput
             var ult = localPlayer.GetLoadOut().GetUtlInfo();
             if(ult!=null)maxDis = ult.RangePreview.Dis; 
         }
-        maxDis *= 160;
-        
         Vector3 playerPos = localPlayer.transform.position;
-        playerPos = Camera.main.WorldToScreenPoint(playerPos);
-        Vector3 mousePos = Input.mousePosition;
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         data = mousePos - playerPos;
+        Debug.Log(data.magnitude);
         data = data.magnitude > maxDis ? data.normalized : (data / maxDis);
         return data;
     }

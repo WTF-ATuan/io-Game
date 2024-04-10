@@ -58,7 +58,7 @@ public class RangePreviewCtrl : MonoBehaviour
         M.SetFloat(Type, (int)data.Type);
         var scale = Vector3.one * data.Dis;
         if(data.Type==RangePreviewType.Throw)scale+=Vector3.one * data.Width/2;
-        scale*=0.235f;
+        scale*=0.2f;
         transform.localScale = scale;
         if(!gameObject.activeSelf) gameObject.SetActive(true);
     }
