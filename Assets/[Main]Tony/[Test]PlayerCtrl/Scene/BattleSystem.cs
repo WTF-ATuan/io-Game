@@ -7,7 +7,7 @@ using Zenject;
 
 public interface IBattleCtrl{
 	public void AddCreature(CreatureCtrl player);
-	public PlayerCtrl GetLocalPlayer();
+	public CreatureCtrl GetLocalPlayer();
 	public ulong GetLocalPlayerID();
 	public void SetSpawner(SyncObjSpawner player);
 	public SyncObjSpawner GetSpawner();
@@ -29,11 +29,11 @@ public class DemoBattleCtrl : IBattleCtrl{
 		_creatureList.Add(player);
 	}
 
-	public PlayerCtrl GetLocalPlayer(){
+	public CreatureCtrl GetLocalPlayer(){
 		var localClientId = NetworkManager.Singleton.LocalClientId;
 		var playerCtrl = _creatureList.Find(x => x.OwnerClientId == localClientId);
 		if(!playerCtrl) throw new NullReferenceException($"Can't find local player with{localClientId}");
-		return (PlayerCtrl)playerCtrl;
+		return playerCtrl;
 	}
 
 	public ulong GetLocalPlayerID(){
@@ -75,7 +75,13 @@ public class DemoBattleCtrl : IBattleCtrl{
 		var playerCreatureList = _creatureList.FindAll(x => !x.IsOwnedByServer).ToList();
 		if(playerCreatureList.Count > 1) return;
 		var ownerClientId = playerCreatureList.First().GetEntityID();
-		Debug.Log($"player:{ownerClientId} is winner");
+		foreach(var connectedClient in NetworkManager.Singleton.ConnectedClients){
+			if(connectedClient.Key.Equals(ownerClientId)) continue;
+			var userData = MatchplayNetworkServer.Instance.GetUserDataByClientId(ownerClientId);
+			userData.userHealth -= 10;
+			Debug.Log($"player : {ownerClientId} current hp is {userData.userHealth}");
+		}
+		MatchplayNetworkServer.Instance.StartBackStage();
 	}
 
 	[ServerRpc(RequireOwnership = true)]

@@ -102,6 +102,10 @@ public class MatchplayNetworkServer : IDisposable{
 		_battleLevelInfo.RandomSelect();
 		NetworkManager.Singleton.SceneManager.LoadScene("BattleScene", LoadSceneMode.Single);
 	}
+	
+	public void StartBackStage(){
+		
+	}
 
 	private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
 		NetworkManager.ConnectionApprovalResponse response){
@@ -231,4 +235,5 @@ public class MatchplayNetworkServer : IDisposable{
 			networkManager.Shutdown();
 		}
 	}
+
 }

@@ -94,6 +94,7 @@ public class UserData
         this.userAuthId = userAuthId;
         this.clientId = clientId;
         this.userGamePreferences = userGamePreferences;
+        userHealth = 100;
     }
 }
 
