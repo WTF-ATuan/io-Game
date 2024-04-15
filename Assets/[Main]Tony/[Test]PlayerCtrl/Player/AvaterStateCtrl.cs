@@ -34,7 +34,6 @@ public class AvaterStateCtrl:INetEntity{
 
 	public void ClientUpdate(){
 		if(Avater.IsController()){
-			Debug.Log(Data.Pos+Avater.GetTransform().name);
 			var missTime = Time.time - Data.ClientUpdateTimeStamp;
 			Data.ClientUpdateTimeStamp = Time.time; //todo change to serverSyncTime
 			UpdateInput();

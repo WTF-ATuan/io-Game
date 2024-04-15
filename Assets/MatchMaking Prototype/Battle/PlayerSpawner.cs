@@ -23,6 +23,7 @@ namespace MatchMaking_Prototype.Battle{
 				var spawnPos = new Vector2(Random.Range(0, 1), Random.Range(0, 1));
 				var characterInstance = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
 				characterInstance.SpawnAsPlayerObject(client.Value.clientId);
+				characterInstance.DestroyWithScene = true;
 			}
 		}
 	}

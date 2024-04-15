@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MatchMaking_Prototype.Battle;
 using Unity.Collections;
@@ -30,6 +31,7 @@ public class MatchplayNetworkServer : IDisposable{
 	public Dictionary<ulong, string> ClientIdToAuth{ get; private set; } = new Dictionary<ulong, string>();
 
 	private readonly BattleLevelInfo _battleLevelInfo = new BattleLevelInfo();
+
 	public MatchplayNetworkServer(NetworkManager networkManager){
 		this.networkManager = networkManager;
 
@@ -94,7 +96,6 @@ public class MatchplayNetworkServer : IDisposable{
 
 	public void StartGame(){
 		gameHasStarted = true;
-
 		NetworkManager.Singleton.SceneManager.LoadScene("BackStage", LoadSceneMode.Single);
 	}
 
@@ -102,10 +103,9 @@ public class MatchplayNetworkServer : IDisposable{
 		_battleLevelInfo.RandomSelect();
 		NetworkManager.Singleton.SceneManager.LoadScene("BattleScene", LoadSceneMode.Single);
 	}
-	
+
 	public void StartBackStage(){
-		var sceneManager = NetworkManager.Singleton.SceneManager;
-		sceneManager.LoadScene("BackStage", LoadSceneMode.Single);
+		NetworkManager.Singleton.SceneManager.LoadScene("BackStage", LoadSceneMode.Single);
 	}
 
 	private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
@@ -122,7 +122,6 @@ public class MatchplayNetworkServer : IDisposable{
 
 		string payload = System.Text.Encoding.UTF8.GetString(request.Payload);
 		UserData userData = JsonUtility.FromJson<UserData>(payload);
-		Debug.Log($"{userData.userHealth}");
 		userData.clientId = request.ClientNetworkId;
 		Debug.Log($"Host ApprovalCheck: connecting client: ({request.ClientNetworkId}) - {userData}");
 
@@ -204,17 +203,17 @@ public class MatchplayNetworkServer : IDisposable{
 	}
 
 	public UserData GetUserDataByClientId(ulong clientId){
-		if(!ClientIdToAuth.TryGetValue(clientId, out var authId)) throw new Exception($"Can't find User with ClientID {clientId}");
+		if(!ClientIdToAuth.TryGetValue(clientId, out var authId))
+			throw new Exception($"Can't find User with ClientID {clientId}");
 		if(ClientData.TryGetValue(authId, out var data))
 			return data;
 		throw new Exception($"Can't find User with authID {authId}");
 	}
 
-	public void SetUserData(ulong clientId , UserData userData){
-		if(!ClientIdToAuth.TryGetValue(clientId, out var authId)) return ;
+	public void SetUserData(ulong clientId, UserData userData){
+		if(!ClientIdToAuth.TryGetValue(clientId, out var authId)) return;
 		if(ClientData.TryGetValue(authId, out var data)){
 			ClientData[authId] = userData;
-			Debug.Log($"{userData.userHealth}");
 		}
 	}
 
@@ -240,5 +239,4 @@ public class MatchplayNetworkServer : IDisposable{
 			networkManager.Shutdown();
 		}
 	}
-
 }

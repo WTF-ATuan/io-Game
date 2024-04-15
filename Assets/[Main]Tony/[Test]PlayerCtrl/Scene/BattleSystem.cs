@@ -30,12 +30,11 @@ public class DemoBattleCtrl : IBattleCtrl{
 		return Disposable.Create(() => { _creatureList.Remove(player); });
 	}
 
-	public PlayerCtrl GetLocalPlayer(){
+	public CreatureCtrl GetLocalPlayer(){
 		var localClientId = NetworkManager.Singleton.LocalClientId;
 		var playerCtrl = _creatureList.Find(x => x.OwnerClientId == localClientId);
-		if(!playerCtrl is PlayerCtrl) throw new NullReferenceException($"Can't find local player with{localClientId}");
 		if(!playerCtrl) throw new NullReferenceException($"Can't find local player with{localClientId}");
-		return (PlayerCtrl)playerCtrl;
+		return playerCtrl;
 	}
 
 	public ulong GetLocalPlayerID(){
@@ -78,11 +77,12 @@ public class DemoBattleCtrl : IBattleCtrl{
 		if(playerCreatureList.Count > 1) return;
 		var ownerClientId = playerCreatureList.First().OwnerClientId;
 		foreach(var connectedClient in NetworkManager.Singleton.ConnectedClients){
-			if(connectedClient.Key.Equals(ownerClientId)) continue;
+			if(!connectedClient.Key.Equals(ownerClientId)) continue;
 			var userData = MatchplayNetworkServer.Instance.GetUserDataByClientId(ownerClientId);
-			userData.userHealth -= 10;
-			MatchplayNetworkServer.Instance.SetUserData(ownerClientId , userData);
+			userData.inGameData.health -= 10;
+			MatchplayNetworkServer.Instance.SetUserData(ownerClientId, userData);
 		}
+
 		MatchplayNetworkServer.Instance.StartBackStage();
 	}
 

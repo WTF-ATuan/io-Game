@@ -1,13 +1,11 @@
 using System.Threading.Tasks;
-using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
 using UnityEngine;
 
 public class ApplicationController : MonoBehaviour{
 	[Header("Setting")] [SerializeField] private bool editorTestingMode = true;
-	[Header("Setting")] [SerializeField] private bool isHostMode = true;
+	[SerializeField] private bool isHostMode = true;
 
 	[Header("References")] [SerializeField]
 	private ServerSingleton serverPrefab;
@@ -19,6 +17,10 @@ public class ApplicationController : MonoBehaviour{
 	public static bool IsServer;
 
 	private async void Start(){
+		#if UNITY_EDITOR
+		var findObjectOfType = FindObjectOfType<ServerSingleton>();
+		if(findObjectOfType) return;
+		#endif
 		Application.targetFrameRate = 60;
 		DontDestroyOnLoad(gameObject);
 
@@ -65,11 +67,11 @@ public class ApplicationController : MonoBehaviour{
 		AuthenticationService.Instance.SwitchProfile("PlayerEditor");
 		await AuthenticationService.Instance.SignInAnonymouslyAsync();
 		ClientSingleton.Instance.Manager.User.AuthId = "PlayerEditor";
-		
+
 		var findHost = false;
 		const int requestLimits = 30;
 		var times = 0;
-		
+
 		while(!findHost){
 			var lobbies = await Lobbies.Instance.QueryLobbiesAsync();
 			if(lobbies.Results.Count < 1){

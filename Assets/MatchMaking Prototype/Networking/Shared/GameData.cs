@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public enum Map
 {
@@ -85,8 +86,7 @@ public class UserData
     public string userAuthId;
     public ulong clientId;
     public GameInfo userGamePreferences;
-
-    public int userHealth = 100; 
+    public PlayerInGameData inGameData;
 
     public UserData(string userName, string userAuthId, ulong clientId, GameInfo userGamePreferences)
     {
@@ -94,6 +94,23 @@ public class UserData
         this.userAuthId = userAuthId;
         this.clientId = clientId;
         this.userGamePreferences = userGamePreferences;
+        inGameData = new PlayerInGameData();
+    }
+}
+[Serializable]
+public class PlayerInGameData{
+    public int health;
+    public string currentScene;
+    public LoadingStatus currentStatus;
+    public PlayerInGameData(){
+        health = 100;
+        currentScene = string.Empty;
+        currentStatus = LoadingStatus.Complete;
+    }
+    public enum LoadingStatus{
+        WaitingToLoad,
+        Loading,
+        Complete
     }
 }
 
@@ -103,10 +120,6 @@ public class GameInfo
     public Map map;
     public GameMode gameMode;
     public GameQueue gameQueue;
-    public string LobbySceneName => "PlayerReadyLobby";
-    
-    public int MaxUsers = 20;
-    public string ToSceneName => ConvertToScene(map);
 
     private const string multiplayCasualQueue = "test-battleMode";
     private const string multiplayCompetitiveQueue = "competitive-queue";
@@ -159,3 +172,4 @@ public class GameInfo
         return multiplayToLocalQueueNames[multiplayQueue];
     }
 }
+
