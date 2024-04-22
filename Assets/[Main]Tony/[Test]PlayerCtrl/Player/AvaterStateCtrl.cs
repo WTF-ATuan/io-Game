@@ -35,13 +35,12 @@ public class AvaterStateCtrl:INetEntity{
 	public void ClientUpdate(){
 		if(Avater.IsController()){
 			var missTime = Time.time - Data.ClientUpdateTimeStamp;
-			Data.ClientUpdateTimeStamp = Time.time; //todo change to serverSyncTime
+			Data.ClientUpdateTimeStamp = Time.time;
 			UpdateInput();
 			UpdateMove(missTime);
 			UpdateRotate(missTime);
 			Shoot(missTime);
-			Ult(missTime);
-			
+
 			Avater.GetTransform().position = Data.Pos;
 			RotCenter.eulerAngles = Vector3.forward * Data.Towards;
 		}
@@ -64,10 +63,12 @@ public class AvaterStateCtrl:INetEntity{
 
 	private void Shoot(float missTime){
 		var weapon = Avater.GetLoadOut().GetWeaponInfo();
-		Data.Power = Mathf.Clamp01(Data.Power + missTime / Avater.GetLoadOut().NowAttribute.PowerChargeToFullSec);
+		var isEmpty = Data.bulletCount < 1;
+		if(isEmpty) return;
 		if(weapon != null && weapon.TryShoot(Data)){
 			Data.Towards = Data.LastAimPos.Angle();
 			Data.RotVec = 0;
+			Data.bulletCount--;
 		}
 	}
 

@@ -9,8 +9,8 @@ public interface IBattleCtrl{
 	public IDisposable AddCreature(CreatureCtrl player);
 	public CreatureCtrl GetLocalPlayer();
 	public ulong GetLocalPlayerID();
-	public void SetSpawner(SyncObjSpawner player);
-	public SyncObjSpawner GetSpawner();
+	public void SetSpawner(BulletObserver player);
+	public BulletObserver GetSpawner();
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage);
 	void AddedPlayerMoveForceRequestServerRpc(ulong targetId, Vector2 forceCenter);
 	public List<CreatureCtrl> GetCreatureList();
@@ -21,7 +21,7 @@ public interface IBattleCtrl{
 
 //Todo we can split Get Interface , Set Interface and Battle API Interface if IBattleCtrl is to large.
 public class DemoBattleCtrl : IBattleCtrl{
-	private SyncObjSpawner _spawner;
+	private BulletObserver _spawner;
 	private readonly List<CreatureCtrl> _creatureList = new();
 	public Dictionary<Vector2Int, GroundCtrl> _padsList = new();
 
@@ -46,11 +46,11 @@ public class DemoBattleCtrl : IBattleCtrl{
 		return GetLocalPlayer().GetEntityID();
 	}
 
-	public void SetSpawner(SyncObjSpawner spawner){
+	public void SetSpawner(BulletObserver spawner){
 		_spawner = spawner;
 	}
 
-	public SyncObjSpawner GetSpawner(){
+	public BulletObserver GetSpawner(){
 		return _spawner;
 	}
 

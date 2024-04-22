@@ -18,7 +18,9 @@ public class AvaterState : INetworkSerializable
 	public float Power;
 	public float ShootCd;
 	public float UltPower;
-	public float Health = 1000; //Todo at init we can set Health to maxHealth
+	public float Health = 1000;
+	public int bulletCount = 5;
+	public int bulletMaxCount = 5;
 
 	public bool IsAim => AimPos != Vector2.zero;
 	public bool IsUtl => UtlPos != Vector2.zero;
@@ -38,6 +40,8 @@ public class AvaterState : INetworkSerializable
 		serializer.SerializeValue(ref ShootCd);
 		serializer.SerializeValue(ref UltPower);
 		serializer.SerializeValue(ref Health);
+		serializer.SerializeValue(ref bulletCount);
+		serializer.SerializeValue(ref bulletMaxCount);
 	}
 }
 public interface IGetLoadOut {

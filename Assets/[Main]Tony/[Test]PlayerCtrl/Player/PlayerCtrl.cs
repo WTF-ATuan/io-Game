@@ -13,18 +13,17 @@ public class PlayerCtrl : CreatureCtrl{
 		IUltSkillFactory ultSkillFactory
 	){
 		InputCtrl = inputCtrl;
-		var weapon = weaponFactory.Create<SnipeGun>(5, 6, 1000, 0.5f, 0.3f, 6f, new RangePreviewData(RangePreviewType.Throw, 6, 2f));
-		//var weapon = weaponFactory.Create<OlaOlaGun>(3, 6, 1000, 0.5f,0.3f,1f,new RangePreviewData(RangePreviewType.Straight,1,10));
+		var weapon = weaponFactory.Create<SnipeGun>(5, 6, 1000, 0.5f, 0.3f, 6f,
+			new RangePreviewData(RangePreviewType.Straight, 6, 2f));
 		Loadout.SetWeapon(weapon, out var unload);
-		//var bigGunUlt = ultSkillFactory.Create<BigGunUltSkill>(weapon);
-		//Loadout.SetUltSkill(bigGunUlt, out var unloadUlt);
 		var bearUlt = ultSkillFactory.Create<BearUltSkill>();
 		Loadout.SetUltSkill(bearUlt, out var unloadUlt);
 
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 		RangePreview.Init(StateCtrl, Loadout);
 
-
+		StateCtrl.Data.bulletMaxCount = 10;
+		StateCtrl.Data.bulletCount = 10;
 	}
 
 	public override IInput GetInput(){

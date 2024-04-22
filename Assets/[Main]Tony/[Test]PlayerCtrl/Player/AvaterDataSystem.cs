@@ -105,13 +105,10 @@ public abstract class Weapon : InsertThing
 
     public virtual bool TryShoot(AvaterState data, bool forceShoot = true) {
         if (IsShooting) return false;
-        float powerNeed = (1f / (int) AttributeBonus[AttributeType.MaxBullet]);
-        float nowTime = Time.time;
+        var nowTime = Time.time;
         if (((data.AimPos == Vector2.zero && data.LastAimPos != Vector2.zero) || !forceShoot) && 
-            data.ShootCd < nowTime && 
-            data.Power >= powerNeed) {
+            data.ShootCd < nowTime) {
             if (forceShoot) {
-                data.Power = Mathf.Clamp01(data.Power - powerNeed);
                 data.ShootCd = nowTime + AttributeBonus[AttributeType.ShootCD];
                 Shoot(data);
             }

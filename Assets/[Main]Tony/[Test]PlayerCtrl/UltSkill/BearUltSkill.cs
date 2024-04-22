@@ -16,6 +16,6 @@ public class BearUltSkill : UltSkill {
 
     protected override void OnShoot(AvaterState data)
     {
-        BattleCtrl.GetSpawner().SpawnMobServerRpc(data.Pos+data.LastUtlPos*RangePreview.Dis, data.Towards);
+        // BattleCtrl.GetSpawner().SpawnMobServerRpc(data.Pos+data.LastUtlPos*RangePreview.Dis, data.Towards);
     }
 }
