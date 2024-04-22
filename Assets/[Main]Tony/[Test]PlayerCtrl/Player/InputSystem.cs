@@ -8,6 +8,7 @@ public interface IInput {
     public Vector2 AimJoy();
     
     public Vector2 UtlJoy();
+    public bool Reload();
 }
 
 public class ServerInput : IInput
@@ -26,6 +27,10 @@ public class ServerInput : IInput
 
     public Vector2 UtlJoy() {
         return _UtlJoy.normalized;
+    }
+
+    public bool Reload(){
+        return false;
     }
 }
 
@@ -79,6 +84,10 @@ public class PCInput : IInput
         }
         return data;
     }
+
+    public bool Reload(){
+        return Input.GetKeyDown(KeyCode.R);
+    }
 }
 
 public class AndroidInput : IInput {
@@ -101,6 +110,10 @@ public class AndroidInput : IInput {
         //todo
         return data;
     }
+
+    public bool Reload(){
+        return false;
+    }
 }
 
 public class IPhoneInput : IInput {
@@ -121,6 +134,10 @@ public class IPhoneInput : IInput {
         Vector2 data = new Vector2();
         //todo
         return data;
+    }
+
+    public bool Reload(){
+        return false;
     }
 }
 

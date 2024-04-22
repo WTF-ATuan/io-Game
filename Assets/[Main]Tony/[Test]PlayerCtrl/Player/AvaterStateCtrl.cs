@@ -40,6 +40,7 @@ public class AvaterStateCtrl:INetEntity{
 			UpdateMove(missTime);
 			UpdateRotate(missTime);
 			Shoot(missTime);
+			Reload();
 
 			Avater.GetTransform().position = Data.Pos;
 			RotCenter.eulerAngles = Vector3.forward * Data.Towards;
@@ -49,6 +50,12 @@ public class AvaterStateCtrl:INetEntity{
 			
 			Avater.GetTransform().position = PosSmoother.Get();
 			RotCenter.eulerAngles = Vector3.forward * RotSmoother.Get();
+		}
+	}
+
+	private void Reload(){
+		if(Avater.GetInput().Reload()){
+			Data.bulletCount = Avater.GetLoadOut().NowAttribute.BulletMaxCount;
 		}
 	}
 

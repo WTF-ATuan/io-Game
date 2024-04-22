@@ -320,7 +320,8 @@ public enum AttributeType {
 public class AvaterAttribute {
     
     public float MoveSpeed = 7f;
-    public float MaxHealth = 1000;
+    public float MaxHealth = 100;
+    public int BulletMaxCount = 5;
     
     //Define by Weapon
     public int MaxBullet = 0;
@@ -348,7 +349,9 @@ public class AvaterAttribute {
         Damage = copy.Damage;
         ShootCD = copy.ShootCD;
     }
-    
+
+
+
     public void Copy(AvaterAttribute copy) {
         MoveSpeed = copy.MoveSpeed;
         MaxHealth = copy.MaxHealth;

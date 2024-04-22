@@ -22,8 +22,8 @@ public class PlayerCtrl : CreatureCtrl{
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 		RangePreview.Init(StateCtrl, Loadout);
 
-		StateCtrl.Data.bulletMaxCount = 10;
-		StateCtrl.Data.bulletCount = 10;
+		StateCtrl.Data.Health = Loadout.NowAttribute.MaxHealth;
+		StateCtrl.Data.bulletCount = Loadout.NowAttribute.BulletMaxCount;
 	}
 
 	public override IInput GetInput(){
