@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -49,6 +50,12 @@ public class PlayerCtrl : CreatureCtrl{
 			avaterData.Pos += avaterData.NowVec * (Time.time - avaterData.ClientUpdateTimeStamp);
 			StateCtrl.DataSync();
 		}
+	}
+	public override async void Reload(){
+		Loadout.NowAttribute.MoveSpeed *= 0.5f;
+		await Task.Delay(1500);
+		Loadout.NowAttribute.MoveSpeed *= 2f;
+		StateCtrl.Data.bulletCount = Loadout.NowAttribute.BulletMaxCount;
 	}
 
 	public override bool IsController(){

@@ -58,4 +58,5 @@ public interface IAvaterSync : IGetLoadOut,IGetTransform,IGetIInput,INetEntity{
 	public NetworkVariable<AvaterState> GetSyncData();
 	public void AvaterDataSyncServerRpc(AvaterState data);
 	public bool IsController();
+	public void Reload();
 }

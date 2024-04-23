@@ -29,6 +29,7 @@ public class AvaterStateCtrl:INetEntity{
 	public void DataSync(){
 		if(Avater.IsController()){
 			Avater.AvaterDataSyncServerRpc(Data);
+			Reload();
 		}
 	}
 
@@ -40,7 +41,7 @@ public class AvaterStateCtrl:INetEntity{
 			UpdateMove(missTime);
 			UpdateRotate(missTime);
 			Shoot(missTime);
-			Reload();
+	
 
 			Avater.GetTransform().position = Data.Pos;
 			RotCenter.eulerAngles = Vector3.forward * Data.Towards;
@@ -55,7 +56,7 @@ public class AvaterStateCtrl:INetEntity{
 
 	private void Reload(){
 		if(Avater.GetInput().Reload()){
-			Data.bulletCount = Avater.GetLoadOut().NowAttribute.BulletMaxCount;
+			Avater.Reload();
 		}
 	}
 
