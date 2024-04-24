@@ -55,7 +55,8 @@ public class PlayerCtrl : CreatureCtrl{
 	public void SetLevelClientRpc(int level){
 		if(level < 1 )return;
 		Loadout.NowAttribute.MoveSpeed *= 1.15f * level;
-		Loadout.NowAttribute.BulletMaxCount *= Mathf.RoundToInt(1.2f * level);
+		Loadout.NowAttribute.BulletMaxCount += Loadout.NowAttribute.BulletMaxCount / 3;
+		Debug.Log($"player {OwnerClientId} is upgrade {Loadout.NowAttribute.MoveSpeed} {Loadout.NowAttribute.BulletMaxCount}");
 	}
 
 	public override async void Reload(){

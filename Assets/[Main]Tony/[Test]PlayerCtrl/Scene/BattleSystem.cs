@@ -61,9 +61,9 @@ public class DemoBattleCtrl : IBattleCtrl{
 		if(!hitPlayer || !hitPlayer.IsSpawned) return;
 		var hitPlayerData = hitPlayer.GetSyncData().Value;
 		if(hitPlayerData.Health - damage <= 0){
-			ConditionLevel(attackerId, hitPlayerData);
 			hitPlayer.DeathClientRpc();
 			hitPlayer.NetworkObject.Despawn();
+			ConditionLevel(attackerId, hitPlayerData);
 		}
 		else{
 			hitPlayer.SetHealthClientRpc(hitPlayerData.Health - damage);
