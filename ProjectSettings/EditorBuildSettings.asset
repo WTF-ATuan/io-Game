@@ -12,12 +12,6 @@ EditorBuildSettings:
     path: Assets/MatchMaking Prototype/MatchMaking Scene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
-    path: Assets/MatchMaking Prototype/PlayerReadyLobby.unity
-    guid: 25b5c27d84d4d414d95f6fd385fd80b0
-  - enabled: 1
-    path: Assets/MatchMaking Prototype/Battle/Backstage.unity
-    guid: 369c14b5a61094c4682eefb5dd794828
-  - enabled: 1
     path: Assets/MatchMaking Prototype/Battle/BattleScene.unity
     guid: cf3b6ef8f05bfbd4cae08ad22e2e5853
   - enabled: 1
