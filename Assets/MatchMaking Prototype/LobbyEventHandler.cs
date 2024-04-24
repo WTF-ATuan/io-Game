@@ -59,7 +59,7 @@ public class LobbyEventHandler : NetworkBehaviour{
 		}
 		//Todo Set player Character info
 
-		MatchplayNetworkServer.Instance.StartGame();
+		// MatchplayNetworkServer.Instance.StartGame();
 	}
 
 	private void HandleServer(){

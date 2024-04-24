@@ -66,7 +66,7 @@ namespace Assets.Scenes{
 				}
 			}
 
-			MatchplayNetworkServer.Instance.StartBattle();
+			// MatchplayNetworkServer.Instance.StartBattle();
 		}
 
 

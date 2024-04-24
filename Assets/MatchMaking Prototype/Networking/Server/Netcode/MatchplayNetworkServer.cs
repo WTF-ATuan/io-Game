@@ -52,7 +52,7 @@ public class MatchplayNetworkServer : IDisposable{
 
 	public async Task<SynchedServerData> ConfigureServer(GameInfo startingGameInfo){
 		networkManager.SceneManager.SetClientSynchronizationMode(LoadSceneMode.Additive);
-		networkManager.SceneManager.LoadScene("PlayerReadyLobby",LoadSceneMode.Single);
+		NetworkManager.Singleton.SceneManager.LoadScene("BattleScene", LoadSceneMode.Single);
 
 		bool localNetworkedSceneLoaded = false;
 		networkManager.SceneManager.OnLoadComplete += CreateAndSetSynchedServerData;
@@ -91,21 +91,6 @@ public class MatchplayNetworkServer : IDisposable{
 			synchedServerData.gameObject);
 
 		return synchedServerData;
-	}
-
-
-	public void StartGame(){
-		gameHasStarted = true;
-		NetworkManager.Singleton.SceneManager.LoadScene("BackStage", LoadSceneMode.Single);
-	}
-
-	public void StartBattle(){
-		_battleLevelInfo.RandomSelect();
-		NetworkManager.Singleton.SceneManager.LoadScene("BattleScene", LoadSceneMode.Single);
-	}
-
-	public void StartBackStage(){
-		NetworkManager.Singleton.SceneManager.LoadScene("BackStage", LoadSceneMode.Single);
 	}
 
 	private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
