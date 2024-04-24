@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;using UniRx;
+using System.Linq;
+using UniRx;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -58,32 +59,26 @@ public class DemoBattleCtrl : IBattleCtrl{
 	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage){
 		var hitPlayer = GetCreatureList().Find(e => e.GetEntityID() == hitId);
 		if(!hitPlayer || !hitPlayer.IsSpawned) return;
-		var creatureCtrl = hitPlayer.GetComponent<CreatureCtrl>();
-		var avaterState = creatureCtrl.GetSyncData().Value;
-		var avaterMaxHealth = creatureCtrl.GetLoadOut().NowAttribute.MaxHealth;
-		if(avaterState.Health - damage <= 0){
-			creatureCtrl.DeathClientRpc();
+		var hitPlayerData = hitPlayer.GetSyncData().Value;
+		if(hitPlayerData.Health - damage <= 0){
+			ConditionLevel(attackerId, hitPlayerData);
+			hitPlayer.DeathClientRpc();
 			hitPlayer.NetworkObject.Despawn();
-			CheckWinningPlayer();
 		}
 		else{
-			var newAvaterHealth = Mathf.Clamp(avaterState.Health - damage, 0, avaterMaxHealth);
-			creatureCtrl.SetHealthClientRpc(newAvaterHealth);
+			hitPlayer.SetHealthClientRpc(hitPlayerData.Health - damage);
 		}
 	}
 
-	private void CheckWinningPlayer(){
-		var playerCreatureList = _creatureList.FindAll(x => x.IsClient).ToList();
-		if(playerCreatureList.Count > 1) return;
-		var ownerClientId = playerCreatureList.First().OwnerClientId;
-		foreach(var connectedClient in NetworkManager.Singleton.ConnectedClients){
-			if(!connectedClient.Key.Equals(ownerClientId)) continue;
-			var userData = MatchplayNetworkServer.Instance.GetUserDataByClientId(ownerClientId);
-			userData.inGameData.health -= 10;
-			MatchplayNetworkServer.Instance.SetUserData(ownerClientId, userData);
+	private void ConditionLevel(ulong attackerId, AvaterState hitPlayerData){
+		var attackPlayer = GetCreatureList().Find(e => e.GetEntityID() == attackerId);
+		var attackPlayerData = attackPlayer.GetSyncData().Value;
+		if(attackPlayerData.level >= hitPlayerData.level){
+			(attackPlayer as PlayerCtrl)?.SetLevelClientRpc(attackPlayerData.level + 1);
 		}
-
-		MatchplayNetworkServer.Instance.StartBackStage();
+		else{
+			(attackPlayer as PlayerCtrl)?.SetLevelClientRpc(hitPlayerData.level);
+		}
 	}
 
 	[ServerRpc(RequireOwnership = true)]

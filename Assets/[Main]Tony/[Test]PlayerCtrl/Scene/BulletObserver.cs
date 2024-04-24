@@ -34,7 +34,7 @@ public class BulletObserver : NetworkBehaviour{
 		if(!parent.TryGetComponent<CreatureCtrl>(out var hitPlayer)) return;
 		var hitPlayerId = hitPlayer.GetEntityID();
 		if(playerId != hitPlayerId){
-			_battleCtrl.PlayerHitRequestServerRpc(playerId, hitPlayerId, 100);
+			_battleCtrl.PlayerHitRequestServerRpc(playerId, hitPlayerId, 35);
 		}
 	}
 }

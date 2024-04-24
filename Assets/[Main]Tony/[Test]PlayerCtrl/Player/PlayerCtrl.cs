@@ -51,6 +51,13 @@ public class PlayerCtrl : CreatureCtrl{
 			StateCtrl.DataSync();
 		}
 	}
+	[ClientRpc]
+	public void SetLevelClientRpc(int level){
+		if(level < 1 )return;
+		Loadout.NowAttribute.MoveSpeed *= 1.15f * level;
+		Loadout.NowAttribute.BulletMaxCount *= Mathf.RoundToInt(1.2f * level);
+	}
+
 	public override async void Reload(){
 		Loadout.NowAttribute.MoveSpeed *= 0.5f;
 		await Task.Delay(1500);

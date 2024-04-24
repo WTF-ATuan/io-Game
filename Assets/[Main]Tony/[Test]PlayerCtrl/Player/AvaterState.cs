@@ -3,8 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 [Serializable]
-public class AvaterState : INetworkSerializable
-{
+public class AvaterState : INetworkSerializable{
 	public Vector2 Pos;
 	public Vector2 TargetVec;
 	public Vector2 NowVec;
@@ -20,11 +19,12 @@ public class AvaterState : INetworkSerializable
 	public float UltPower;
 	public float Health;
 	public int bulletCount;
+	public int level;
 
 	public bool IsAim => AimPos != Vector2.zero;
 	public bool IsUtl => UtlPos != Vector2.zero;
-	public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-	{
+
+	public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter{
 		serializer.SerializeValue(ref Pos);
 		serializer.SerializeValue(ref TargetVec);
 		serializer.SerializeValue(ref NowVec);
@@ -40,21 +40,23 @@ public class AvaterState : INetworkSerializable
 		serializer.SerializeValue(ref UltPower);
 		serializer.SerializeValue(ref Health);
 		serializer.SerializeValue(ref bulletCount);
+		serializer.SerializeValue(ref level);
 	}
 }
-public interface IGetLoadOut {
+
+public interface IGetLoadOut{
 	public PlayerLoadout GetLoadOut();
 }
 
-public interface IGetTransform {
+public interface IGetTransform{
 	public Transform GetTransform();
 }
 
-public interface IGetIInput {
+public interface IGetIInput{
 	public IInput GetInput();
 }
 
-public interface IAvaterSync : IGetLoadOut,IGetTransform,IGetIInput,INetEntity{
+public interface IAvaterSync : IGetLoadOut, IGetTransform, IGetIInput, INetEntity{
 	public NetworkVariable<AvaterState> GetSyncData();
 	public void AvaterDataSyncServerRpc(AvaterState data);
 	public bool IsController();
