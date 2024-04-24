@@ -27,7 +27,6 @@ public class ClientGameManager : IDisposable
         NetworkClient = new MatchplayNetworkClient();
         Matchmaker = new MatchplayMatchmaker();
         AuthState authenticationResult = await AuthenticationWrapper.DoAuth();
-
         if (authenticationResult == AuthState.Authenticated)
         {
             User.AuthId = AuthenticationWrapper.PlayerID();
@@ -36,6 +35,9 @@ public class ClientGameManager : IDisposable
         {
             User.AuthId = Guid.NewGuid().ToString();
         }
+        #if UNITY_EDITOR
+        User.AuthId = Guid.NewGuid().ToString();
+        #endif
 
         Debug.Log($"did Auth?{authenticationResult} {User.AuthId}");
         Initialized = true;
