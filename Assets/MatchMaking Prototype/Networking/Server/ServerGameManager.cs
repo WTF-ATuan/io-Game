@@ -49,7 +49,10 @@ public class ServerGameManager : IDisposable{
 				NetworkServer.OnPlayerJoined += UserJoinedServer;
 				NetworkServer.OnPlayerLeft += UserLeft;
 				startedServices = true;
-				await StartBackfill(matchmakerPayload);
+				
+				#pragma warning disable CS4014
+				StartBackfill(matchmakerPayload);
+				#pragma warning restore CS4014
 			}
 			else{
 				Debug.LogWarning("Getting the Matchmaker Payload timed out, starting with defaults.");
@@ -158,7 +161,9 @@ public class ServerGameManager : IDisposable{
 			_backfillTicket.Id = await MatchmakerService.Instance.CreateBackfillTicketAsync(_createTicketOptions);
 		}
 
-		await BackfillLoop();
+		#pragma warning disable CS4014
+		BackfillLoop();
+		#pragma warning restore CS4014
 	}
 
 	private async Task BackfillLoop(){
