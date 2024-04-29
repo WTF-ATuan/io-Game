@@ -92,7 +92,6 @@ public class MatchplayNetworkClient : IDisposable
         if (networkManager.StartClient())
         {
             Debug.Log("Starting Client!");
-            NetworkManager.Singleton.SceneManager.SetClientSynchronizationMode(LoadSceneMode.Single);
             NetworkManager.Singleton.SceneManager.PostSynchronizationSceneUnloading = true; // 
             RegisterListeners();
         }
