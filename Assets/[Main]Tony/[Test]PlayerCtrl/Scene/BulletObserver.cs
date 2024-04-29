@@ -20,6 +20,7 @@ public class BulletObserver : NetworkBehaviour{
 	[ServerRpc(RequireOwnership = false)]
 	public void SpawnBulletServerRpc(BulletData data){
 		var bulletClone = Instantiate(bulletNetworkObject, data.genPos, Quaternion.Euler(0, 0, data.angle));
+		bulletClone.transform.position = data.genPos;
 		bulletClone.Spawn();
 		bulletClone.GetComponent<BulletCtrl>().Setup(data.genPos, data.angle, data.flySec, data.flyDis,
 			() => { bulletClone.Despawn(); });
