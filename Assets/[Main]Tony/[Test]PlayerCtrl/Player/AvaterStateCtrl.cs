@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-public class AvaterStateCtrl:INetEntity{
+public class AvaterStateCtrl : INetEntity{
 	private IAvaterSync Avater;
 	public Transform RotCenter{ get; private set; }
 
@@ -23,6 +23,7 @@ public class AvaterStateCtrl:INetEntity{
 				RotSmoother.Update();
 			};
 		}
+
 		Data.Pos = Avater.GetTransform().position;
 	}
 
@@ -41,14 +42,14 @@ public class AvaterStateCtrl:INetEntity{
 			UpdateMove(missTime);
 			UpdateRotate(missTime);
 			Shoot(missTime);
-	
+
 
 			Avater.GetTransform().position = Data.Pos;
 			RotCenter.eulerAngles = Vector3.forward * Data.Towards;
 		}
 		else{
 			Data = Avater.GetSyncData().Value;
-			
+
 			Avater.GetTransform().position = PosSmoother.Get();
 			RotCenter.eulerAngles = Vector3.forward * RotSmoother.Get();
 		}
@@ -57,15 +58,6 @@ public class AvaterStateCtrl:INetEntity{
 	private void Reload(){
 		if(Avater.GetInput().Reload()){
 			Avater.Reload();
-		}
-	}
-
-	private void Ult(float missTime){
-		var ultSkill = Avater.GetLoadOut().GetUtlInfo();
-		Data.UltPower = Mathf.Clamp01(Data.UltPower + missTime / AvaterAttribute.UltPowerChargeToFullSec);
-		if(ultSkill != null && ultSkill.TryShoot(Data)){
-			Data.Towards = Data.LastUtlPos.Angle();
-			Data.RotVec = 0;
 		}
 	}
 
@@ -104,7 +96,7 @@ public class AvaterStateCtrl:INetEntity{
 		Data.NowVec = distance > moveFriction
 				? Data.NowVec + direction * Mathf.Min(moveFriction, distance)
 				: Data.TargetVec;
-		Data.Pos += Data.NowVec * (Avater.GetLoadOut().NowAttribute.MoveSpeed * missTime);
+		Data.Pos += Data.NowVec * (Avater.GetLoadOut().NowAttribute.moveSpeed * missTime);
 	}
 
 	private void UpdateInput(){
@@ -115,7 +107,7 @@ public class AvaterStateCtrl:INetEntity{
 		Data.UtlPos = Avater.GetInput().UtlJoy();
 	}
 
-	public ulong GetEntityID() {
+	public ulong GetEntityID(){
 		return Avater.GetEntityID();
 	}
 }

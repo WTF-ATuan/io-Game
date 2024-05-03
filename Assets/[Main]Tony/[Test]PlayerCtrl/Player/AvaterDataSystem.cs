@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 public abstract class Item{ }
@@ -88,7 +90,8 @@ public class WeaponData{
 	public float AimSlow = 0.5f; //Use it with moveSpeed 
 	public float ShootingDelay = 0.2f;
 
-	public WeaponData(int maxBullet, float damage, float shootCd, float flySec, float flyDis, RangePreviewData rangePreview){
+	public WeaponData(int maxBullet, float damage, float shootCd, float flySec, float flyDis,
+		RangePreviewData rangePreview){
 		MaxBullet = maxBullet;
 		Damage = damage;
 		ShootCd = shootCd;
@@ -136,7 +139,7 @@ public abstract class Weapon : InsertThing{
 		if(((data.AimPos == Vector2.zero && data.LastAimPos != Vector2.zero) || !forceShoot) &&
 		   data.ShootCd < nowTime){
 			if(forceShoot){
-				data.ShootCd = nowTime + AttributeBonus[AttributeType.ShootCD];
+				data.ShootCd = nowTime + AttributeBonus[AttributeType.ShootCd];
 				Shoot(data);
 			}
 
@@ -150,7 +153,7 @@ public abstract class Weapon : InsertThing{
 		AttributeBonus = new Dictionary<AttributeType, float>{
 			{ AttributeType.MaxBullet, weaponData.MaxBullet },
 			{ AttributeType.Damage, weaponData.Damage },
-			{ AttributeType.ShootCD, weaponData.ShootCd },
+			{ AttributeType.ShootCd, weaponData.ShootCd },
 			{ AttributeType.FlySec, weaponData.FlySec },
 			{ AttributeType.FlyDis, weaponData.FlyDis }
 		};
@@ -209,7 +212,7 @@ public class PlayerLoadout : IGetPlayerLoadout{
 	protected Rune[] UltSkillRunes;
 
 	private AvaterAttribute BaseAttribute;
-	public AvaterAttribute NowAttribute{ private set; get; }
+	public AvaterAttribute NowAttribute{ get; }
 
 	public PlayerLoadout(AvaterAttribute baseAttribute, INetEntity entity){
 		Entity = entity;
@@ -250,44 +253,11 @@ public class PlayerLoadout : IGetPlayerLoadout{
 			Weapon = weapon;
 			WeaponRunes = new Rune[Weapon.MaxInsert];
 			Weapon.OnEquip(Entity);
-			NowAttributeUpdate();
+			NowAttributeUpdateServerRpc();
 			return true;
 		}
 
 		return false;
-	}
-
-	public bool SetArmor(Armor armor, out List<Item> unload){
-		if(SetThing(Armor, ArmorPassives, armor, out unload)){
-			Armor = armor;
-			ArmorPassives = new Passive[Armor.MaxInsert];
-			NowAttributeUpdate();
-			return true;
-		}
-
-		return false;
-	}
-
-	public bool SetUltSkill(UltSkill skill, out List<Item> unload){
-		if(SetThing(UltSkill, UltSkillRunes, skill, out unload)){
-			UltSkill = skill;
-			UltSkillRunes = new Rune[UltSkill.MaxInsert];
-			return true;
-		}
-
-		return false;
-	}
-
-	public bool AddWeaponRune(Rune rune, int index, out Rune unload){
-		return ArrayInsert(WeaponRunes, rune, index, out unload);
-	}
-
-	public bool AddArmorPassive(Passive passive, int index, out Passive unload){
-		return ArrayInsert(ArmorPassives, passive, index, out unload);
-	}
-
-	public bool AddUltSkillRune(Rune rune, int index, out Rune unload){
-		return ArrayInsert(UltSkillRunes, rune, index, out unload);
 	}
 
 	private T GetInfo<T>(T thing, Item[] array, out Item[] inserts) where T : InsertThing{
@@ -317,8 +287,8 @@ public class PlayerLoadout : IGetPlayerLoadout{
 		array[index] = insert;
 		return true;
 	}
-
-	private void NowAttributeUpdate(){
+	[ServerRpc(RequireOwnership = false)]
+	private void NowAttributeUpdateServerRpc(){
 		var data = new AvaterAttribute(BaseAttribute);
 		if(Weapon != null){
 			foreach(var attribute in Weapon.AttributeBonus){
@@ -331,7 +301,7 @@ public class PlayerLoadout : IGetPlayerLoadout{
 				data.AddAttribute(attribute.Key, attribute.Value);
 			}
 		}
-
+		
 		NowAttribute.Copy(data);
 		EventAggregator.Publish(new OnAttributeChange(Entity, NowAttribute));
 	}
@@ -340,75 +310,69 @@ public class PlayerLoadout : IGetPlayerLoadout{
 public enum AttributeType{
 	MoveSpeed,
 	MaxHealth,
-
 	MaxBullet,
-	PowerChargeToFullSec,
 	Damage,
-	ShootCD,
+	ShootCd,
 	FlySec,
 	FlyDis
 }
-
-public class AvaterAttribute{
-	public float MoveSpeed = 7f;
-	public float MaxHealth = 3;
+[Serializable]
+public class AvaterAttribute : INetworkSerializable{
+	public float moveSpeed = 7f;
+	public float maxHealth = 3;
 
 	//Define by Weapon
-	public int MaxBullet;
-	public float PowerChargeToFullSec;
-	public float Damage;
-	public float ShootCD;
+	public int maxBullet;
+	public float damage;
+	public float shootCd;
 
-	//NotChange
-	public const float HealthChargeToFullSec = 3f;
 	public const float RotSpeed = 0.1f;
 	public const float MoveFriction = 0.07f;
-	public const float CureStartCD = 2;
-	public const float UltPowerChargeToFullSec = 6;
 
 	public AvaterAttribute(){ }
 
 	public AvaterAttribute(AvaterAttribute copy){
-		MoveSpeed = copy.MoveSpeed;
-		MaxHealth = copy.MaxHealth;
-		MaxBullet = copy.MaxBullet;
-		PowerChargeToFullSec = copy.PowerChargeToFullSec;
-		Damage = copy.Damage;
-		ShootCD = copy.ShootCD;
+		moveSpeed = copy.moveSpeed;
+		maxHealth = copy.maxHealth;
+		maxBullet = copy.maxBullet;
+		damage = copy.damage;
+		shootCd = copy.shootCd;
 	}
 
 
 	public void Copy(AvaterAttribute copy){
-		MoveSpeed = copy.MoveSpeed;
-		MaxHealth = copy.MaxHealth;
-		MaxBullet = copy.MaxBullet;
-		PowerChargeToFullSec = copy.PowerChargeToFullSec;
-		Damage = copy.Damage;
-		ShootCD = copy.ShootCD;
+		moveSpeed = copy.moveSpeed;
+		maxHealth = copy.maxHealth;
+		maxBullet = copy.maxBullet;
+		damage = copy.damage;
+		shootCd = copy.shootCd;
 	}
 
 	public void AddAttribute(AttributeType type, float value){
 		switch(type){
 			case AttributeType.MoveSpeed:
-				MoveSpeed += value;
-				MoveSpeed = Mathf.Max(MoveSpeed, 0.1f);
+				moveSpeed += value;
+				moveSpeed = Mathf.Max(moveSpeed, 0.1f);
 				break;
 			case AttributeType.MaxHealth:
-				MaxHealth += value;
+				maxHealth += value;
 				break;
 			case AttributeType.MaxBullet:
-				MaxBullet += (int)value;
-				break;
-			case AttributeType.PowerChargeToFullSec:
-				PowerChargeToFullSec += value;
+				maxBullet += (int)value;
 				break;
 			case AttributeType.Damage:
-				Damage += value;
+				damage += value;
 				break;
-			case AttributeType.ShootCD:
-				ShootCD += value;
+			case AttributeType.ShootCd:
+				shootCd += value;
 				break;
 		}
+	}
+
+	public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter{
+		serializer.SerializeValue(ref moveSpeed);
+		serializer.SerializeValue(ref maxHealth);
+		serializer.SerializeValue(ref maxBullet);
 	}
 }
 
@@ -434,12 +398,6 @@ public class AvaterAttributeCtrl : IAvaterAttributeCtrl{
 		if(Dic.ContainsKey(id))
 			return Dic[id];
 		return null;
-	}
-}
-
-public class ServerAvaterAttributeCtrl : AvaterAttributeCtrl{
-	public override Dictionary<int, AvaterAttribute> DataLoad(){
-		return base.DataLoad();
 	}
 }
 

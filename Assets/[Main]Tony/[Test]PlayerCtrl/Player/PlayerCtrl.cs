@@ -24,8 +24,8 @@ public class PlayerCtrl : CreatureCtrl{
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 		RangePreview.Init(StateCtrl, Loadout);
 
-		StateCtrl.Data.Health = Loadout.NowAttribute.MaxHealth;
-		StateCtrl.Data.bulletCount = Loadout.NowAttribute.MaxBullet;
+		StateCtrl.Data.Health = Loadout.NowAttribute.maxHealth;
+		StateCtrl.Data.bulletCount = Loadout.NowAttribute.maxBullet;
 	}
 
 	public override IInput GetInput(){
@@ -56,10 +56,10 @@ public class PlayerCtrl : CreatureCtrl{
 	[ClientRpc]
 	public void SetLevelClientRpc(int level){
 		if(level < 1) return;
-		Loadout.NowAttribute.MoveSpeed *= 1.15f * level;
-		Loadout.NowAttribute.MaxBullet += Loadout.NowAttribute.MaxBullet / 3;
+		Loadout.NowAttribute.moveSpeed *= 1.15f * level;
+		Loadout.NowAttribute.maxBullet += Loadout.NowAttribute.maxBullet / 3;
 		Debug.Log(
-			$"player {OwnerClientId} is upgrade {Loadout.NowAttribute.MoveSpeed} {Loadout.NowAttribute.MaxBullet}");
+			$"player {OwnerClientId} is upgrade {Loadout.NowAttribute.moveSpeed} {Loadout.NowAttribute.maxBullet}");
 	}
 
 	public void SwitchWeapon(Type weaponType){
@@ -76,14 +76,14 @@ public class PlayerCtrl : CreatureCtrl{
 			var weapon = _weaponFactory.Create<Shotgun>(shotGun);
 			Loadout.SetWeapon(weapon, out _);
 		}
-		StateCtrl.Data.bulletCount = Loadout.NowAttribute.MaxBullet;
+		StateCtrl.Data.bulletCount = Loadout.NowAttribute.maxBullet;
 	}
 
 	public override async void Reload(){
-		Loadout.NowAttribute.MoveSpeed *= 0.5f;
+		Loadout.NowAttribute.moveSpeed *= 0.5f;
 		await Task.Delay(1500);
-		Loadout.NowAttribute.MoveSpeed *= 2f;
-		StateCtrl.Data.bulletCount = Loadout.NowAttribute.MaxBullet;
+		Loadout.NowAttribute.moveSpeed *= 2f;
+		StateCtrl.Data.bulletCount = Loadout.NowAttribute.maxBullet;
 	}
 
 	public override bool IsController(){

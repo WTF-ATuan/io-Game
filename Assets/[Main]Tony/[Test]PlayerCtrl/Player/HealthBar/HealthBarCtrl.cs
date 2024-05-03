@@ -36,9 +36,9 @@ public class HealthBarCtrl : MonoBehaviour{
 	}
 	
 	private void Update(){	
-		bulletRoundImage.fillAmount = (float)StateData.Data.bulletCount / Loadout.GetNowAttribute().MaxBullet;
+		bulletRoundImage.fillAmount = (float)StateData.Data.bulletCount / Loadout.GetNowAttribute().maxBullet;
 		bulletText.text = StateData.Data.bulletCount.ToString();
-		HelthLine.localScale = new Vector3(1-(StateData.Data.Health / Loadout.GetNowAttribute().MaxHealth), 1, 1);
+		HelthLine.localScale = new Vector3(1-(StateData.Data.Health / Loadout.GetNowAttribute().maxHealth), 1, 1);
 	}
 	
 	
