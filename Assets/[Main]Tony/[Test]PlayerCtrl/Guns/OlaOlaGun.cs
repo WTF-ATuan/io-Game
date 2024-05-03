@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class OlaOlaGun : Weapon {
 
-    public OlaOlaGun(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, float flySec, float flyDis, RangePreviewData rangePreview) : base(maxBullet, powerChargeToFullSec, damage, shootCD, flySec, flyDis, rangePreview)
+    public OlaOlaGun(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, float flySec, float flyDis, RangePreviewData rangePreview) : base(new WeaponData(maxBullet, damage, shootCD, flySec, flyDis, rangePreview))
     {
     }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
@@ -6,6 +7,7 @@ using Zenject;
 public class PlayerCtrl : CreatureCtrl{
 	private IInput InputCtrl;
 	private RangePreviewCtrl RangePreview;
+	private IWeaponFactory _weaponFactory;
 
 	[Inject]
 	private void Initialization(
@@ -14,17 +16,17 @@ public class PlayerCtrl : CreatureCtrl{
 		IUltSkillFactory ultSkillFactory
 	){
 		InputCtrl = inputCtrl;
-		var weapon = weaponFactory.Create<SnipeGun>(5, 6, 1000, 0.5f, 0.3f, 6f,
-			new RangePreviewData(RangePreviewType.Straight, 6, 2f));
-		Loadout.SetWeapon(weapon, out var unload);
-		var bearUlt = ultSkillFactory.Create<BearUltSkill>();
-		Loadout.SetUltSkill(bearUlt, out var unloadUlt);
-
+		_weaponFactory = weaponFactory;
+		var pistolWeapon = new WeaponData(7, 1, 0.25f, 0.4f, 5f
+			, new RangePreviewData(RangePreviewType.Straight, 5, 3f));
+		var weapon = _weaponFactory.Create<SnipeGun>(pistolWeapon);
+		Loadout.SetWeapon(weapon, out _);
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 		RangePreview.Init(StateCtrl, Loadout);
 
 		StateCtrl.Data.Health = Loadout.NowAttribute.MaxHealth;
 		StateCtrl.Data.bulletCount = Loadout.NowAttribute.BulletMaxCount;
+		Debug.Log($"{Loadout.NowAttribute.MaxBullet} {Loadout.NowAttribute.Damage}");
 	}
 
 	public override IInput GetInput(){
@@ -51,12 +53,31 @@ public class PlayerCtrl : CreatureCtrl{
 			StateCtrl.DataSync();
 		}
 	}
+
 	[ClientRpc]
 	public void SetLevelClientRpc(int level){
-		if(level < 1 )return;
+		if(level < 1) return;
 		Loadout.NowAttribute.MoveSpeed *= 1.15f * level;
 		Loadout.NowAttribute.BulletMaxCount += Loadout.NowAttribute.BulletMaxCount / 3;
-		Debug.Log($"player {OwnerClientId} is upgrade {Loadout.NowAttribute.MoveSpeed} {Loadout.NowAttribute.BulletMaxCount}");
+		Debug.Log(
+			$"player {OwnerClientId} is upgrade {Loadout.NowAttribute.MoveSpeed} {Loadout.NowAttribute.BulletMaxCount}");
+	}
+
+	public void SwitchWeapon(Type weaponType){
+		if(weaponType == typeof(SnipeGun)){
+			var snipeWeapon = new WeaponData(5, 2, 1.5f, 0.2f, 8f,
+				new RangePreviewData(RangePreviewType.Straight, 8f, 4f));
+			var weapon = _weaponFactory.Create<SnipeGun>(snipeWeapon);
+			Loadout.SetWeapon(weapon, out _);
+			StateCtrl.Data.bulletCount = Loadout.NowAttribute.BulletMaxCount;
+		}
+
+		if(weaponType == typeof(Shotgun)){
+			var shotGun = new WeaponData(3, 0.3f, 1f, 0.3f , 3f,
+				new RangePreviewData(RangePreviewType.Sector, 3f, 12f));
+			var weapon = _weaponFactory.Create<Shotgun>(shotGun);
+			Loadout.SetWeapon(weapon, out _);
+		}
 	}
 
 	public override async void Reload(){
@@ -75,5 +96,8 @@ public class PlayerCtrl : CreatureCtrl{
 		base.Update();
 		if(IsController())
 			RangePreview.Update();
+		if(Input.GetKeyDown(KeyCode.Q)){
+			SwitchWeapon(typeof(Shotgun));
+		}
 	}
 }

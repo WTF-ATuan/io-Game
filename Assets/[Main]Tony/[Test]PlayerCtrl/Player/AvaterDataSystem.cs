@@ -78,6 +78,23 @@ public class UltSkillFactory : IUltSkillFactory{
 	}
 }
 
+public class WeaponData{
+	public RangePreviewData _rangePreview;
+	public float _flyDis;
+	public float _flySec;
+	public float _shootCd;
+	public float _damage;
+	public int _maxBullet;
+	public WeaponData(int maxBullet, float damage, float shootCd, float flySec, float flyDis, RangePreviewData rangePreview){
+		_maxBullet = maxBullet;
+		_damage = damage;
+		_shootCd = shootCd;
+		_flySec = flySec;
+		_flyDis = flyDis;
+		_rangePreview = rangePreview;
+	}
+}
+
 public abstract class Weapon : InsertThing{
 	protected INetEntity Owner;
 	public Dictionary<AttributeType, float> AttributeBonus;
@@ -125,16 +142,15 @@ public abstract class Weapon : InsertThing{
 		return false;
 	}
 
-	public Weapon(int maxBullet, float powerChargeToFullSec, float damage, float shootCD, float flySec, float flyDis,
-		RangePreviewData rangePreview){
-		AttributeBonus = new Dictionary<AttributeType, float>();
-		AttributeBonus.Add(AttributeType.MaxBullet, maxBullet);
-		AttributeBonus.Add(AttributeType.PowerChargeToFullSec, powerChargeToFullSec);
-		AttributeBonus.Add(AttributeType.Damage, damage);
-		AttributeBonus.Add(AttributeType.ShootCD, shootCD);
-		AttributeBonus.Add(AttributeType.FlySec, flySec);
-		AttributeBonus.Add(AttributeType.FlyDis, flyDis);
-		RangePreview = rangePreview;
+	public Weapon(WeaponData weaponData){
+		AttributeBonus = new Dictionary<AttributeType, float>{
+			{ AttributeType.MaxBullet, weaponData._maxBullet },
+			{ AttributeType.Damage, weaponData._damage },
+			{ AttributeType.ShootCD, weaponData._shootCd },
+			{ AttributeType.FlySec, weaponData._flySec },
+			{ AttributeType.FlyDis, weaponData._flyDis }
+		};
+		RangePreview = weaponData._rangePreview;
 	}
 
 	protected BulletData GetDefaultBullet(AvaterState data){
