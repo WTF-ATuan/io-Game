@@ -79,19 +79,22 @@ public class UltSkillFactory : IUltSkillFactory{
 }
 
 public class WeaponData{
-	public RangePreviewData _rangePreview;
-	public float _flyDis;
-	public float _flySec;
-	public float _shootCd;
-	public float _damage;
-	public int _maxBullet;
+	public RangePreviewData RangePreview;
+	public float FlyDis;
+	public float FlySec;
+	public float ShootCd;
+	public float Damage;
+	public int MaxBullet;
+	public float AimSlow = 0.5f; //Use it with moveSpeed 
+	public float ShootingDelay = 0.2f;
+
 	public WeaponData(int maxBullet, float damage, float shootCd, float flySec, float flyDis, RangePreviewData rangePreview){
-		_maxBullet = maxBullet;
-		_damage = damage;
-		_shootCd = shootCd;
-		_flySec = flySec;
-		_flyDis = flyDis;
-		_rangePreview = rangePreview;
+		MaxBullet = maxBullet;
+		Damage = damage;
+		ShootCd = shootCd;
+		FlySec = flySec;
+		FlyDis = flyDis;
+		RangePreview = rangePreview;
 	}
 }
 
@@ -104,6 +107,7 @@ public abstract class Weapon : InsertThing{
 	public bool IsShooting{ protected set; get; }
 
 	protected IBattleCtrl BattleCtrl;
+	protected WeaponData weaponData;
 
 	[Inject]
 	private void Initialization(IBattleCtrl battleCtrl){
@@ -144,13 +148,14 @@ public abstract class Weapon : InsertThing{
 
 	public Weapon(WeaponData weaponData){
 		AttributeBonus = new Dictionary<AttributeType, float>{
-			{ AttributeType.MaxBullet, weaponData._maxBullet },
-			{ AttributeType.Damage, weaponData._damage },
-			{ AttributeType.ShootCD, weaponData._shootCd },
-			{ AttributeType.FlySec, weaponData._flySec },
-			{ AttributeType.FlyDis, weaponData._flyDis }
+			{ AttributeType.MaxBullet, weaponData.MaxBullet },
+			{ AttributeType.Damage, weaponData.Damage },
+			{ AttributeType.ShootCD, weaponData.ShootCd },
+			{ AttributeType.FlySec, weaponData.FlySec },
+			{ AttributeType.FlyDis, weaponData.FlyDis }
 		};
-		RangePreview = weaponData._rangePreview;
+		this.weaponData = weaponData;
+		RangePreview = weaponData.RangePreview;
 	}
 
 	protected BulletData GetDefaultBullet(AvaterState data){
@@ -346,14 +351,13 @@ public enum AttributeType{
 
 public class AvaterAttribute{
 	public float MoveSpeed = 7f;
-	public float MaxHealth = 100;
-	public int BulletMaxCount = 5;
+	public float MaxHealth = 3;
 
 	//Define by Weapon
-	public int MaxBullet = 0;
-	public float PowerChargeToFullSec = 0;
-	public float Damage = 0;
-	public float ShootCD = 0;
+	public int MaxBullet;
+	public float PowerChargeToFullSec;
+	public float Damage;
+	public float ShootCD;
 
 	//NotChange
 	public const float HealthChargeToFullSec = 3f;

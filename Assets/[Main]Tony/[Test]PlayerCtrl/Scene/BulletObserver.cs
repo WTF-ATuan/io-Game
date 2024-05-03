@@ -28,10 +28,9 @@ public class BulletObserver : NetworkBehaviour{
 	}
 
 	//Server Only
-	private void OnBulletHit(Collision obj, ulong playerId)
-	{
+	private void OnBulletHit(Collision obj, ulong playerId){
 		var parent = obj.transform.parent;
-		if (parent == null) return;
+		if(parent == null) return;
 		if(!parent.TryGetComponent<CreatureCtrl>(out var hitPlayer)) return;
 		var hitPlayerId = hitPlayer.GetEntityID();
 		if(playerId != hitPlayerId){

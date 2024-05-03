@@ -17,7 +17,7 @@ public class PlayerCtrl : CreatureCtrl{
 	){
 		InputCtrl = inputCtrl;
 		_weaponFactory = weaponFactory;
-		var pistolWeapon = new WeaponData(7, 1, 0.25f, 0.4f, 5f
+		var pistolWeapon = new WeaponData(7, 1, 0.15f, 0.5f, 5f
 			, new RangePreviewData(RangePreviewType.Straight, 5, 3f));
 		var weapon = _weaponFactory.Create<SnipeGun>(pistolWeapon);
 		Loadout.SetWeapon(weapon, out _);
@@ -25,8 +25,7 @@ public class PlayerCtrl : CreatureCtrl{
 		RangePreview.Init(StateCtrl, Loadout);
 
 		StateCtrl.Data.Health = Loadout.NowAttribute.MaxHealth;
-		StateCtrl.Data.bulletCount = Loadout.NowAttribute.BulletMaxCount;
-		Debug.Log($"{Loadout.NowAttribute.MaxBullet} {Loadout.NowAttribute.Damage}");
+		StateCtrl.Data.bulletCount = Loadout.NowAttribute.MaxBullet;
 	}
 
 	public override IInput GetInput(){
@@ -58,33 +57,33 @@ public class PlayerCtrl : CreatureCtrl{
 	public void SetLevelClientRpc(int level){
 		if(level < 1) return;
 		Loadout.NowAttribute.MoveSpeed *= 1.15f * level;
-		Loadout.NowAttribute.BulletMaxCount += Loadout.NowAttribute.BulletMaxCount / 3;
+		Loadout.NowAttribute.MaxBullet += Loadout.NowAttribute.MaxBullet / 3;
 		Debug.Log(
-			$"player {OwnerClientId} is upgrade {Loadout.NowAttribute.MoveSpeed} {Loadout.NowAttribute.BulletMaxCount}");
+			$"player {OwnerClientId} is upgrade {Loadout.NowAttribute.MoveSpeed} {Loadout.NowAttribute.MaxBullet}");
 	}
 
 	public void SwitchWeapon(Type weaponType){
 		if(weaponType == typeof(SnipeGun)){
-			var snipeWeapon = new WeaponData(5, 2, 1.5f, 0.2f, 8f,
+			var snipeWeapon = new WeaponData(5, 2.5f, 1.5f, 0.2f, 8f,
 				new RangePreviewData(RangePreviewType.Straight, 8f, 4f));
 			var weapon = _weaponFactory.Create<SnipeGun>(snipeWeapon);
 			Loadout.SetWeapon(weapon, out _);
-			StateCtrl.Data.bulletCount = Loadout.NowAttribute.BulletMaxCount;
 		}
 
 		if(weaponType == typeof(Shotgun)){
 			var shotGun = new WeaponData(3, 0.3f, 1f, 0.3f , 3f,
-				new RangePreviewData(RangePreviewType.Sector, 3f, 12f));
+				new RangePreviewData(RangePreviewType.Sector, 3f, 45f));
 			var weapon = _weaponFactory.Create<Shotgun>(shotGun);
 			Loadout.SetWeapon(weapon, out _);
 		}
+		StateCtrl.Data.bulletCount = Loadout.NowAttribute.MaxBullet;
 	}
 
 	public override async void Reload(){
 		Loadout.NowAttribute.MoveSpeed *= 0.5f;
 		await Task.Delay(1500);
 		Loadout.NowAttribute.MoveSpeed *= 2f;
-		StateCtrl.Data.bulletCount = Loadout.NowAttribute.BulletMaxCount;
+		StateCtrl.Data.bulletCount = Loadout.NowAttribute.MaxBullet;
 	}
 
 	public override bool IsController(){
@@ -98,6 +97,9 @@ public class PlayerCtrl : CreatureCtrl{
 			RangePreview.Update();
 		if(Input.GetKeyDown(KeyCode.Q)){
 			SwitchWeapon(typeof(Shotgun));
+		}
+		if(Input.GetKeyDown(KeyCode.E)){
+			SwitchWeapon(typeof(SnipeGun));
 		}
 	}
 }

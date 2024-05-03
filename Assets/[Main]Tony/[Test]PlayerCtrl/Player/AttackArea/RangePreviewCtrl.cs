@@ -38,14 +38,6 @@ public class RangePreviewCtrl : MonoBehaviour
                 radius = PlayerData.Data.AimPos.magnitude;
             }
         }
-        if (PlayerData.Data.IsUtl) {
-            var utl = PlayerLoadout.GetUtlInfo();
-            if (utl.TryShoot(PlayerData.Data, false)) {
-                data = utl.RangePreview;
-                ang = PlayerData.Data.UtlPos.Angle();
-                radius = PlayerData.Data.UtlPos.magnitude;
-            }
-        }
         if (data == null) {
             if(gameObject.activeSelf)gameObject.SetActive(false);
             return;
