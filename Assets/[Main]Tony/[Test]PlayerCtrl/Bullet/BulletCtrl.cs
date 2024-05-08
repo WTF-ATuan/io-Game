@@ -36,7 +36,7 @@ public class BulletCtrl : NetworkBehaviour{
 			_movement.Value = new Vector3(position.x, position.y, position.z);
 		}
 		else{
-			transform.position = _vec3Smoother.Get();
+			transform.position = _movement.Value;
 		}
 	}
 }
