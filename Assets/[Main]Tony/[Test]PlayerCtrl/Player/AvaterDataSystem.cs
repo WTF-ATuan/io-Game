@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
 public abstract class Item{ }
 
-public class Passive : Item{ }
 
 public class Rune : Item{ }
 
@@ -88,7 +86,7 @@ public abstract class Weapon : InsertThing{
 	public bool IsShooting{ protected set; get; }
 
 	protected IBattleCtrl BattleCtrl;
-	protected WeaponData weaponData;
+	protected WeaponData WeaponData;
 
 	[Inject]
 	private void Initialization(IBattleCtrl battleCtrl){
@@ -135,7 +133,7 @@ public abstract class Weapon : InsertThing{
 			{ AttributeType.FlySec, weaponData.FlySec },
 			{ AttributeType.FlyDis, weaponData.FlyDis }
 		};
-		this.weaponData = weaponData;
+		this.WeaponData = weaponData;
 		RangePreview = weaponData.RangePreview;
 	}
 
@@ -151,10 +149,6 @@ public abstract class Weapon : InsertThing{
 		};
 		return bulletData;
 	}
-}
-
-public class Armor : InsertThing{
-	public Dictionary<AttributeType, int> AttributeBonus;
 }
 
 public interface IGetPlayerLoadout{
