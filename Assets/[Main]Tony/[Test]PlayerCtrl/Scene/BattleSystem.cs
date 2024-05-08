@@ -12,7 +12,7 @@ public interface IBattleCtrl{
 	public ulong GetLocalPlayerID();
 	public void SetSpawner(BulletObserver player);
 	public BulletObserver GetSpawner();
-	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage);
+	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, float damage);
 	void AddedPlayerMoveForceRequestServerRpc(ulong targetId, Vector2 forceCenter);
 	public List<CreatureCtrl> GetCreatureList();
 	public List<GroundCtrl> GetGroundList();
@@ -56,10 +56,11 @@ public class DemoBattleCtrl : IBattleCtrl{
 	}
 
 	[ServerRpc(RequireOwnership = true)]
-	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, int damage){
+	public void PlayerHitRequestServerRpc(ulong attackerId, ulong hitId, float damage){
 		var hitPlayer = GetCreatureList().Find(e => e.GetEntityID() == hitId);
 		if(!hitPlayer || !hitPlayer.IsSpawned) return;
 		var hitPlayerData = hitPlayer.GetSyncData().Value;
+		Debug.Log($"{hitPlayerData.Health} {damage}");
 		if(hitPlayerData.Health - damage <= 0){
 			hitPlayer.DeathClientRpc();
 			hitPlayer.NetworkObject.Despawn();

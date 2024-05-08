@@ -24,17 +24,17 @@ public class BulletObserver : NetworkBehaviour{
 		bulletClone.Spawn();
 		bulletClone.GetComponent<BulletCtrl>().Setup(data.genPos, data.angle, data.flySec, data.flyDis,
 			() => { bulletClone.Despawn(); });
-		bulletClone.OnCollisionEnterAsObservable().Subscribe(x => OnBulletHit(x, data.playerId));
+		bulletClone.OnCollisionEnterAsObservable().Subscribe(x => OnBulletHit(x, data.playerId , data.damage));
 	}
 
 	//Server Only
-	private void OnBulletHit(Collision obj, ulong playerId){
+	private void OnBulletHit(Collision obj, ulong playerId , float damage){
 		var parent = obj.transform.parent;
 		if(parent == null) return;
 		if(!parent.TryGetComponent<CreatureCtrl>(out var hitPlayer)) return;
 		var hitPlayerId = hitPlayer.GetEntityID();
 		if(playerId != hitPlayerId){
-			_battleCtrl.PlayerHitRequestServerRpc(playerId, hitPlayerId, 35);
+			_battleCtrl.PlayerHitRequestServerRpc(playerId, hitPlayerId, damage);
 		}
 	}
 }
