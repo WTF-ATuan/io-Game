@@ -190,12 +190,16 @@ public class PlayerLoadout : IGetPlayerLoadout{
 	protected Rune[] UltSkillRunes;
 
 	private AvaterAttribute BaseAttribute;
-	public AvaterAttribute NowAttribute{ get; }
+	public AvaterAttribute NowAttribute{ get; private set; }
 
-	public PlayerLoadout(AvaterAttribute baseAttribute, INetEntity entity){
+	private ISyncAttribute _syncAttribute;
+
+	public PlayerLoadout(AvaterAttribute baseAttribute, INetEntity entity
+		, ISyncAttribute syncAttribute){
 		Entity = entity;
 		BaseAttribute = baseAttribute;
 		NowAttribute = new AvaterAttribute(BaseAttribute);
+		_syncAttribute = syncAttribute;
 	}
 
 	public Weapon GetWeaponInfo(){
@@ -223,7 +227,7 @@ public class PlayerLoadout : IGetPlayerLoadout{
 	}
 
 	public AvaterAttribute GetNowAttribute(){
-		return NowAttribute;
+		return _syncAttribute.GetAttributeData().Value;
 	}
 
 	public bool SetWeapon(Weapon weapon, out List<Item> unload){
@@ -260,18 +264,19 @@ public class PlayerLoadout : IGetPlayerLoadout{
 	private void NowAttributeUpdate(){
 		var data = new AvaterAttribute(BaseAttribute);
 		if(Weapon != null){
-			foreach(var attribute in Weapon.AttributeBonus){
-				data.AddAttribute(attribute.Key, attribute.Value);
-			}
+			data.damage = Weapon.AttributeBonus[AttributeType.Damage];
+			data.maxBullet = (int)Weapon.AttributeBonus[AttributeType.MaxBullet];
+			data.shootCd = Weapon.AttributeBonus[AttributeType.ShootCd];
 		}
 
-		if(Armor != null){
-			foreach(var attribute in Armor.AttributeBonus){
-				data.AddAttribute(attribute.Key, attribute.Value);
-			}
+		if(_syncAttribute.IsController()){
+			NowAttribute.Copy(data);
+			_syncAttribute.AttributeDataSyncServerRpc(NowAttribute);
 		}
-		
-		NowAttribute.Copy(data);
+		else{
+			NowAttribute = _syncAttribute.GetAttributeData().Value ?? data;
+		}
+
 		EventAggregator.Publish(new OnAttributeChange(Entity, NowAttribute));
 	}
 }

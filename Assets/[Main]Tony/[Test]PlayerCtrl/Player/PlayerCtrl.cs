@@ -17,13 +17,16 @@ public class PlayerCtrl : CreatureCtrl{
 	){
 		InputCtrl = inputCtrl;
 		_weaponFactory = weaponFactory;
+	}
+
+	public override void OnNetworkSpawn(){
+		base.OnNetworkSpawn();
 		var pistolWeapon = new WeaponData(7, 1, 0.15f, 0.5f, 5f
 			, new RangePreviewData(RangePreviewType.Straight, 5, 3f));
 		var weapon = _weaponFactory.Create<SnipeGun>(pistolWeapon);
 		Loadout.SetWeapon(weapon, out _);
 		RangePreview = GetComponentInChildren<RangePreviewCtrl>();
 		RangePreview.Init(StateCtrl, Loadout);
-
 		StateCtrl.Data.Health = Loadout.NowAttribute.maxHealth;
 		StateCtrl.Data.bulletCount = Loadout.NowAttribute.maxBullet;
 	}
@@ -58,8 +61,6 @@ public class PlayerCtrl : CreatureCtrl{
 		if(level < 1) return;
 		Loadout.NowAttribute.moveSpeed *= 1.15f * level;
 		Loadout.NowAttribute.maxBullet += Loadout.NowAttribute.maxBullet / 3;
-		Debug.Log(
-			$"player {OwnerClientId} is upgrade {Loadout.NowAttribute.moveSpeed} {Loadout.NowAttribute.maxBullet}");
 	}
 
 	public void SwitchWeapon(Type weaponType){
@@ -71,11 +72,12 @@ public class PlayerCtrl : CreatureCtrl{
 		}
 
 		if(weaponType == typeof(Shotgun)){
-			var shotGun = new WeaponData(3, 0.3f, 1f, 0.3f , 3f,
+			var shotGun = new WeaponData(3, 0.3f, 1f, 0.3f, 3f,
 				new RangePreviewData(RangePreviewType.Sector, 3f, 45f));
 			var weapon = _weaponFactory.Create<Shotgun>(shotGun);
 			Loadout.SetWeapon(weapon, out _);
 		}
+
 		StateCtrl.Data.bulletCount = Loadout.NowAttribute.maxBullet;
 	}
 
@@ -98,6 +100,7 @@ public class PlayerCtrl : CreatureCtrl{
 		if(Input.GetKeyDown(KeyCode.Q)){
 			SwitchWeapon(typeof(Shotgun));
 		}
+
 		if(Input.GetKeyDown(KeyCode.E)){
 			SwitchWeapon(typeof(SnipeGun));
 		}

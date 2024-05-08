@@ -59,5 +59,14 @@ public class AvaterAttribute : INetworkSerializable{
 		serializer.SerializeValue(ref moveSpeed);
 		serializer.SerializeValue(ref maxHealth);
 		serializer.SerializeValue(ref maxBullet);
+		serializer.SerializeValue(ref damage);
+		serializer.SerializeValue(ref shootCd);
 	}
+}
+
+public interface ISyncAttribute{
+	[ServerRpc(RequireOwnership = false)]
+	void AttributeDataSyncServerRpc(AvaterAttribute attribute);
+	NetworkVariable<AvaterAttribute> GetAttributeData();
+	bool IsController();
 }

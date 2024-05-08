@@ -9,13 +9,16 @@ public interface INetEntity{
 	public ulong GetEntityID();
 }
 
-public abstract class CreatureCtrl : NetworkBehaviour, IAvaterSync{
+public abstract class CreatureCtrl : NetworkBehaviour, IAvaterSync , ISyncAttribute{
 	protected IBattleCtrl BattleCtrl;
 	protected AvaterAttribute BaseAttribute;
 	protected PlayerLoadout Loadout;
 	protected List<IDisposable> RecycleThings;
 	protected AvaterStateCtrl StateCtrl;
 	protected PoolObj<HealthBarCtrl> HealthBar;
+
+	protected NetworkVariable<AvaterState> StateSyncData = new();
+	protected NetworkVariable<AvaterAttribute> AttributeSyncData = new();
 
 	[Inject]
 	private void Initialization(
@@ -27,22 +30,29 @@ public abstract class CreatureCtrl : NetworkBehaviour, IAvaterSync{
 		RecycleThings.Add(BattleCtrl.AddCreature(this));
 		StateCtrl = new AvaterStateCtrl(this);
 		BaseAttribute = avaterAttributeCtrl.GetData();
-		Loadout = new PlayerLoadout(BaseAttribute, this);
+		Loadout = new PlayerLoadout(BaseAttribute, this , this);
 
 		HealthBar = healthBarPool.Get();
 		HealthBar.Ctrl.Setup(Loadout, StateCtrl);
 		RecycleThings.Add(HealthBar);
 	}
 
-	protected NetworkVariable<AvaterState> AvaterSyncData = new();
-
 	public NetworkVariable<AvaterState> GetSyncData(){
-		return AvaterSyncData;
+		return StateSyncData;
 	}
 
 	[ServerRpc(RequireOwnership = false)]
 	public void AvaterDataSyncServerRpc(AvaterState data){
-		AvaterSyncData.Value = data;
+		StateSyncData.Value = data;
+	}
+
+	public NetworkVariable<AvaterAttribute> GetAttributeData(){
+		return AttributeSyncData;
+	}
+
+	[ServerRpc(RequireOwnership = false)]
+	public void AttributeDataSyncServerRpc(AvaterAttribute attribute){
+		AttributeSyncData.Value = attribute;
 	}
 
 	[ClientRpc]

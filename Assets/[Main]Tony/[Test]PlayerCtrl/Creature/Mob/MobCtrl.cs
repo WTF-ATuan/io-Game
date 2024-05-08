@@ -17,7 +17,7 @@ public class MobCtrl : CreatureCtrl
         IAvaterAttributeCtrl avaterAttributeCtrl,
         IWeaponFactory weaponFactory) {
         BaseAttribute = avaterAttributeCtrl.GetData(1);
-        Loadout = new PlayerLoadout(BaseAttribute, this);
+        Loadout = new PlayerLoadout(BaseAttribute, this , this);
         Input = new ServerInput();
         var weapon = weaponFactory.Create<OlaOlaGun>(3, 6, 1000, 0.5f,0.3f,1f,new RangePreviewData(RangePreviewType.Straight,1f,30));
         Loadout.SetWeapon(weapon, out var unload);
