@@ -159,13 +159,10 @@ public class Armor : InsertThing{
 
 public interface IGetPlayerLoadout{
 	public Weapon GetWeaponInfo();
-	public Armor GetArmorInfo();
-	public UltSkill GetUtlInfo();
-	public Weapon GetWeaponInfo(out Item[] inserts);
-	public Armor GetArmorInfo(out Item[] inserts);
-	public UltSkill GetUtlInfo(out Item[] inserts);
 
 	public AvaterAttribute GetNowAttribute();
+
+	public AvaterAttribute GetBaseAttribute();
 }
 
 public class OnAttributeChange{
@@ -179,26 +176,22 @@ public class OnAttributeChange{
 }
 
 public class PlayerLoadout : IGetPlayerLoadout{
-	protected INetEntity Entity;
+	private INetEntity _entity;
+	private Weapon _weapon;
+	private UltSkill _ultSkill;
+	private Rune[] _weaponRunes;
+	private Rune[] _ultSkillRunes;
 
-	protected Weapon Weapon;
-	protected Armor Armor;
-	protected UltSkill UltSkill;
-
-	protected Rune[] WeaponRunes;
-	protected Passive[] ArmorPassives;
-	protected Rune[] UltSkillRunes;
-
-	private AvaterAttribute BaseAttribute;
+	private AvaterAttribute _baseAttribute;
 	public AvaterAttribute NowAttribute{ get; private set; }
 
 	private ISyncAttribute _syncAttribute;
 
 	public PlayerLoadout(AvaterAttribute baseAttribute, INetEntity entity
 		, ISyncAttribute syncAttribute){
-		Entity = entity;
-		BaseAttribute = baseAttribute;
-		NowAttribute = new AvaterAttribute(BaseAttribute);
+		_entity = entity;
+		_baseAttribute = baseAttribute;
+		NowAttribute = new AvaterAttribute(_baseAttribute);
 		_syncAttribute = syncAttribute;
 	}
 
@@ -206,40 +199,33 @@ public class PlayerLoadout : IGetPlayerLoadout{
 		return GetWeaponInfo(out Item[] inserts);
 	}
 
-	public Armor GetArmorInfo(){
-		return GetArmorInfo(out Item[] inserts);
-	}
-
 	public UltSkill GetUtlInfo(){
 		return GetUtlInfo(out Item[] inserts);
 	}
 
 	public Weapon GetWeaponInfo(out Item[] inserts){
-		return GetInfo(Weapon, WeaponRunes, out inserts);
-	}
-
-	public Armor GetArmorInfo(out Item[] inserts){
-		return GetInfo(Armor, ArmorPassives, out inserts);
+		return GetInfo(_weapon, _weaponRunes, out inserts);
 	}
 
 	public UltSkill GetUtlInfo(out Item[] inserts){
-		return GetInfo(UltSkill, UltSkillRunes, out inserts);
+		return GetInfo(_ultSkill, _ultSkillRunes, out inserts);
 	}
 
 	public AvaterAttribute GetNowAttribute(){
 		return _syncAttribute.GetAttributeData().Value;
 	}
 
-	public bool SetWeapon(Weapon weapon, out List<Item> unload){
-		if(SetThing(Weapon, WeaponRunes, weapon, out unload)){
-			Weapon = weapon;
-			WeaponRunes = new Rune[Weapon.MaxInsert];
-			Weapon.OnEquip(Entity);
-			NowAttributeUpdate();
-			return true;
-		}
+	public AvaterAttribute GetBaseAttribute(){
+		return _baseAttribute;
+	}
 
-		return false;
+	public void SetWeapon(Weapon weapon, out List<Item> unload){
+		if(SetThing(_weapon, _weaponRunes, weapon, out unload)){
+			_weapon = weapon;
+			_weaponRunes = new Rune[_weapon.MaxInsert];
+			_weapon.OnEquip(_entity);
+			NowAttributeUpdate();
+		}
 	}
 
 	private T GetInfo<T>(T thing, Item[] array, out Item[] inserts) where T : InsertThing{
@@ -262,11 +248,11 @@ public class PlayerLoadout : IGetPlayerLoadout{
 	}
 
 	private void NowAttributeUpdate(){
-		var data = new AvaterAttribute(BaseAttribute);
-		if(Weapon != null){
-			data.damage = Weapon.AttributeBonus[AttributeType.Damage];
-			data.maxBullet = (int)Weapon.AttributeBonus[AttributeType.MaxBullet];
-			data.shootCd = Weapon.AttributeBonus[AttributeType.ShootCd];
+		var data = new AvaterAttribute(_baseAttribute);
+		if(_weapon != null){
+			data.damage = _weapon.AttributeBonus[AttributeType.Damage];
+			data.maxBullet = (int)_weapon.AttributeBonus[AttributeType.MaxBullet];
+			data.shootCd = _weapon.AttributeBonus[AttributeType.ShootCd];
 		}
 
 		if(_syncAttribute.IsController()){
@@ -277,7 +263,7 @@ public class PlayerLoadout : IGetPlayerLoadout{
 			NowAttribute = _syncAttribute.GetAttributeData().Value ?? data;
 		}
 
-		EventAggregator.Publish(new OnAttributeChange(Entity, NowAttribute));
+		EventAggregator.Publish(new OnAttributeChange(_entity, NowAttribute));
 	}
 }
 

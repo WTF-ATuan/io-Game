@@ -74,11 +74,9 @@ public class AvaterStateCtrl : INetEntity{
 
 	private void UpdateRotate(float missTime){
 		var weapon = Avater.GetLoadOut().GetWeaponInfo();
-		var ultSkill = Avater.GetLoadOut().GetUtlInfo();
 		float targetTowards =
 				weapon.IsPauseAim ? Data.Towards :
 				Data.IsAim && weapon.TryShoot(Data, false) ? Data.AimPos.Angle() :
-				Data.IsUtl && ultSkill.TryShoot(Data, false) ? Data.UtlPos.Angle() :
 				Data.TargetVec != Vector2.zero ? Data.TargetVec.Angle() :
 				Data.Towards;
 		Data.Towards = Mathf.SmoothDampAngle(Data.Towards, targetTowards, ref Data.RotVec, AvaterAttribute.RotSpeed,
