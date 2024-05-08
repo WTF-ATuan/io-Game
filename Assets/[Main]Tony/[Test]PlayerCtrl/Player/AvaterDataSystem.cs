@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
 public abstract class Item{ }
@@ -77,27 +76,6 @@ public class UltSkillFactory : IUltSkillFactory{
 		var instance = (T)Activator.CreateInstance(typeof(T), parameters);
 		_container.Inject(instance);
 		return instance;
-	}
-}
-
-public class WeaponData{
-	public RangePreviewData RangePreview;
-	public float FlyDis;
-	public float FlySec;
-	public float ShootCd;
-	public float Damage;
-	public int MaxBullet;
-	public float AimSlow = 0.5f; //Use it with moveSpeed 
-	public float ShootingDelay = 0.2f;
-
-	public WeaponData(int maxBullet, float damage, float shootCd, float flySec, float flyDis,
-		RangePreviewData rangePreview){
-		MaxBullet = maxBullet;
-		Damage = damage;
-		ShootCd = shootCd;
-		FlySec = flySec;
-		FlyDis = flyDis;
-		RangePreview = rangePreview;
 	}
 }
 
@@ -253,7 +231,7 @@ public class PlayerLoadout : IGetPlayerLoadout{
 			Weapon = weapon;
 			WeaponRunes = new Rune[Weapon.MaxInsert];
 			Weapon.OnEquip(Entity);
-			NowAttributeUpdateServerRpc();
+			NowAttributeUpdate();
 			return true;
 		}
 
@@ -279,16 +257,7 @@ public class PlayerLoadout : IGetPlayerLoadout{
 		return true;
 	}
 
-	private bool ArrayInsert<T>(T[] array, T insert, int index, out T unload) where T : class{
-		unload = null;
-		if(array == null) return false;
-		if(index < 0 || index > array.Length) return false;
-		if(array[index] != null) unload = array[index];
-		array[index] = insert;
-		return true;
-	}
-	[ServerRpc(RequireOwnership = false)]
-	private void NowAttributeUpdateServerRpc(){
+	private void NowAttributeUpdate(){
 		var data = new AvaterAttribute(BaseAttribute);
 		if(Weapon != null){
 			foreach(var attribute in Weapon.AttributeBonus){
@@ -315,65 +284,6 @@ public enum AttributeType{
 	ShootCd,
 	FlySec,
 	FlyDis
-}
-[Serializable]
-public class AvaterAttribute : INetworkSerializable{
-	public float moveSpeed = 7f;
-	public float maxHealth = 3;
-
-	//Define by Weapon
-	public int maxBullet;
-	public float damage;
-	public float shootCd;
-
-	public const float RotSpeed = 0.1f;
-	public const float MoveFriction = 0.07f;
-
-	public AvaterAttribute(){ }
-
-	public AvaterAttribute(AvaterAttribute copy){
-		moveSpeed = copy.moveSpeed;
-		maxHealth = copy.maxHealth;
-		maxBullet = copy.maxBullet;
-		damage = copy.damage;
-		shootCd = copy.shootCd;
-	}
-
-
-	public void Copy(AvaterAttribute copy){
-		moveSpeed = copy.moveSpeed;
-		maxHealth = copy.maxHealth;
-		maxBullet = copy.maxBullet;
-		damage = copy.damage;
-		shootCd = copy.shootCd;
-	}
-
-	public void AddAttribute(AttributeType type, float value){
-		switch(type){
-			case AttributeType.MoveSpeed:
-				moveSpeed += value;
-				moveSpeed = Mathf.Max(moveSpeed, 0.1f);
-				break;
-			case AttributeType.MaxHealth:
-				maxHealth += value;
-				break;
-			case AttributeType.MaxBullet:
-				maxBullet += (int)value;
-				break;
-			case AttributeType.Damage:
-				damage += value;
-				break;
-			case AttributeType.ShootCd:
-				shootCd += value;
-				break;
-		}
-	}
-
-	public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter{
-		serializer.SerializeValue(ref moveSpeed);
-		serializer.SerializeValue(ref maxHealth);
-		serializer.SerializeValue(ref maxBullet);
-	}
 }
 
 public interface IAvaterAttributeCtrl{
