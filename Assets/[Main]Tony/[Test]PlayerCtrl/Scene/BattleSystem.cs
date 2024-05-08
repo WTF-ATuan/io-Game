@@ -60,7 +60,6 @@ public class DemoBattleCtrl : IBattleCtrl{
 		var hitPlayer = GetCreatureList().Find(e => e.GetEntityID() == hitId);
 		if(!hitPlayer || !hitPlayer.IsSpawned) return;
 		var hitPlayerData = hitPlayer.GetSyncData().Value;
-		Debug.Log($"{hitPlayerData.Health} {damage}");
 		if(hitPlayerData.Health - damage <= 0){
 			hitPlayer.DeathClientRpc();
 			hitPlayer.NetworkObject.Despawn();
