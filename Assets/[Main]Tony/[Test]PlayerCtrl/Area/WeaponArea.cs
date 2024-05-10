@@ -11,17 +11,16 @@ namespace _Main_Tony._Test_PlayerCtrl.Area{
 		private Collider _detectRange;
 		[Inject] private IBattleCtrl _battleCtrl;
 		private ulong _targetCreatureID = ulong.MaxValue;
-		private WeaponType _weaponType;
+		private NetworkVariable<WeaponType> _weaponType = new();
 
 		public void RandomWeaponType(){
 			var values = Enum.GetValues(typeof(WeaponType));
-			_weaponType = (WeaponType)values.GetValue(Random.Range(0, values.Length));
+			_weaponType.Value = (WeaponType)values.GetValue(Random.Range(0, values.Length));
 		}
-
-		[ClientRpc]
-		private void ChangeAreaViewClientRpc(){
+		
+		private void ChangeAreaView(){
 			var meshRenderer = GetComponentInChildren<MeshRenderer>();
-			var color = _weaponType switch{
+			var color = _weaponType.Value switch{
 				WeaponType.Pistol => Color.green,
 				WeaponType.Snipe => Color.yellow,
 				WeaponType.ShotGun => Color.red,
@@ -31,18 +30,21 @@ namespace _Main_Tony._Test_PlayerCtrl.Area{
 		}
 
 		public override void OnNetworkSpawn(){
-			if(!IsServer) return;
+			if(!IsServer){
+				ChangeAreaView();
+				return;
+			}
 			_detectRange = GetComponentInChildren<Collider>();
 			_detectRange.OnTriggerEnterAsObservable().Subscribe(OnCreatureEnter);
 			RandomWeaponType();
-			ChangeAreaViewClientRpc();
+			ChangeAreaView();
 		}
 
 		private void OnCreatureEnter(Collider obj){
 			var creature = obj.transform.parent.GetComponent<CreatureCtrl>();
 			if(!creature) return;
 			_targetCreatureID = creature.GetEntityID();
-			_battleCtrl.SwitchWeaponServerRpc(_targetCreatureID , _weaponType);
+			_battleCtrl.SwitchWeaponServerRpc(_targetCreatureID , _weaponType.Value);
 		}
 	}
 
