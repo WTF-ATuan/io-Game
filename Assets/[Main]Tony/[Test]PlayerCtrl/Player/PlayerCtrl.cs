@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using _Main_Tony._Test_PlayerCtrl.Area;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -62,22 +63,19 @@ public class PlayerCtrl : CreatureCtrl{
 		Loadout.NowAttribute.moveSpeed *= 1.15f * level;
 		Loadout.NowAttribute.maxBullet += Loadout.NowAttribute.maxBullet / 3;
 	}
-
-	public void SwitchWeapon(Type weaponType){
-		if(weaponType == typeof(SnipeGun)){
-			var snipeWeapon = new WeaponData(5, 2.5f, 1.5f, 0.2f, 8f,
-				new RangePreviewData(RangePreviewType.Straight, 8f, 4f));
-			var weapon = _weaponFactory.Create<SnipeGun>(snipeWeapon);
-			Loadout.SetWeapon(weapon, out _);
-		}
-
-		if(weaponType == typeof(Shotgun)){
-			var shotGun = new WeaponData(3, 0.3f, 1f, 0.3f, 3f,
-				new RangePreviewData(RangePreviewType.Sector, 3f, 45f));
-			var weapon = _weaponFactory.Create<Shotgun>(shotGun);
-			Loadout.SetWeapon(weapon, out _);
-		}
-
+	[ClientRpc]
+	public void SwitchWeaponClientRpc(WeaponType weaponType){
+		var weaponToSwitch = weaponType switch{
+			WeaponType.Pistol => new WeaponData(7, 1, 0.15f, 0.5f, 5f,
+				new RangePreviewData(RangePreviewType.Straight, 5, 3f)){ WeaponType = typeof(SnipeGun) },
+			WeaponType.Snipe => new WeaponData(5, 2.5f, 1.5f, 0.2f, 8f,
+				new RangePreviewData(RangePreviewType.Straight, 8f, 4f)){ WeaponType = typeof(SnipeGun) },
+			WeaponType.ShotGun => new WeaponData(3, 0.3f, 1f, 0.3f, 3f,
+				new RangePreviewData(RangePreviewType.Sector, 3f, 45f)){ WeaponType = typeof(Shotgun) },
+			_ => throw new ArgumentOutOfRangeException(nameof(weaponType), weaponType, null)
+		};
+		var weapon = _weaponFactory.Create(weaponToSwitch);
+		Loadout.SetWeapon(weapon, out _);
 		StateCtrl.Data.bulletCount = Loadout.NowAttribute.maxBullet;
 	}
 
@@ -97,12 +95,5 @@ public class PlayerCtrl : CreatureCtrl{
 		base.Update();
 		if(IsController())
 			RangePreview.Update();
-		if(Input.GetKeyDown(KeyCode.Q)){
-			SwitchWeapon(typeof(Shotgun));
-		}
-
-		if(Input.GetKeyDown(KeyCode.E)){
-			SwitchWeapon(typeof(SnipeGun));
-		}
 	}
 }

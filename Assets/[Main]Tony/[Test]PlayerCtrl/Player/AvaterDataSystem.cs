@@ -43,6 +43,7 @@ public abstract class UltSkill : InsertThing{
 
 public interface IWeaponFactory{
 	T Create<T>(params object[] parameters) where T : Weapon;
+	Weapon Create(WeaponData data);
 }
 
 public class WeaponFactory : IWeaponFactory{
@@ -54,6 +55,12 @@ public class WeaponFactory : IWeaponFactory{
 
 	public T Create<T>(params object[] parameters) where T : Weapon{
 		var instance = (T)Activator.CreateInstance(typeof(T), parameters);
+		_container.Inject(instance);
+		return instance;
+	}
+
+	public Weapon Create(WeaponData data){
+		var instance = (Weapon) Activator.CreateInstance(data.WeaponType, data);
 		_container.Inject(instance);
 		return instance;
 	}

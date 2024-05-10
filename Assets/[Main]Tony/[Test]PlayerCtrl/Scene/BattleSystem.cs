@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using _Main_Tony._Test_PlayerCtrl.Area;
 using UniRx;
 using Unity.Netcode;
 using UnityEngine;
@@ -18,6 +19,7 @@ public interface IBattleCtrl{
 	public List<GroundCtrl> GetGroundList();
 	public bool AddPad(GroundCtrl ctrl);
 	public bool RemovePad(GroundCtrl ctrl);
+	void SwitchWeaponServerRpc(ulong targetId, WeaponType weaponType);
 }
 
 //Todo we can split Get Interface , Set Interface and Battle API Interface if IBattleCtrl is to large.
@@ -91,6 +93,17 @@ public class DemoBattleCtrl : IBattleCtrl{
 		var playerCtrl = targetPlayer.GetComponent<PlayerCtrl>();
 		playerCtrl.ForceToClientRpc(forceCenter);
 	}
+
+	public void SwitchWeaponServerRpc(ulong targetId, WeaponType weaponType){
+		var targetPlayer = GetCreatureList().Find(e => e.GetEntityID() == targetId);
+		if(!targetPlayer || !targetPlayer.IsSpawned){
+			return;
+		}
+
+		var playerCtrl = targetPlayer.GetComponent<PlayerCtrl>();
+		playerCtrl.SwitchWeaponClientRpc(weaponType);
+	}
+
 
 	public List<CreatureCtrl> GetCreatureList(){
 		return new List<CreatureCtrl>(_creatureList);

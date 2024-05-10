@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 3988412337280034915}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1343668340588651009}
@@ -116,8 +116,9 @@ GameObject:
   - component: {fileID: 1343668340588651009}
   - component: {fileID: 4734627881927365303}
   - component: {fileID: 4599233134440722547}
+  - component: {fileID: 402123059409103068}
   m_Layer: 0
-  m_Name: '[Main] Area'
+  m_Name: '[Main] weapon Area'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -186,3 +187,15 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &402123059409103068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5526041483157546065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3558510c495f4da18d1c68ff23f563e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
